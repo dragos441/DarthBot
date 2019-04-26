@@ -1,4 +1,4 @@
-package me.darth.bot.db;
+package me.darth.darthbot.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

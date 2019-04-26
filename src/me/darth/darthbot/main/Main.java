@@ -2,9 +2,9 @@ package me.darth.darthbot.main;
 
 import java.awt.Color;
 
-import me.darth.bot.db.*;
 import me.darth.darthbot.commands.*;
-import me.darth.bot.testserver.*;
+import me.darth.darthbot.db.*;
+import me.darth.darthbot.testserver.*;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;

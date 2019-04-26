@@ -1,4 +1,4 @@
-package me.darth.bot.testserver;
+package me.darth.darthbot.testserver;
 
 import java.util.concurrent.TimeUnit;
 

@@ -1,4 +1,4 @@
-package me.darth.bot.db;
+package me.darth.darthbot.db;
 
 import java.awt.Color;
 import java.sql.Connection;
