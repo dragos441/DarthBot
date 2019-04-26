@@ -43,7 +43,7 @@ public class Whois extends ListenerAdapter {
 					}
 				}
 			} catch (ArrayIndexOutOfBoundsException e1) {target=e.getMember();}
-			EmbedBuilder eb = new EmbedBuilder();
+			EmbedBuilder eb = new EmbedBuilder(me.darth.darthbot.main.Main.affiliation(target));
 			eb.setColor(Color.BLUE);
 			eb.setAuthor("Information about "+target.getEffectiveName(),null,target.getUser().getAvatarUrl());
 			eb.addField("User", ""+target.getAsMention(), true);
@@ -83,7 +83,9 @@ public class Whois extends ListenerAdapter {
 			Collections.reverse(roles);
 			eb.addField("Roles ["+roles.size()+"]", ""+roles, true);
 			eb.setThumbnail(target.getUser().getAvatarUrl());
-			
+			if (target.getUser().getId().equals("569461469154902016")) {
+				eb.addField("Developed by", "**Darth#9386**", true);
+			}
 			List<Permission> permsRaw = target.getPermissions();
 			
 			List<String> perms = new ArrayList<String>();
@@ -106,17 +108,7 @@ public class Whois extends ListenerAdapter {
 				permsstring = permsstring+" , Kick Members, Ban Members";
 			}
 			eb.addField("Permissions ["+perms.size()+"]", ""+permsstring, true);
-			if (me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").isMember(target.getUser())) {
-				eb.setFooter(target.getUser().getName()+" is a Member of the DarthBot Discord!", "https://i.imgur.com/2Dm5fiE.png");
-				if (me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getMember(target.getUser()).getRoles()
-				.contains(me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getRoleById("569464005416976394"))) {
-					eb.setFooter(target.getUser().getName()+" is a Server Moderator on the DarthBot Discord!", "https://i.imgur.com/xSA1FBS.png");
-				}
-				if (me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getMember(target.getUser()).getRoles()
-				.contains(me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getRoleById("569463842552152094"))) {
-					eb.setFooter(target.getUser().getName()+" is a Developer of DarthBot!", "https://i.imgur.com/zDmrbWS.png");
-				}
-			}
+			
 			
 			eb.setTimestamp(Instant.from(ZonedDateTime.now()));
 			e.getChannel().sendMessage(eb.build()).queue();

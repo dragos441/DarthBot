@@ -72,12 +72,12 @@ public class Main {
 	public static EmbedBuilder affiliation(Member m) {
 		EmbedBuilder eb = new EmbedBuilder();
 		if (jda.getGuildById("568849490425937940").getMembers().contains(m)) {
-			eb.setFooter(m.getUser().getName()+" is a Member of the DarthBot Discord!", "https://cdn.onlinewebfonts.com/svg/img_288560.png");
+			eb.setFooter(m.getUser().getName()+" is a Member of the DarthBot Discord!", "https://i.imgur.com/OhUmIFC.png");
 			if (jda.getGuildById("568849490425937940").getMembersWithRoles(jda.getGuildById("568849490425937940").getRoleById("569464005416976394")).contains(m)) {
-				eb.setFooter(m.getUser().getName()+" is a Server Moderator on the DarthBot Discord!", "https://i.imgur.com/xSA1FBS.png");
+				eb.setFooter(m.getUser().getName()+" is a Server Moderator on the DarthBot Discord!", "https://i.imgur.com/P0Fkt4t.png");
 			}
-			if (m.getUser().getId().equals("159770472567799808")) {
-				eb.setFooter(m.getUser().getName()+" is a Developer of DarthBot!", "https://i.imgur.com/zDmrbWS.png");
+			if (jda.getGuildById("568849490425937940").getMembersWithRoles(jda.getGuildById("568849490425937940").getRoleById("569463842552152094")).contains(m)) {
+				eb.setFooter(m.getUser().getName()+" is a Developer of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
 			}
 		}
 		return eb;
