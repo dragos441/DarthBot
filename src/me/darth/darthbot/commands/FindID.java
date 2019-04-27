@@ -35,8 +35,7 @@ public class FindID extends ListenerAdapter {
 				} catch (IndexOutOfBoundsException e1) {
 					em = e.getMessage().getEmotes().get(0);
 				}
-				eb.setAuthor(e.getMember().getAsMention()
-				+ "\nInformation about :"+em.getName()+":", null, em.getImageUrl());
+				eb.setAuthor("Information about :"+em.getName()+":", null, em.getImageUrl());
 				eb.setDescription("**ID:** `"+em.getId()
 				+"`\n**As Mention:** `"+em.getAsMention()+"`");
 				e.getChannel().sendMessage(eb.build()).queue();
@@ -85,7 +84,7 @@ public class FindID extends ListenerAdapter {
 				try {
 					String f = args[1];
 				} catch (ArrayIndexOutOfBoundsException e1) {
-					e.getChannel().sendMessage(":no_entry: Invalid Syntax: `"+args[0]+" <Category/Emote/Member/Role/Text Channel/Voice Channel>`").queue();
+					e.getChannel().sendMessage(":no_entry: Invalid Syntax: `"+args[0]+" <Category/Custom Emote/Member/Role/Text Channel/Voice Channel>`").queue();
 					return;
 				}
 				e.getChannel().sendMessage(":no_entry: I couldn't find the ID for that! Make sure the spelling is correct, and no additional symbols are used!").queue();

@@ -43,6 +43,7 @@ public class Main {
 		jda.addEventListener(new ChangeLog());
 		jda.addEventListener(new Daily());
 		jda.addEventListener(new GuildJoin());
+		jda.addEventListener(new ServerLogs());
 		jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
 		
 		g = jda.getGuildById("568849490425937940");
@@ -71,15 +72,17 @@ public class Main {
 	
 	public static EmbedBuilder affiliation(Member m) {
 		EmbedBuilder eb = new EmbedBuilder();
-		if (jda.getGuildById("568849490425937940").getMembers().contains(m)) {
-			eb.setFooter(m.getUser().getName()+" is a Member of the DarthBot Discord!", "https://i.imgur.com/OhUmIFC.png");
-			if (jda.getGuildById("568849490425937940").getMembersWithRoles(jda.getGuildById("568849490425937940").getRoleById("569464005416976394")).contains(m)) {
-				eb.setFooter(m.getUser().getName()+" is a Server Moderator on the DarthBot Discord!", "https://i.imgur.com/P0Fkt4t.png");
+		try {
+			if (jda.getGuildById("568849490425937940").isMember(m.getUser())) {
+				eb.setFooter(m.getUser().getName()+" is a Member of the DarthBot Discord!", "https://i.imgur.com/OhUmIFC.png");
+				if (jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("569464005416976394"))) {
+					eb.setFooter(m.getUser().getName()+" is a Server Moderator on the DarthBot Discord!", "https://i.imgur.com/P0Fkt4t.png");
+				}
+				if (jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("569463842552152094"))) {
+					eb.setFooter(m.getUser().getName()+" is a Developer of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
+				}
 			}
-			if (jda.getGuildById("568849490425937940").getMembersWithRoles(jda.getGuildById("568849490425937940").getRoleById("569463842552152094")).contains(m)) {
-				eb.setFooter(m.getUser().getName()+" is a Developer of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
-			}
-		}
+		} catch (NullPointerException e1) {}
 		return eb;
 	}
 }
