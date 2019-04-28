@@ -7,6 +7,8 @@ import net.dv8tion.jda.core.entities.Guild;
 
 public class MusicPlayer {
 
+	int volume = 20;
+	
 	private final AudioPlayer audioPlayer;
 	private final AudioListener listener;
 	private final Guild guild;
@@ -16,6 +18,7 @@ public class MusicPlayer {
 		this.guild = guild;
 		listener = new AudioListener(this);
 		audioPlayer.addListener(listener);
+		audioPlayer.setVolume(volume);
 	}
 	
 	public AudioPlayer getAudioPlayer() {

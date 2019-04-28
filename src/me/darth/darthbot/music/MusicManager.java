@@ -1,5 +1,6 @@
 package me.darth.darthbot.music;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -31,42 +33,47 @@ public class MusicManager {
 	}
 	
 	public void loadTrack(final TextChannel channel, final String source){
-		Message msg = channel.sendMessage("`STATUS` Joining Channel & Configuring...").complete();
+		EmbedBuilder eb = new EmbedBuilder().setAuthor("Music", null, me.darth.darthbot.main.Main.g.getIconUrl()).setColor(Color.red);
+		eb.setDescription("Joining Channel & Configuring");
+		Message msg = channel.sendMessage(eb.build()).complete();
 		MusicPlayer player = getPlayer(channel.getGuild());
-		
 		channel.getGuild().getAudioManager().setSendingHandler(player.getAudioHandler());
-		
 		manager.loadItemOrdered(player, source, new AudioLoadResultHandler(){
 			
 			@Override
 			public void trackLoaded(AudioTrack track) {
-				msg.editMessage("Added track to the queue..."+track.getInfo().title+".").queue();
+				eb.setColor(Color.green);
+				eb.setDescription("Added track **"+track.getInfo().title+"** to the queue!");
 				player.playTrack(track);
+				msg.editMessage(eb.build()).queue();
 			}
 			
 			@Override
 			public void playlistLoaded(AudioPlaylist playlist) {
-				StringBuilder builder = new StringBuilder();
-				builder.append("Added all songs from **").append(playlist.getName()).append("** to the song queue:\n");
+				eb.setColor(Color.green);
+				eb.setDescription("Added all songs from **"+playlist.getName()+"** to the queue:\n");
 				
 				for(int i = 0; i < playlist.getTracks().size(); i++){
 					AudioTrack track = playlist.getTracks().get(i);
-					builder.append("\n>  **#"+player.getListener().getTrackSize()+"**").append(track.getInfo().title);
+					long t = track.getDuration() / 1000;
+					eb.addField("#"+player.getListener().getTrackSize()+" - "+track.getInfo().title, track.getInfo().uri+" `"+t+"s`", false);
 					player.playTrack(track);
 				}
 				
-				msg.editMessage(builder.toString()).queue();
+				msg.editMessage(eb.build()).queue();
 			}
 			
 			
 			@Override
 			public void noMatches() {
-				msg.editMessage("That is not a valid YouTube URL!").queue();
+				eb.setDescription("That is not a valid URL!");
+				msg.editMessage(eb.build()).queue();
 			}
 
 			@Override
 			public void loadFailed(FriendlyException exception) {
-				msg.editMessage("Unable to play the track: (" + exception.getMessage()+")").queue();
+				eb.setDescription("Unable to play the track: (" + exception.getMessage()+")");
+				msg.editMessage(eb.build()).queue();
 			}
 		});
 	}

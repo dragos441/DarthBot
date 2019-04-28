@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONPointer;
@@ -40,6 +41,22 @@ public class ReportBug extends ListenerAdapter {
 			URL url;
 			String desc = null;
 			String[] cardsplit = null;
+			EmbedBuilder dupes = new EmbedBuilder().setAuthor("Possible Duplicates Found", null, e.getGuild().getIconUrl());
+			dupes.setDescription("Please check that the below cards aren't a duplicate of what you're submitting. If none of them are, **react with a :white_check_mark:"
+					+ "to your message above to submit it!**");
+			TreeMap<Integer, String> map = me.darth.darthbot.commands.search.searchTrello(args);
+			while(!map.isEmpty()) {
+				if (map.firstKey() >= (args.length / 2) - 1) {
+					float acc = map.firstKey() * 100 / (args.length - 1);
+					dupes.addField("Accuracy: "+acc+"%", map.firstEntry().getValue(), false);
+				}
+				map.remove(map.firstKey());
+			}
+			if (dupes.getFields().size() > 0) {
+				e.getChannel().sendMessage(e.getMember().getAsMention()).embed(dupes.build()).queue();
+				e.getMessage().addReaction("✅").queue();
+				return;
+			}
 			try {
 				cardsplit = e.getMessage().getContentRaw().replace(args[0], "").split(" - ");
 				try {

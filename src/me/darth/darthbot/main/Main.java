@@ -55,7 +55,7 @@ public class Main {
 		jda.addEventListener(new GuildJoin());
 		jda.addEventListener(new ServerLogs());
 		jda.addEventListener(new MusicCommand());
-		
+		jda.addEventListener(new search());
 		jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
 		g = jda.getGuildById("568849490425937940");
 	}

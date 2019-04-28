@@ -13,6 +13,11 @@
     <artifactId>lavaplayer</artifactId>
     <version>1.3.17</version>
   </dependency>
+  <dependency>
+  <groupId>com.taskadapter</groupId>
+  <artifactId>trello-java-wrapper</artifactId>
+  <version>0.13</version>
+</dependency>
 </dependencies>
   <modelVersion>4.0.0</modelVersion>
   <groupId>DarthBot</groupId>
