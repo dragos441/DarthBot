@@ -2,8 +2,18 @@ package me.darth.darthbot.main;
 
 import java.awt.Color;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+
 import me.darth.darthbot.commands.*;
 import me.darth.darthbot.db.*;
+import me.darth.darthbot.music.*;
 import me.darth.darthbot.testserver.*;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -44,8 +54,9 @@ public class Main {
 		jda.addEventListener(new Daily());
 		jda.addEventListener(new GuildJoin());
 		jda.addEventListener(new ServerLogs());
-		jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
+		jda.addEventListener(new MusicCommand());
 		
+		jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
 		g = jda.getGuildById("568849490425937940");
 	}
 	
