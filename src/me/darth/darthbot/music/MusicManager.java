@@ -62,10 +62,8 @@ public class MusicManager {
 			public void playlistLoaded(AudioPlaylist playlist) {
 				eb.setColor(Color.green);
 				eb.setDescription("Added songs from **"+playlist.getName()+"** to the queue:\n");
-				
 				int i = 0;
 				for(i = 0; i < playlist.getTracks().size(); i++){
-					ArrayList<AudioTrack> list = new ArrayList(manager.getPlayer(e.getGuild()).getListener().getTracks());
 					AudioTrack track = playlist.getTracks().get(i);
 					long s = track.getDuration() / 1000;
 					int m = 0;
@@ -79,6 +77,7 @@ public class MusicManager {
 					if (i < 20) {
 						eb.addField("#"+player.getListener().getTrackSize()+" - "+track.getInfo().title, track.getInfo().uri+" `"+m+":"+s+"`", false);
 					}
+					player.playTrack(track);
 				}
 				if (i > 20) {
 					int total = i - 20;
