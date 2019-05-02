@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,9 +16,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.julienvey.trello.Trello;
 import com.julienvey.trello.domain.Card;
 import com.julienvey.trello.impl.TrelloImpl;
@@ -27,21 +25,28 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class search extends ListenerAdapter {
+public class SearchTrello extends ListenerAdapter {
 
 	public static TreeMap<Integer, String> searchTrello(String[] args) {
 		Trello trello = new TrelloImpl("68203d3c0219e66cb264d77cad3031de", "6be68efc8c4017ca24c55ce3ccca7fff22d12d1a24406138dd17045139a0a25a", new ApacheHttpClient());
 		List<Card> cards = trello.getBoardCards("5cbc6c2d584c75132d2d08cb");
 		TreeMap<Integer, String> map = new TreeMap<>(Collections.reverseOrder());
-		for (int x = 0 ; x < cards.size() ; x++) {
+		ArrayList<Integer> added = new ArrayList<Integer>();
+		for (int x = 0 ; x < cards.size() && added.size() <= 10 ; x++) {
 			int accuracy = 0;
 			Card c = cards.get(x);
 			for (int i = 1 ; i < args.length ; i++) {
 				if (c.getName().toLowerCase().contains(args[i].toLowerCase())) {
 					accuracy=accuracy+1;
+					
 				}
 			}
+			accuracy=accuracy * 100 / (args.length - 1);
 			if (accuracy > 0) {
+				while (added.contains(accuracy)) {
+					accuracy=accuracy-1;
+				}
+				added.add(accuracy);
 				map.put(accuracy, "**"+c.getName()+"** ("+c.getShortUrl()+")");
 			}
 			
@@ -59,7 +64,7 @@ public class search extends ListenerAdapter {
 			int x = 0;
 			TreeMap<Integer, String> smap = map;
 			while (!map.isEmpty() && x < 5) {
-				eb.addField("Accuracy: "+map.firstKey(), map.firstEntry().getValue(), false);
+				eb.addField("Accuracy: "+map.firstKey()+"%", map.firstEntry().getValue(), false);
 				map.remove(map.firstKey());
 			}
 			e.getChannel().sendMessage(smap+"").embed(eb.build()).queue();

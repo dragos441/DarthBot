@@ -15,21 +15,61 @@ import java.util.Date;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import org.json.JSONPointer;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.julienvey.trello.Trello;
+import com.julienvey.trello.domain.Card;
+import com.julienvey.trello.impl.TrelloImpl;
+import com.julienvey.trello.impl.http.ApacheHttpClient;
 
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class ReportBug extends ListenerAdapter {
 
+	public static void makeCard(String[] args, Message msg, User author, TextChannel chnl, Boolean bug) {
+		String [] cardsplit = msg.getContentRaw().replace(args[0], "").split(" - ");
+		String desc = null;
+		try {
+			desc = cardsplit[1];
+		} catch (ArrayIndexOutOfBoundsException e1) {
+			desc = "No Description Set";
+		}
+		Trello trello = new TrelloImpl("68203d3c0219e66cb264d77cad3031de", "6be68efc8c4017ca24c55ce3ccca7fff22d12d1a24406138dd17045139a0a25a", new ApacheHttpClient());
+		Card c = new Card();
+		if (bug) {
+			c.setName("[BUG]"+cardsplit[0]);
+			c.setDesc("**Bug:**"+cardsplit[0]
+					+ "\n**Details:** "+desc
+					+ "\n\n---\n\n"
+					+ "> Reported by `"+author.getName()+"#"+author.getDiscriminator()+"`"
+					+ "\n> Reporter ID: `"+author.getId()+"`");
+			c = trello.createCard("5cbc6c61a0685f1423e3055d", c);
+		} else {
+			c.setName(cardsplit[0]);
+			c.setDesc("**Suggestion:** "+cardsplit[0]
+					+ "\n**Details:** "+desc
+					+ "\n\n---\n\n"
+					+ "> Submitted by `"+author.getName()+"#"+author.getDiscriminator()+"`"
+					+ "\n> Submitter ID: `"+author.getId()+"`");
+			c = trello.createCard("5cbc6c5a24c96885903fde3e", c);
+		}
+		EmbedBuilder eb = new EmbedBuilder();
+		eb.setAuthor("Successfully submitted to Trello!", c.getShortUrl(), "https://cdn3.iconfinder.com/data/icons/budicon-chroma-communication/24/email-forward-512.png");
+		eb.addField("Submission", cardsplit[0], true);
+		eb.addField("Description", desc, true);
+		eb.addField("Submitted by", author.getName()+"#"+author.getDiscriminator(), true);
+		eb.addField("Full Card URL", c.getUrl(), true);
+		eb.setDescription("**"+cardsplit[0]+"** has been successfully forwarded to Trello. View your card here: "+c.getShortUrl());
+		eb.setColor(Color.blue);
+		chnl.sendMessage(eb.build()).queue();
+	}
+	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!bug") || args[0].equalsIgnoreCase("!reportbug")) {
 			try {
@@ -44,10 +84,10 @@ public class ReportBug extends ListenerAdapter {
 			EmbedBuilder dupes = new EmbedBuilder().setAuthor("Possible Duplicates Found", null, e.getGuild().getIconUrl());
 			dupes.setDescription("Please check that the below cards aren't a duplicate of what you're submitting. If none of them are, **react with a :white_check_mark:"
 					+ "to your message above to submit it!**");
-			TreeMap<Integer, String> map = me.darth.darthbot.commands.search.searchTrello(args);
+			TreeMap<Integer, String> map = me.darth.darthbot.commands.SearchTrello.searchTrello(args);
 			while(!map.isEmpty()) {
-				if (map.firstKey() >= (args.length / 2) - 1) {
-					float acc = map.firstKey() * 100 / (args.length - 1);
+				float acc = map.firstKey();
+				if (acc > 50) {
 					dupes.addField("Accuracy: "+acc+"%", map.firstEntry().getValue(), false);
 				}
 				map.remove(map.firstKey());
@@ -57,52 +97,21 @@ public class ReportBug extends ListenerAdapter {
 				e.getMessage().addReaction("✅").queue();
 				return;
 			}
-			try {
-				cardsplit = e.getMessage().getContentRaw().replace(args[0], "").split(" - ");
-				try {
-					desc = cardsplit[1];
-				} catch (ArrayIndexOutOfBoundsException e1) {
-					desc = "No Description Set";
-				}
-				String cardname = URLEncoder.encode("[BUG] "+cardsplit[0]);
-				String carddesc = URLEncoder.encode("**Bug:** "+cardsplit[0]
-						+ "\n**Details:** "+desc
-						+ "\n\n---\n\n"
-						+ "> Reported by `"+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+"`"
-						+ "\n> Reporter ID: `"+e.getAuthor().getId()+"`");
-				Date d = new Date();
-				int y = d.getYear() + 1900;
-				url = new URL("https://api.trello.com/1/cards?name="+cardname+"&desc="+carddesc+"&idList=5cbc6c61a0685f1423e3055d"
-						+ "&keepFromSource=all"
-						+ "&key=68203d3c0219e66cb264d77cad3031de"
-						+ "&token=6be68efc8c4017ca24c55ce3ccca7fff22d12d1a24406138dd17045139a0a25a");
-			} catch (MalformedURLException e3) {return;}
-			HttpURLConnection con = null;
-			try {
-				con = (HttpURLConnection) url.openConnection();
-				con.setRequestMethod("POST");
-				JsonParser jp = new JsonParser();
-				JsonElement root = jp.parse(new InputStreamReader((InputStream) con.getContent()));
-				JsonObject rootobj = root.getAsJsonObject();
-				System.out.println(rootobj);
-				
-				
-				EmbedBuilder eb = new EmbedBuilder();
-				eb.setAuthor("Bug Successfully Reported!", rootobj.get("shortUrl").getAsString(), "https://i.imgur.com/vEFegXx.png");
-				eb.addField("Bug", cardsplit[0], true);
-				eb.addField("Description", desc, true);
-				eb.addField("Reported by", e.getMember().getAsMention()+" *"+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+"*", true);
-				eb.addField("URL", rootobj.get("shortUrl").getAsString(), true);
-				eb.setColor(Color.blue);
-				e.getChannel().sendMessage(eb.build()).queue();
-			    
-			} catch (MalformedURLException e1) {
-				e1.printStackTrace();
-			} catch (IOException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
+			makeCard(args, e.getMessage(), e.getAuthor(), e.getChannel(), true);
+		}
+	}
+	
+	@Override
+	public void onMessageReactionAdd(MessageReactionAddEvent e) {
+		Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
+		if (msg.getContentRaw().split(" ")[0].equalsIgnoreCase("!reportbug") && e.getReactionEmote().getName().equals("✅")
+				|| msg.getContentRaw().split(" ")[0].equalsIgnoreCase("!bug") && e.getReactionEmote().getName().equals("✅")) { 
+			if (!e.getMember().equals(msg.getMember()) && !e.getMember().getUser().equals(e.getJDA().getSelfUser())) {
+				e.getTextChannel().removeReactionById(e.getMessageId(), "✅", e.getMember().getUser()).queue();
+				return;
+			} else if (e.getMember().equals(msg.getMember())) {
+				makeCard(msg.getContentRaw().split(" "), msg, msg.getAuthor(), e.getTextChannel(), true);
 			}
-			
 		}
 	}
 }

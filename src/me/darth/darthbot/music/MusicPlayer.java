@@ -38,7 +38,11 @@ public class MusicPlayer {
 	}
 	
 	public synchronized void playTrack(AudioTrack track){
-		listener.queue(track);
+		if (track != null) {
+			listener.queue(track);
+		} else {
+			me.darth.darthbot.main.Main.g.getAudioManager().closeAudioConnection();
+		}
 	}
 	
 	public synchronized void skipTrack(){

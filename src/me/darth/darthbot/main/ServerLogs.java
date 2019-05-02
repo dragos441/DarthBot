@@ -107,11 +107,10 @@ public class ServerLogs extends ListenerAdapter {
 		        		eb.setDescription("**Message:** "+Content);
 		        		eb.setFooter("Message ID: "+MessageID, null);
 		        		eb.setTimestamp(Instant.ofEpochMilli(Timestamp));
-		        		e.getChannel().sendMessage(eb.build()).queue();
 		        		ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 		        		while (g.next()) {
 		        			long GuildID = g.getLong("GuildID");
-		        			if (GuildID == e.getGuild().getIdLong()) {
+		        			if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 		        				long logchannel = g.getLong("LogChannel");
 		        				e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 		        			}
@@ -159,6 +158,7 @@ public class ServerLogs extends ListenerAdapter {
 		String msg1 = null;
 		String msg2 = null;
 		boolean send = false;
+		boolean pin = false;
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 		      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM messageLog");
 		      while (rs.next())
@@ -174,9 +174,20 @@ public class ServerLogs extends ListenerAdapter {
 		        		send=true;
 		        		msg2=msg1;
 		        		msg1=Content;
-		        		eb.setAuthor("Message by "+e.getGuild().getMemberById(AuthorID).getEffectiveName()+" edited in #"
-		        		+e.getGuild().getTextChannelById(ChannelID).getName(), null, 
-		        			e.getGuild().getMemberById(AuthorID).getUser().getAvatarUrl());
+		        		if (msg1.equals(msg2)) {
+		        			pin=true;
+		        			String pinned = "pinned";
+		        			if (!e.getMessage().isPinned()) {
+		        				pinned="unpinned";
+		        			}
+		        			eb.setAuthor("Message by "+e.getGuild().getMemberById(AuthorID).getEffectiveName()+" "+pinned+" in #"
+		    		        		+e.getGuild().getTextChannelById(ChannelID).getName(), null, 
+		    		        			e.getGuild().getMemberById(AuthorID).getUser().getAvatarUrl());
+		        		} else {
+			        		eb.setAuthor("Message by "+e.getGuild().getMemberById(AuthorID).getEffectiveName()+" edited in #"
+			        		+e.getGuild().getTextChannelById(ChannelID).getName(), null, 
+			        			e.getGuild().getMemberById(AuthorID).getUser().getAvatarUrl());
+		        		}
 		        		eb.setFooter("Message ID: "+MessageID, null);
 		        		eb.setTimestamp(Instant.ofEpochMilli(Timestamp));
 		        	}
@@ -185,12 +196,16 @@ public class ServerLogs extends ListenerAdapter {
 		      }
 		
 		      if (send) {
-	        	eb.addField("Old Message", "**Message:** "+msg2, true);
-	        	eb.addField("New Message", "**Message:** "+msg1, true);
+		    	if (!pin) {
+		        	eb.addField("Old Message", "**Message:** "+msg2, true);
+		        	eb.addField("New Message", "**Message:** "+msg1, true);
+		    	} else {
+		    		eb.addField("Message", "**Message:** "+msg1, true);
+		    	}
 	        	ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
         		while (g.next()) {
         			long GuildID = g.getLong("GuildID");
-        			if (GuildID == e.getGuild().getIdLong()) {
+        			if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
         				long logchannel = g.getLong("LogChannel");
         				e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
         			}
@@ -231,7 +246,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -254,7 +269,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -277,7 +292,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -300,7 +315,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -323,7 +338,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -346,7 +361,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -369,7 +384,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -392,7 +407,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -414,7 +429,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -436,7 +451,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -458,7 +473,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -478,7 +493,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -499,7 +514,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -520,7 +535,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -541,7 +556,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -562,7 +577,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -583,7 +598,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -604,7 +619,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -627,7 +642,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -650,7 +665,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -674,7 +689,7 @@ public class ServerLogs extends ListenerAdapter {
 				ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 				while (g.next()) {
 					long GuildID = g.getLong("GuildID");
-					if (GuildID == e.getGuild().getIdLong()) {
+					if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 						long logchannel = g.getLong("LogChannel");
 						e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 					}
@@ -696,7 +711,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -717,7 +732,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -740,7 +755,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -761,7 +776,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -782,7 +797,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -805,7 +820,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -833,7 +848,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -856,7 +871,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}
@@ -879,7 +894,7 @@ public class ServerLogs extends ListenerAdapter {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (g.next()) {
 				long GuildID = g.getLong("GuildID");
-				if (GuildID == e.getGuild().getIdLong()) {
+				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
 					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
 				}

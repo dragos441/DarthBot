@@ -55,7 +55,8 @@ public class Main {
 		jda.addEventListener(new GuildJoin());
 		jda.addEventListener(new ServerLogs());
 		jda.addEventListener(new MusicCommand());
-		jda.addEventListener(new search());
+		jda.addEventListener(new SearchTrello());
+		jda.addEventListener(new Discord());
 		jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
 		g = jda.getGuildById("568849490425937940");
 	}
@@ -90,7 +91,7 @@ public class Main {
 					eb.setFooter(m.getUser().getName()+" is a Server Moderator on the DarthBot Discord!", "https://i.imgur.com/P0Fkt4t.png");
 				}
 				if (jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("569463842552152094"))) {
-					eb.setFooter(m.getUser().getName()+" is a Developer of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
+					eb.setFooter(m.getUser().getName()+" is the Developer of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
 				}
 			}
 		} catch (NullPointerException e1) {}
