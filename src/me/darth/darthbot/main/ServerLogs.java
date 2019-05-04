@@ -136,14 +136,15 @@ public class ServerLogs extends ListenerAdapter {
 		}
 		if (e.getMessage().getContentRaw() != null && e.getMessage().getContentRaw() != "" && !e.getAuthor().isBot()) {
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
-				String query1 = " INSERT INTO messageLog (Timestamp, MessageID, AuthorID, ChannelID, Content)"
-				        + " values (?, ?, ?, ?, ?)";
+				String query1 = " INSERT INTO messageLog (GuildID, Timestamp, MessageID, AuthorID, ChannelID, Content)"
+				        + " values (?, ?, ?, ?, ?, ?)";
 				java.sql.PreparedStatement s1 = con.prepareStatement(query1);
-				s1.setLong(1, System.currentTimeMillis());
-				s1.setLong(2, e.getMessageIdLong());
-				s1.setLong(3, e.getAuthor().getIdLong());
-				s1.setLong(4, e.getChannel().getIdLong());
-				s1.setString(5, e.getMessage().getContentRaw());
+				s1.setLong(1, e.getGuild().getIdLong());
+				s1.setLong(2, System.currentTimeMillis());
+				s1.setLong(3, e.getMessageIdLong());
+				s1.setLong(4, e.getAuthor().getIdLong());
+				s1.setLong(5, e.getChannel().getIdLong());
+				s1.setString(6, e.getMessage().getContentRaw());
 				s1.execute();
 				con.close();
 			} catch (SQLException e1) {

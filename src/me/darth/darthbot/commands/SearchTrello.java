@@ -28,10 +28,11 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 public class SearchTrello extends ListenerAdapter {
 
 	public static TreeMap<Integer, String> searchTrello(String[] args) {
-		Trello trello = new TrelloImpl("68203d3c0219e66cb264d77cad3031de", "6be68efc8c4017ca24c55ce3ccca7fff22d12d1a24406138dd17045139a0a25a", new ApacheHttpClient());
+		Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
 		List<Card> cards = trello.getBoardCards("5cbc6c2d584c75132d2d08cb");
 		TreeMap<Integer, String> map = new TreeMap<>(Collections.reverseOrder());
 		ArrayList<Integer> added = new ArrayList<Integer>();
+		
 		for (int x = 0 ; x < cards.size() && added.size() <= 10 ; x++) {
 			int accuracy = 0;
 			Card c = cards.get(x);

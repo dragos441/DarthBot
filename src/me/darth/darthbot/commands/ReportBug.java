@@ -38,7 +38,7 @@ public class ReportBug extends ListenerAdapter {
 		} catch (ArrayIndexOutOfBoundsException e1) {
 			desc = "No Description Set";
 		}
-		Trello trello = new TrelloImpl("68203d3c0219e66cb264d77cad3031de", "6be68efc8c4017ca24c55ce3ccca7fff22d12d1a24406138dd17045139a0a25a", new ApacheHttpClient());
+		Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
 		Card c = new Card();
 		if (bug) {
 			c.setName("[BUG]"+cardsplit[0]);

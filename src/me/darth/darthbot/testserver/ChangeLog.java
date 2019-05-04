@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class ChangeLog  extends ListenerAdapter {
+public class ChangeLog extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {

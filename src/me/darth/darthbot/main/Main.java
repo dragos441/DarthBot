@@ -58,6 +58,8 @@ public class Main {
 		jda.addEventListener(new SearchTrello());
 		jda.addEventListener(new Discord());
 		jda.addEventListener(new WelcomeMessages());
+		jda.addEventListener(new FAQ());
+		jda.addEventListener(new Vote());
 		jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
 		g = jda.getGuildById("568849490425937940");
 	}

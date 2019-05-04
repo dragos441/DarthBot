@@ -84,7 +84,7 @@ public class ProfileGen extends ListenerAdapter {
 		      }
 		      if (!found) {
 		    	  	con.prepareStatement("INSERT INTO profiles (UserID, Name, DBux)"
-					        + " values ('"+e.getAuthor().getIdLong()+"', '"+e.getMember().getEffectiveName()+"', '0');").execute();
+					        + " values ('"+e.getAuthor().getIdLong()+"', '"+e.getMember().getEffectiveName()+"', '100000');").execute();
 		    	  	EmbedBuilder eb = new EmbedBuilder().setAuthor("Database - Account Generated", null, e.getMember().getUser().getEffectiveAvatarUrl())
 							.setDescription(e.getMember().getAsMention()+"'s profile was generated (Method 1)").setColor(Color.green)
 							.setFooter("User ID: "+e.getMember().getUser().getId(), null);
