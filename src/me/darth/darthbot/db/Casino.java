@@ -191,13 +191,13 @@ public class Casino extends ListenerAdapter {
     			eb.addField("Bot's Roll", "*Waiting...*", false);
     			Message msg = e.getChannel().sendMessage(eb.build()).complete();
     			eb.clearFields();
-    			int usernum = new Random().nextInt(11);	
+    			int botnum = new Random().nextInt(12);
+    			int usernum = new Random().nextInt(12);	
     			usernum++;
+    			botnum++;
     			eb.addField("Your Roll", "`"+usernum+"`", false);
     			eb.addField("Bot's Roll", "*Rolling...*", false);
     			msg.editMessage(eb.build()).queueAfter(1, TimeUnit.SECONDS);
-    			int botnum = new Random().nextInt(12);
-    			botnum++;
     			/*if (bux > 10000 && botnum != 12) {
     				botnum=botnum+1;
     			}*/
