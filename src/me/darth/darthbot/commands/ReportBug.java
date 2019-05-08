@@ -7,16 +7,22 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.julienvey.trello.Trello;
 import com.julienvey.trello.domain.Card;
+import com.julienvey.trello.domain.TList;
 import com.julienvey.trello.impl.TrelloImpl;
 import com.julienvey.trello.impl.http.ApacheHttpClient;
 
@@ -29,9 +35,9 @@ import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class ReportBug extends ListenerAdapter {
-
+	
 	public static void makeCard(String[] args, Message msg, User author, TextChannel chnl, Boolean bug) {
-		String [] cardsplit = msg.getContentRaw().replace(args[0], "").split(" - ");
+		String [] cardsplit = msg.getContentStripped().replace(args[0], "").split(" - ");
 		String desc = null;
 		try {
 			desc = cardsplit[1];
@@ -54,15 +60,16 @@ public class ReportBug extends ListenerAdapter {
 					+ "\n**Details:** "+desc
 					+ "\n\n---\n\n"
 					+ "> Submitted by `"+author.getName()+"#"+author.getDiscriminator()+"`"
-					+ "\n> Submitter ID: `"+author.getId()+"`");
-			c = trello.createCard("5cbc6c5a24c96885903fde3e", c);
+					+ "\n> Submitter ID: `"+author.getId()+"`\n\n---\n\nVotes: ,");
+			c.setPos(-9999);;
+			Card nc = trello.createCard("5cbc6c5a24c96885903fde3e", c);
+			me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getTextChannelById("575440909018202136").sendMessage("**NEW SUGGESTION:** "+nc.getShortUrl()).complete().delete().queueAfter(15, TimeUnit.SECONDS);
 		}
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setAuthor("Successfully submitted to Trello!", c.getShortUrl(), "https://cdn3.iconfinder.com/data/icons/budicon-chroma-communication/24/email-forward-512.png");
 		eb.addField("Submission", cardsplit[0], true);
 		eb.addField("Description", desc, true);
 		eb.addField("Submitted by", author.getName()+"#"+author.getDiscriminator(), true);
-		eb.addField("Full Card URL", c.getUrl(), true);
 		eb.setDescription("**"+cardsplit[0]+"** has been successfully forwarded to Trello. View your card here: "+c.getShortUrl());
 		eb.setColor(Color.blue);
 		chnl.sendMessage(eb.build()).queue();

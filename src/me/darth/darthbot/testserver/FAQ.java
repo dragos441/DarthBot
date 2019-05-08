@@ -17,7 +17,7 @@ public class FAQ extends ListenerAdapter {
 	
 		if (e.getChannel().equals(me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getTextChannelById("574246600570830853")) && !e.getAuthor().isBot()) {
 			EmbedBuilder eb = new EmbedBuilder().setAuthor("Asked by "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator(), null, e.getAuthor().getEffectiveAvatarUrl())
-				.addField("Question", e.getMessage().getContentDisplay(), false).setColor(Color.orange);
+				.addField("Question", e.getMessage().getContentDisplay(), false).setColor(Color.orange).setFooter(e.getMember().getUser().getId(), null);
 			Message msg = e.getGuild().getTextChannelById("574250427462320168").sendMessage("`Command incoming!`").embed(eb.build()).complete();
 			msg.editMessage("!r "+msg.getId()).queue();
 			e.getGuild().getTextChannelById("574250427462320168").sendMessage("<@&569463842552152094> (New Question)").complete().delete().queueAfter(10, TimeUnit.SECONDS);
@@ -33,6 +33,8 @@ public class FAQ extends ListenerAdapter {
 			EmbedBuilder eb = new EmbedBuilder().setAuthor(msg.getAuthor().getName(), null, msg.getAuthor().getIconUrl()).addField("Question: "+msg.getFields().get(0).getValue(), 
 				e.getMessage().getContentRaw().replace(args[0]+" ", "").replace(args[1]+" ", ""), false).setColor(Color.green);
 			e.getGuild().getTextChannelById("574246600570830853").sendMessage(eb.build()).queue();
+			e.getGuild().getTextChannelById("574246600570830853").sendMessage(e.getGuild().getMemberById(msg.getFooter().getText()).getAsMention()+" - Your question has been"
+					+ " answered!").complete().delete().queueAfter(30, TimeUnit.SECONDS);
 			e.getChannel().sendMessage("`#574246600570830853` successfully answered").complete().delete().queueAfter(10, TimeUnit.SECONDS);
 			e.getChannel().getMessageById(args[1]).complete().delete().queue();
 			e.getMessage().delete().queue();

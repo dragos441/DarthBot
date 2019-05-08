@@ -61,6 +61,9 @@ public class Suggest extends ListenerAdapter {
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent e) {
 		Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
+		if (e.getUser().isBot()) {
+			return;
+		}
 		if (msg.getContentRaw().split(" ")[0].equalsIgnoreCase("!suggest") && e.getReactionEmote().getName().equals("✅")
 				|| msg.getContentRaw().split(" ")[0].equalsIgnoreCase("!suggestion") && e.getReactionEmote().getName().equals("✅")) { 
 			if (!e.getMember().equals(msg.getMember()) && !e.getMember().getUser().equals(e.getJDA().getSelfUser())) {

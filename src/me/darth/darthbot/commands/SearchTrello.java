@@ -29,10 +29,10 @@ public class SearchTrello extends ListenerAdapter {
 
 	public static TreeMap<Integer, String> searchTrello(String[] args) {
 		Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
-		List<Card> cards = trello.getBoardCards("5cbc6c2d584c75132d2d08cb");
+		trello.getBoardCards("EndaJ5Op");
 		TreeMap<Integer, String> map = new TreeMap<>(Collections.reverseOrder());
 		ArrayList<Integer> added = new ArrayList<Integer>();
-		
+		List<Card> cards = trello.getBoardCards("EndaJ5Op");
 		for (int x = 0 ; x < cards.size() && added.size() <= 10 ; x++) {
 			int accuracy = 0;
 			Card c = cards.get(x);

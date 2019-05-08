@@ -354,7 +354,11 @@ public class Casino extends ListenerAdapter {
 					if (eb.getFields().size() <= 2) {
 						return;
 					}
+					int start = Integer.parseInt(oldeb.getDescription().split("\n")[0].replace("*Starting Bet: $*", ""));
 					int cashout = Integer.parseInt(oldeb.getDescription().split("\n")[1].replace("**Cashout Prize: $**", ""));
+					if (eb.getFields().size() >= 6) {
+						cashout = cashout + Math.abs(start / 2);
+					}
 					if (cashout > 300 && eb.getFields().size() <= 4) {
 						e.getChannel().sendMessage("You must have 3+ guesses to cash out prizes over $300!").queue();
 						return;
