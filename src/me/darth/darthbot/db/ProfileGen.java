@@ -28,7 +28,7 @@ public class ProfileGen extends ListenerAdapter {
 				List<Member> members = e.getGuild().getMembers();
 				for(int x = 0 ; x < members.size() ; x++) {
 					Member m = members.get(x);
-					String query = " INSERT INTO profiles (UserID, Name, Messages, RetaliBux)"
+					String query = " INSERT INTO profiles (UserID, Name, GuildProfiles, RetaliBux)"
 					        + " values (?, ?, ?, ?)";
 		    	  	java.sql.PreparedStatement s = con.prepareStatement(query);
 					s.setLong(1, m.getUser().getIdLong());
@@ -54,7 +54,7 @@ public class ProfileGen extends ListenerAdapter {
 		}
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 
-			ResultSet guild = con.createStatement().executeQuery("SELECT * FROM Messages");
+			ResultSet guild = con.createStatement().executeQuery("SELECT * FROM GuildProfiles");
 			long GuildID = -1;
 		      boolean found = false;
 		      while (guild.next())
@@ -66,8 +66,8 @@ public class ProfileGen extends ListenerAdapter {
 		        }
 		      }
 		      if (!found) {
-		    	  con.prepareStatement("INSERT INTO Messages (GuildID, UserID, Messages)"
-					        + " values ('"+e.getGuild().getIdLong()+"', '"+e.getMember().getUser().getIdLong()+"', '0');").execute();
+		    	  con.prepareStatement("INSERT INTO GuildProfiles (GuildID, UserID)"
+					        + " values ('"+e.getGuild().getIdLong()+"', '"+e.getMember().getUser().getIdLong()+"');").execute();
 		    	  	EmbedBuilder eb = new EmbedBuilder().setAuthor("Database - Message Account Generated", null, e.getMember().getUser().getEffectiveAvatarUrl())
 							.setDescription(e.getMember().getAsMention()+"'s profile was generated").setColor(Color.green)
 							.setFooter("Guild ID: "+e.getGuild().getId()+" ("+e.getGuild().getName()+")", null);

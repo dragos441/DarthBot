@@ -46,13 +46,17 @@ public class ViewProfile extends ListenerAdapter {
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 
 				long Messages = 0L;
-				ResultSet msgs = con.createStatement().executeQuery("SELECT * FROM Messages");
+				long xp = 0L;
+				int level = 0;
+				ResultSet msgs = con.createStatement().executeQuery("SELECT * FROM GuildProfiles");
 			      while (msgs.next()) {
 				      long UserID = msgs.getLong("UserID");
 				      long GuildID = msgs.getLong("GuildID");
-				      long rsmsg = msgs.getLong("Messages");
+				      long rsxp = msgs.getLong("xp");
+				      int rslevel = msgs.getInt("Level");
 				      if (UserID == target.getUser().getIdLong() && GuildID == e.getGuild().getIdLong()) {
-				    	  Messages = rsmsg;
+				    	  xp = rsxp;
+				    	  level = rslevel;
 				      }
 			      }
 				
@@ -91,10 +95,9 @@ public class ViewProfile extends ListenerAdapter {
 				    	  } else {
 				    		  eb.addField("DBux $$$", "**$"+DBux+"**", true);
 				    	  }
+				    	  int reqxp = (level + 1) * 100;
+				    	  eb.addField("Chat Level", "Level "+level+" *("+xp+"/"+reqxp+"*xp*)*", true);
 				    	  String month = new SimpleDateFormat("MMM").format(new Date().getTime());
-				    	  if (!target.getUser().isBot()) {
-				    		  eb.addField("Messages in "+month, Messages+"", true);
-				    	  }
 				    	  eb.addField("What can I use DBux for?", "```> Win big at the !casino\n\nComing soon:\n- Lottery\n- Work Jobs/Rob Others```", false);
 				    	  PreparedStatement st = con.prepareStatement("UPDATE profiles SET Name = ? WHERE UserID = "+target.getUser().getIdLong());
 				    	  st.setString(1, target.getEffectiveName());

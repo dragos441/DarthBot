@@ -1,6 +1,7 @@
 package me.darth.darthbot.testserver;
 
 import java.awt.Color;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -12,6 +13,9 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class FAQ extends ListenerAdapter {
 
+	static String fm = "**Have a question about DarthBot?** Type it in chat below, and it'll get answered soon by Darth.\n*Before you do though, please scroll up and make sure "
+			+ "your question hasn't already been answered ^^*";
+	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 	
@@ -38,6 +42,14 @@ public class FAQ extends ListenerAdapter {
 			e.getChannel().sendMessage("`#574246600570830853` successfully answered").complete().delete().queueAfter(10, TimeUnit.SECONDS);
 			e.getChannel().getMessageById(args[1]).complete().delete().queue();
 			e.getMessage().delete().queue();
+			
+			List<Message> messages = e.getGuild().getTextChannelById("574246600570830853").getHistory().retrievePast(5).complete();
+			for (int x = 0 ; x < messages.size() ; x++) {
+				if (messages.get(x).getContentRaw().equals(fm)) {
+					messages.get(x).delete().queue();
+				}
+			}
+			e.getGuild().getTextChannelById("574246600570830853").sendMessage(fm).queue();
 		}
 	}
 	

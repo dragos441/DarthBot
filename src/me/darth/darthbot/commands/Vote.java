@@ -46,6 +46,7 @@ import com.mysql.fabric.Response;
 
 import me.darth.darthbot.main.Main;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -333,18 +334,17 @@ public class Vote extends ListenerAdapter {
 			String link = null;
 			for (int x = 0 ; x < args.length ; x++) {
 				if (args[x].contains("trello.com")) {
-					link = args[x];
+					link = args[x].replace(",", "");
 				}
 			}
 			for (int x = 0 ; x < urlsplit.length ; x++) {
 				if (urlsplit[x].equals("c")) {
 					x=x+1;
-					cardID=urlsplit[x];
+					cardID=urlsplit[x].split("/")[0];
 					//e.getChannel().sendMessage("ID: "+urlsplit[x]).queue();
 					break;
 				}
 			}
-			
 			if (cardID == null) {
 				return;
 			}
@@ -365,11 +365,8 @@ public class Vote extends ListenerAdapter {
 				JSONArray arrname = obj.getJSONArray("customFieldItems");
 				String name = obj.getString("name").toString();
 				String desc = null;
-				try {
-					desc = obj.getString("desc").toString().split("\n")[1];
-				} catch (ArrayIndexOutOfBoundsException e1) {
-					desc = "*No description set*";
-				}
+				Member sm = e.getGuild().getMemberById(obj.getString("desc").toString().split("\n")[6].replace("> Submitter ID: `", "").replace("`", ""));
+				desc = obj.getString("desc").toString().split("\n")[1];
 				String value = null;
 				for (int x = 0 ; x < arr.length() ; x++) {
 					value = arr.getJSONObject(x).get("value").toString();
@@ -381,8 +378,13 @@ public class Vote extends ListenerAdapter {
 					votes = 0;
 				}
 				EmbedBuilder eb = new EmbedBuilder().setTitle(name, link)
-						.addField("Votes", ""+votes, true).setFooter("React with +1 or -1 to vote for this suggestions priority!", null).setFooter(cardID, null)
+						.addField("Votes", ""+votes, true).setFooter(cardID, null)
 						.setDescription(desc);
+				if (sm == null) {
+					eb.setAuthor(obj.getString("desc").toString().split("\n")[5].replace("> ", "").replace("`", "").replace("`", ""), link, me.darth.darthbot.main.Main.g.getIconUrl());
+				} else {
+					eb.setAuthor("Submitted by "+sm.getUser().getName()+"#"+sm.getUser().getDiscriminator(), link, sm.getUser().getEffectiveAvatarUrl());
+				}
 				if (votes < 0) {
 					eb.setColor(Color.red);
 				} else if (votes >= 0 && votes < 3) {
@@ -413,12 +415,13 @@ public class Vote extends ListenerAdapter {
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent e) {
 		Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
-		if (e.getUser().isBot()) {
-			return;
-		}
 		try {
 			if (e.getReactionEmote().getId().equals("574532922321797120") || e.getReactionEmote().getId().equals("574532942437810177")) {
 				String cardID = msg.getEmbeds().get(0).getFooter().getText();
+				Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
+				if (trello.getCard(cardID).isClosed()) {
+					msg.delete().queue();
+				}
 				int votes = getVotes(cardID);
 				if (votes == -99999) {
 					return;
@@ -459,6 +462,13 @@ public class Vote extends ListenerAdapter {
 					EmbedBuilder eb = new EmbedBuilder(msg.getEmbeds().get(0));
 					eb.getFields().clear();
 					eb.addField("Votes", ""+votes, false);
+					if (votes < 0) {
+						eb.setColor(Color.red);
+					} else if (votes >= 0 && votes < 5) {
+						eb.setColor(Color.orange); 
+					} else {
+						eb.setColor(Color.green);
+					}
 					msg.editMessage(eb.build()).queue();
 					listSort();
 					

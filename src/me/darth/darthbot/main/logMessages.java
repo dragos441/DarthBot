@@ -47,13 +47,6 @@ public class logMessages extends ListenerAdapter {
 					s1.setLong(5, e.getChannel().getIdLong());
 					s1.setString(6, e.getMessage().getContentRaw());
 					s1.execute();
-					
-					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Messages WHERE UserID = "+e.getAuthor().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong());
-					while (rs.next()) {
-						int msgCount = rs.getInt("Messages") + 1;
-						java.sql.PreparedStatement st = con.prepareStatement("UPDATE Messages SET Messages = "+msgCount+" WHERE UserID = "+e.getAuthor().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong());
-			        	st.executeUpdate();
-					}
 	
 					
 					con.close();

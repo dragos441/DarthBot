@@ -92,7 +92,9 @@ public class RandomEarn extends ListenerAdapter {
 			    e.getChannel().sendMessage("<@393796810918985728> Error! ```"+e1+"```").queue();
 			}
 			
-			e.getChannel().sendMessage(eb.build()).complete().delete().queueAfter(20, TimeUnit.SECONDS);
+			if (!e.getGuild().getId().equals("575023671014588416")) {
+				e.getChannel().sendMessage(eb.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
+			}
 		}
 		
 	}

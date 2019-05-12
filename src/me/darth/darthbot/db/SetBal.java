@@ -18,8 +18,8 @@ public class SetBal extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!setbalance") && e.getMember().getRoles().contains(e.getGuild().getRoleById("569468990943133709"))
-			|| args[0].equalsIgnoreCase("!setbal") && e.getMember().getRoles().contains(e.getGuild().getRoleById("569468990943133709"))) {
+		if (args[0].equalsIgnoreCase("!setbalance") && e.getMember().getRoles().contains(e.getGuild().getRoleById("569463842552152094"))
+			|| args[0].equalsIgnoreCase("!setbal") && e.getMember().getRoles().contains(e.getGuild().getRoleById("569463842552152094"))) {
 			Member target = null;
 			long bux = 0;
 			try {

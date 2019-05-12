@@ -51,8 +51,13 @@ public class FindID extends ListenerAdapter {
 					+ "\n**ID:** `"+m.getUser().getId()
 					+"`\n**As Mention:** `"+m.getAsMention()+"`");
 				e.getChannel().sendMessage(eb.build()).queue();
-			} else if (!e.getGuild().getRolesByName(target, true).isEmpty()) {
-				Role r = e.getGuild().getRolesByName(target, true).get(0);
+			} else if (!e.getGuild().getRolesByName(target, true).isEmpty() || !e.getMessage().getMentionedRoles().isEmpty()) {
+				Role r = null;
+				try {
+					r = e.getGuild().getRolesByName(target, true).get(0);
+				} catch (IndexOutOfBoundsException e1) {
+					r = e.getMessage().getMentionedRoles().get(0);
+				}
 				eb.setColor(r.getColorRaw());
 				eb.setAuthor("Information about "+r.getName(), null, e.getGuild().getIconUrl());
 				eb.setDescription(r.getAsMention()
@@ -60,8 +65,13 @@ public class FindID extends ListenerAdapter {
 					+"`\n**As Mention:** `"+r.getAsMention()+"`");
 				eb.setFooter("Color: "+r.getColorRaw(), null);
 				e.getChannel().sendMessage(eb.build()).queue();
-			} else if (!e.getGuild().getTextChannelsByName(target, true).isEmpty()) {
-				TextChannel c = e.getGuild().getTextChannelsByName(target, true).get(0);
+			} else if (!e.getGuild().getTextChannelsByName(target, true).isEmpty() || !e.getMessage().getMentionedChannels().isEmpty()) {
+				TextChannel c = null;
+				try {
+					c = e.getGuild().getTextChannelsByName(target, true).get(0);
+				} catch (IndexOutOfBoundsException e1) {
+					c = e.getMessage().getMentionedChannels().get(0);
+				}
 				eb.setAuthor("Information about #"+c.getName(), null, e.getGuild().getIconUrl());
 				eb.setDescription(c.getAsMention()
 					+ "\n**ID:** `"+c.getId()

@@ -422,7 +422,7 @@ public class ServerLogs extends ListenerAdapter {
 	public void onGuildMemberJoin(GuildMemberJoinEvent e) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.green);
-		eb.setAuthor("Member Joined", null, e.getMember().getUser().getAvatarUrl());
+		eb.setAuthor("Member Joined", null, e.getMember().getUser().getEffectiveAvatarUrl());
 		eb.setDescription(""+e.getMember().getAsMention()+" ("+e.getMember().getEffectiveName()+"#"+e.getMember().getUser().getDiscriminator()+")");
 		eb.setThumbnail(e.getUser().getAvatarUrl());
 		eb.setTimestamp(Instant.from(ZonedDateTime.now()));
@@ -444,7 +444,7 @@ public class ServerLogs extends ListenerAdapter {
 	public void onGuildMemberLeave(GuildMemberLeaveEvent e) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.red);
-		eb.setAuthor("Member Left",null, e.getMember().getUser().getAvatarUrl());
+		eb.setAuthor("Member Left",null, e.getMember().getUser().getEffectiveAvatarUrl());
 		eb.setDescription(""+e.getMember().getAsMention()+" ("+e.getMember().getEffectiveName()+"#"+e.getMember().getUser().getDiscriminator()+")");
 		eb.setThumbnail(e.getUser().getAvatarUrl());
 		eb.setTimestamp(Instant.from(ZonedDateTime.now()));

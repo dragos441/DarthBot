@@ -38,7 +38,7 @@ public class Casino extends ListenerAdapter {
 			eb.setAuthor("Casino ~ Hub", null, e.getGuild().getIconUrl());
 			eb.setColor(Color.green);
 			eb.addField("Double or Nothing ~ !bet <money>", "Automatically roll 2 dice and attempt to score higher than the bot. Either win double, or nothing.", false);
-			eb.addField("Higher or Lower ~ !higherlower <money>", "Guess whether the next number will be higher or lower, and win half your bet for each correct guess", false);
+			eb.addField("Higher or Lower ~ !higherlower <money>", "Guess whether the next number will be higher or lower, and win 10% of your bet for each correct guess", false);
 			e.getChannel().sendMessage(eb.build()).queue();
 		}
 		if (args[0].equalsIgnoreCase("!hl") || args[0].equalsIgnoreCase("!higherlower") || args[0].equalsIgnoreCase("!highlow")) {
@@ -50,10 +50,6 @@ public class Casino extends ListenerAdapter {
 				return;
 			} catch (NumberFormatException e2) {
 				e.getChannel().sendMessage("Invalid Syntax: `!hl <amount>`").queue();
-				return;
-			}
-			if (tobet > 1000) {
-				e.getChannel().sendMessage("You can only bet $1000 maximum at a time!").queue();
 				return;
 			}
 			try {
@@ -105,13 +101,12 @@ public class Casino extends ListenerAdapter {
     				eb.setColor(Color.yellow);
     				eb.setAuthor("Casino ~ Higher or Lower", null, e.getAuthor().getEffectiveAvatarUrl());
     				eb.setDescription("__**Instructions**__\nReact with :arrow_up: for Upper\nReact with :arrow_down: for Lower"
-    						+ "\nReact with :moneybag: to Cashout\n:newspaper: **Info** The minimum is 1, and the maximum is 10"
+    						+ "\nReact with :moneybag: to Cashout\n:newspaper: **Info** The minimum is 0, and the maximum is 10"
     						+ "\n:bulb: **Tip** You won't get any money unless you cashout, even if you lose!");
     				e.getChannel().sendMessage(eb.build()).queue();
     				eb.setFooter(e.getAuthor().getId(), null);
     				eb.setDescription("*Starting Bet: $*"+args[1]+"\n**Cashout Prize: $**"+args[1]+"");
-    				int rand = new Random().nextInt(10);
-    				rand++;
+    				int rand = new Random().nextInt(11);
     				eb.addField("Higher or Lower: ", ""+rand, false);
     				Message msg = e.getChannel().sendMessage(eb.build()).complete();
     				msg.addReaction("⬆").queue();
@@ -261,8 +256,7 @@ public class Casino extends ListenerAdapter {
 				try {
 					num = Integer.parseInt(e.getChannel().getMessageById(e.getMessageId()).complete().getEmbeds().get(0).getFields().get(num).getValue());
 				} catch (IndexOutOfBoundsException e1) {con.close(); return;} catch (NumberFormatException e2) { con.close();return;}
-				int rand = new Random().nextInt(9);
-				rand++;
+				int rand = new Random().nextInt(11);
 				/*if (bux > 10000) {
 					if (rand < 4 && new Random().nextInt(10) <= 3) {
 						rand++;
@@ -301,7 +295,7 @@ public class Casino extends ListenerAdapter {
 						|| rand == num && e.getReactionEmote().getName().equals("⬇") || rand == num && e.getReactionEmote().getName().equals("⬆")) {
 					int start = Integer.parseInt(oldeb.getDescription().split("\n")[0].replace("*Starting Bet: $*", ""));
 					int cashout = Integer.parseInt(oldeb.getDescription().split("\n")[1].replace("**Cashout Prize: $**", ""));
-					cashout = cashout + Math.abs(start / 2);
+					cashout = cashout + Math.abs(start / 10);
 					eb.setDescription("*Starting Bet: $*"+start+"\n**Cashout Prize: $**"+cashout+"");
 					
 				} else {
@@ -343,8 +337,7 @@ public class Casino extends ListenerAdapter {
 				try {
 					num = Integer.parseInt(e.getChannel().getMessageById(e.getMessageId()).complete().getEmbeds().get(0).getFields().get(num).getValue());
 				} catch (IndexOutOfBoundsException e1) {con.close(); return;} catch (NumberFormatException e2) { con.close();return;}
-				int rand = new Random().nextInt(9);
-				rand++;
+				int rand = new Random().nextInt(11);
 				EmbedBuilder eb = new EmbedBuilder(oldeb);
 				eb.addField("Higher or Lower:", ""+rand, false);
 				if (!e.getMember().getUser().isBot()) {
@@ -357,7 +350,7 @@ public class Casino extends ListenerAdapter {
 					int start = Integer.parseInt(oldeb.getDescription().split("\n")[0].replace("*Starting Bet: $*", ""));
 					int cashout = Integer.parseInt(oldeb.getDescription().split("\n")[1].replace("**Cashout Prize: $**", ""));
 					if (eb.getFields().size() >= 6) {
-						cashout = cashout + Math.abs(start / 2);
+						cashout = cashout + Math.abs(start / 10);
 					}
 					if (cashout > 300 && eb.getFields().size() <= 4) {
 						e.getChannel().sendMessage("You must have 3+ guesses to cash out prizes over $300!").queue();
@@ -378,7 +371,7 @@ public class Casino extends ListenerAdapter {
 						|| rand == num && e.getReactionEmote().getName().equals("⬇") || rand == num && e.getReactionEmote().getName().equals("⬆")) {
 					int start = Integer.parseInt(oldeb.getDescription().split("\n")[0].replace("*Starting Bet: $*", ""));
 					int cashout = Integer.parseInt(oldeb.getDescription().split("\n")[1].replace("**Cashout Prize: $**", ""));
-					cashout = cashout + Math.abs(start / 2);
+					cashout = cashout + Math.abs(start / 10);
 					eb.setDescription("*Starting Bet: $*"+start+"\n**Cashout Prize: $**"+cashout+"");
 					
 				} else {

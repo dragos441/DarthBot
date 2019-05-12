@@ -42,7 +42,7 @@ public class ReportBug extends ListenerAdapter {
 		try {
 			desc = cardsplit[1];
 		} catch (ArrayIndexOutOfBoundsException e1) {
-			desc = "No Description Set";
+			desc = "*No Description Set*";
 		}
 		Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
 		Card c = new Card();
@@ -61,9 +61,10 @@ public class ReportBug extends ListenerAdapter {
 					+ "\n\n---\n\n"
 					+ "> Submitted by `"+author.getName()+"#"+author.getDiscriminator()+"`"
 					+ "\n> Submitter ID: `"+author.getId()+"`\n\n---\n\nVotes: ,");
-			c.setPos(-9999);;
 			Card nc = trello.createCard("5cbc6c5a24c96885903fde3e", c);
-			me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getTextChannelById("575440909018202136").sendMessage("**NEW SUGGESTION:** "+nc.getShortUrl()).complete().delete().queueAfter(15, TimeUnit.SECONDS);
+			c.setPos(9999);;
+			me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getTextChannelById("575440909018202136").sendMessage("**NEW SUGGESTION:** "
+			+nc.getShortUrl()).complete().delete().queueAfter(5, TimeUnit.SECONDS);
 		}
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setAuthor("Successfully submitted to Trello!", c.getShortUrl(), "https://cdn3.iconfinder.com/data/icons/budicon-chroma-communication/24/email-forward-512.png");
