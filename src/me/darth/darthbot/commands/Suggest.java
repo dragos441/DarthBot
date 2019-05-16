@@ -1,20 +1,6 @@
 package me.darth.darthbot.commands;
 
-import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -33,6 +19,7 @@ public class Suggest extends ListenerAdapter {
 		if (args[0].equalsIgnoreCase("!suggest")) {
 			try {
 				String test = args[1];
+				test=test+"";
 			} catch (ArrayIndexOutOfBoundsException e1) {
 				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!suggest Idea - Description`").queue();
 				return;

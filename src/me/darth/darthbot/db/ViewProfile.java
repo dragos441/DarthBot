@@ -6,15 +6,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import com.mysql.jdbc.CommunicationsException;
-
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -45,7 +39,6 @@ public class ViewProfile extends ListenerAdapter {
 			}
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 
-				long Messages = 0L;
 				long xp = 0L;
 				int level = 0;
 				ResultSet msgs = con.createStatement().executeQuery("SELECT * FROM GuildProfiles");
@@ -97,7 +90,6 @@ public class ViewProfile extends ListenerAdapter {
 				    	  }
 				    	  int reqxp = (level + 1) * 100;
 				    	  eb.addField("Chat Level", "Level "+level+" *("+xp+"/"+reqxp+"*xp*)*", true);
-				    	  String month = new SimpleDateFormat("MMM").format(new Date().getTime());
 				    	  eb.addField("What can I use DBux for?", "```> Win big at the !casino\n\nComing soon:\n- Lottery\n- Work Jobs/Rob Others```", false);
 				    	  PreparedStatement st = con.prepareStatement("UPDATE profiles SET Name = ? WHERE UserID = "+target.getUser().getIdLong());
 				    	  st.setString(1, target.getEffectiveName());

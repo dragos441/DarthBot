@@ -1,7 +1,6 @@
 package me.darth.darthbot.music;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +19,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 
 public class MusicManager {
 
-	private final AudioPlayerManager manager = new DefaultAudioPlayerManager();
+	private final static AudioPlayerManager manager = new DefaultAudioPlayerManager();
 	private final Map<String, MusicPlayer> players = new HashMap<>();
 	
 	public MusicManager(){
@@ -33,10 +32,12 @@ public class MusicManager {
 		return players.get(guild.getId());
 	}
 	
+	
 	public void loadTrack(final TextChannel channel, final String source){
 		EmbedBuilder eb = new EmbedBuilder().setAuthor("Music", null, me.darth.darthbot.main.Main.g.getIconUrl()).setColor(Color.red);
 		eb.setDescription("Joining Channel & Configuring").setFooter("This may take a moment if you're loading a Playlist", null);
 		Message msg = channel.sendMessage(eb.build()).complete();
+		eb.setFooter(null, null);
 		MusicPlayer player = getPlayer(channel.getGuild());
 		channel.getGuild().getAudioManager().setSendingHandler(player.getAudioHandler());
 		manager.loadItemOrdered(player, source, new AudioLoadResultHandler(){
@@ -49,9 +50,6 @@ public class MusicManager {
 				while (s >= 60) {
 					s=s-60;
 					m=m+1;
-				}
-				if (s < 10) {
-					s=s*10;
 				}
 				eb.setDescription("Added track **"+track.getInfo().title+"** to the queue! `"+m+":"+s+"`");
 				player.playTrack(track);
@@ -71,9 +69,6 @@ public class MusicManager {
 						s=s-60;
 						m=m+1;
 					}
-					if (s < 10) {
-						s=s*10;
-					}
 					if (i < 20) {
 						eb.addField("#"+player.getListener().getTrackSize()+" - "+track.getInfo().title, track.getInfo().uri+" `"+m+":"+s+"`", false);
 					}
@@ -81,7 +76,7 @@ public class MusicManager {
 				}
 				if (i > 20) {
 					int total = i - 20;
-					eb.setFooter("And "+i+" more! (Type !queue to view full queue)", null);
+					eb.setFooter("And "+total+" more! (Type !queue to view full queue)", null);
 				}
 				msg.editMessage(eb.build()).queue();
 			}
@@ -89,9 +84,7 @@ public class MusicManager {
 			
 			@Override
 			public void noMatches() {
-				eb.setDescription("That is not a valid URL!");
-				msg.editMessage(eb.build()).queue();
-				return;
+				
 			}
 
 			@Override

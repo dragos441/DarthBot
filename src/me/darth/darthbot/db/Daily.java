@@ -2,19 +2,17 @@ package me.darth.darthbot.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Random;
 
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Daily extends ListenerAdapter {
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		String[] args = e.getMessage().getContentRaw().split(" ");
@@ -23,7 +21,6 @@ public class Daily extends ListenerAdapter {
 			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getIdLong());
 			      while (rs.next())
 			      {
-			        long UserID = rs.getLong("UserID");
 			        long bux = rs.getLong("DBux");
 			        int daily = rs.getInt("DailyBonus");
 			        if (daily != new Date().getDate()) {

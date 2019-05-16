@@ -2,14 +2,11 @@ package me.darth.darthbot.commands;
 
 import java.awt.Color;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -17,38 +14,22 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.julienvey.trello.Trello;
 import com.julienvey.trello.domain.Card;
 import com.julienvey.trello.impl.TrelloImpl;
 import com.julienvey.trello.impl.http.ApacheHttpClient;
-import com.mysql.fabric.Response;
-
-import me.darth.darthbot.main.Main;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -98,8 +79,6 @@ public class Vote extends ListenerAdapter {
 			in.close();
 			JSONObject obj = new JSONObject(content.toString());
 			JSONArray arr = obj.getJSONArray("customFieldItems");
-			JSONArray arrname = obj.getJSONArray("customFieldItems");
-			String name = obj.getString("name").toString();
 			String value = null;
 			for (int x = 0 ; x < arr.length() ; x++) {
 				value = arr.getJSONObject(x).get("value").toString();
@@ -126,12 +105,6 @@ public class Vote extends ListenerAdapter {
 	
 	public String cardID(String[] args, String[] split) {
 		String cardID = null;
-		String link = null;
-		for (int x = 0 ; x < args.length ; x++) {
-			if (args[x].contains("trello.com")) {
-				link = args[x];
-			}
-		}
 		for (int x = 0 ; x < split.length ; x++) {
 			if (split[x].equals("c")) {
 				x=x+1;
@@ -143,6 +116,7 @@ public class Vote extends ListenerAdapter {
 		
 		return null;
 	}
+	@SuppressWarnings("deprecation")
 	public boolean addVoted(String cardID, Long userID) {
 		URL url;
 		try {
@@ -200,6 +174,7 @@ public class Vote extends ListenerAdapter {
 		return true;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void listSort() {
 		if (lastUpdated > new Date().getMinutes() - 5) {
 			return;
@@ -257,7 +232,6 @@ public class Vote extends ListenerAdapter {
 			}
 		}
 		while (!map.isEmpty()) {
-			URL url;
 			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 			try {
 			    HttpPut request = new HttpPut("https://api.trello.com/1/cards/"+map.firstEntry().getValue()+"?pos=bottom"//+map.firstKey()
@@ -362,7 +336,6 @@ public class Vote extends ListenerAdapter {
 				in.close();
 				JSONObject obj = new JSONObject(content.toString());
 				JSONArray arr = obj.getJSONArray("customFieldItems");
-				JSONArray arrname = obj.getJSONArray("customFieldItems");
 				String name = obj.getString("name").toString();
 				String desc = null;
 				Member sm = e.getGuild().getMemberById(obj.getString("desc").toString().split("\n")[6].replace("> Submitter ID: `", "").replace("`", ""));
@@ -377,13 +350,20 @@ public class Vote extends ListenerAdapter {
 				} catch (NullPointerException e1) {
 					votes = 0;
 				}
-				EmbedBuilder eb = new EmbedBuilder().setTitle(name, link)
-						.addField("Votes", ""+votes, true).setFooter(cardID, null)
-						.setDescription(desc);
+				EmbedBuilder eb = new EmbedBuilder().addField("Votes", ""+votes, true).setFooter(cardID, null).setDescription(desc);
+				if (name.toString().length() < 256) {
+					eb.setTitle(name, link);
+				} else {
+					String shortname = "";
+					for (int x = 0 ; x < 256 ; x++) {
+						shortname=shortname+name.toCharArray()[x];
+					}
+					eb.setTitle(shortname, link);
+				}
 				if (sm == null) {
 					eb.setAuthor(obj.getString("desc").toString().split("\n")[5].replace("> ", "").replace("`", "").replace("`", ""), link, me.darth.darthbot.main.Main.g.getIconUrl());
 				} else {
-					eb.setAuthor("Submitted by "+sm.getUser().getName()+"#"+sm.getUser().getDiscriminator(), link, sm.getUser().getEffectiveAvatarUrl());
+					eb.setAuthor("Submitted by "+sm.getUser().getName(), link, sm.getUser().getEffectiveAvatarUrl());
 				}
 				if (votes < 0) {
 					eb.setColor(Color.red);

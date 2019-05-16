@@ -3,7 +3,6 @@ package me.darth.darthbot.db;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
@@ -11,7 +10,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -22,7 +20,6 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.requests.RestAction;
 
 public class Casino extends ListenerAdapter {
 	
@@ -88,8 +85,8 @@ public class Casino extends ListenerAdapter {
     					betcooldown.put(e.getMember(), System.currentTimeMillis());
     					return;
     				}
-    				if (tobet <= 0) {
-    					e.getChannel().sendMessage("You must bet more than $0!").queue();
+    				if (tobet < 10) {
+    					e.getChannel().sendMessage("You must bet $10 or more!").queue();
     					betcooldown.put(e.getMember(), System.currentTimeMillis());
     					return;
     				}
@@ -166,8 +163,8 @@ public class Casino extends ListenerAdapter {
     					betcooldown.put(e.getMember(), System.currentTimeMillis());
     					return;
     				}
-    				if (tobet <= 0) {
-    					e.getChannel().sendMessage("You must bet more than $0!").queue();
+    				if (tobet < 10) {
+    					e.getChannel().sendMessage("You must bet $10 or more!").queue();
     					betcooldown.put(e.getMember(), System.currentTimeMillis());
     					return;
     				}

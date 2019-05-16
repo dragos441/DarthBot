@@ -3,14 +3,8 @@ package me.darth.darthbot.db;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -40,7 +33,6 @@ public class RandomEarn extends ListenerAdapter {
 				}
 			}
 		} catch (IndexOutOfBoundsException e2) {return;}
-		int multi = 1;
 		int rN = new Random().nextInt(10);
 		/*if (e.getMember().getRoles().contains(e.getGuild().getRoleById("569277445354815499"))) { // Bronze
 			multi=2;

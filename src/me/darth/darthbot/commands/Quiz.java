@@ -13,16 +13,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -36,7 +31,9 @@ public class Quiz extends ListenerAdapter {
 
 	HashMap<Long, String> ansmap = new HashMap<Long, String>();
 	HashMap<Long, Long> msgmap = new HashMap<Long, Long>();
+	HashMap<Long, Boolean> isactive = new HashMap<Long, Boolean>();
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		if (ansmap.get(e.getGuild().getIdLong()) != null && !e.getAuthor().isBot()) {
@@ -53,9 +50,7 @@ public class Quiz extends ListenerAdapter {
 				      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getIdLong());
 				      while (rs.next())
 				      {
-				        long UserID = rs.getLong("UserID");
 				        long bux = rs.getLong("DBux");
-				        int daily = rs.getInt("DailyBonus");
 				        long newbux = bux + prize;
 				        if (bux != -1337) {
 				        	con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
@@ -68,6 +63,7 @@ public class Quiz extends ListenerAdapter {
 				} catch (SQLException e1) {
 				   e1.printStackTrace();
 				}
+				isactive.put(e.getGuild().getIdLong(), false);
 			}
 		}
 		
@@ -80,9 +76,8 @@ public class Quiz extends ListenerAdapter {
 				      while (rs.next())
 				      {
 				        int quiz = rs.getInt("Quiz");
-				        int wait = (new Date().getMinutes() - quiz) + 4;
-				        if (wait >= 5) {
-				        	e.getChannel().sendMessage(e.getMember().getAsMention()+", you must wait another **"+wait+"** minutes before starting a new quiz!").queue();
+				        if (quiz == new Date().getMinutes()) {
+				        	e.getChannel().sendMessage(e.getMember().getAsMention()+", you must wait a minute between uses of the `!quiz` command!").queue();
 				        	return;
 				        }
 				        con.prepareStatement("UPDATE profiles SET Quiz = "+new Date().getMinutes()+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
@@ -91,6 +86,12 @@ public class Quiz extends ListenerAdapter {
 				      con.close();
 				} catch (SQLException e1) {
 				   e1.printStackTrace();
+				}
+				if (isactive.get(e.getGuild().getIdLong()) == null || isactive.get(e.getGuild().getIdLong()) == false) {
+					isactive.put(e.getGuild().getIdLong(), true);
+				} else {
+					e.getChannel().sendMessage("There is already a quiz in progress on this server!").queue();
+					return;
 				}
 				url = new URL("https://opentdb.com/api.php?amount=1&category=15&difficulty=easy&type=multiple");
 				HttpURLConnection con = (HttpURLConnection) url.openConnection();

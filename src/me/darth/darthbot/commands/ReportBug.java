@@ -1,28 +1,11 @@
 package me.darth.darthbot.commands;
 
 import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.julienvey.trello.Trello;
 import com.julienvey.trello.domain.Card;
-import com.julienvey.trello.domain.TList;
 import com.julienvey.trello.impl.TrelloImpl;
 import com.julienvey.trello.impl.http.ApacheHttpClient;
 
@@ -60,7 +43,7 @@ public class ReportBug extends ListenerAdapter {
 					+ "\n**Details:** "+desc
 					+ "\n\n---\n\n"
 					+ "> Submitted by `"+author.getName()+"#"+author.getDiscriminator()+"`"
-					+ "\n> Submitter ID: `"+author.getId()+"`\n\n---\n\nVotes: ,");
+					+ "\n> Submitter ID: `"+author.getId()+"`\n\n---\n\n**Vote ID's:** ");
 			Card nc = trello.createCard("5cbc6c5a24c96885903fde3e", c);
 			c.setPos(9999);;
 			me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getTextChannelById("575440909018202136").sendMessage("**NEW SUGGESTION:** "
@@ -82,13 +65,11 @@ public class ReportBug extends ListenerAdapter {
 		if (args[0].equalsIgnoreCase("!bug") || args[0].equalsIgnoreCase("!reportbug")) {
 			try {
 				String test = args[1];
+				test=test+"";
 			} catch (ArrayIndexOutOfBoundsException e1) {
 				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!reportbug Bug - Description`").queue();
 				return;
 			}
-			URL url;
-			String desc = null;
-			String[] cardsplit = null;
 			EmbedBuilder dupes = new EmbedBuilder().setAuthor("Possible Duplicates Found", null, e.getGuild().getIconUrl());
 			dupes.setDescription("Please check that the below cards aren't a duplicate of what you're submitting. If none of them are, **react with a :white_check_mark:"
 					+ "to your message above to submit it!**");

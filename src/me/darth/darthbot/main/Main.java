@@ -1,18 +1,8 @@
 package me.darth.darthbot.main;
 
-import java.awt.Color;
-
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
 import me.darth.darthbot.commands.*;
 import me.darth.darthbot.db.*;
+import me.darth.darthbot.moderation.History;
 import me.darth.darthbot.music.*;
 import me.darth.darthbot.testserver.*;
 import net.dv8tion.jda.core.AccountType;
@@ -23,14 +13,13 @@ import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Main {
 	
 	public static JDA jda = null;
 	public static Guild g = null;
 	
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception {
 		jda = new JDABuilder(AccountType.BOT)
 				.setToken("NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8").buildBlocking();
@@ -62,6 +51,7 @@ public class Main {
 		jda.addEventListener(new Vote());
 		jda.addEventListener(new Experience());
 		jda.addEventListener(new Quiz());
+		jda.addEventListener(new History());
 		jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
 		g = jda.getGuildById("568849490425937940");
 	}

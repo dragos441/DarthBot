@@ -1,7 +1,5 @@
 package me.darth.darthbot.commands;
 
-import java.util.Date;
-
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;

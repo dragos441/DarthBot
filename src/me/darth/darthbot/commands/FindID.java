@@ -93,6 +93,7 @@ public class FindID extends ListenerAdapter {
 			} else {
 				try {
 					String f = args[1];
+					f=f+"";
 				} catch (ArrayIndexOutOfBoundsException e1) {
 					e.getChannel().sendMessage(":no_entry: Invalid Syntax: `"+args[0]+" <Category/Custom Emote/Member/Role/Text Channel/Voice Channel>`").queue();
 					return;

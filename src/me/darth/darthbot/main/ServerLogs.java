@@ -1,52 +1,22 @@
 package me.darth.darthbot.main;
 
 import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import net.dv8tion.jda.client.entities.Group;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Category;
-import net.dv8tion.jda.core.entities.Channel;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.channel.text.TextChannelCreateEvent;
 import net.dv8tion.jda.core.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.core.events.channel.text.update.TextChannelUpdateNSFWEvent;
 import net.dv8tion.jda.core.events.channel.text.update.TextChannelUpdateNameEvent;
-import net.dv8tion.jda.core.events.channel.text.update.TextChannelUpdatePermissionsEvent;
 import net.dv8tion.jda.core.events.channel.text.update.TextChannelUpdateTopicEvent;
 import net.dv8tion.jda.core.events.channel.voice.VoiceChannelCreateEvent;
 import net.dv8tion.jda.core.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.core.events.channel.voice.update.VoiceChannelUpdateNameEvent;
 import net.dv8tion.jda.core.events.guild.GuildBanEvent;
-import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.core.events.guild.GuildUnbanEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent;
@@ -59,17 +29,11 @@ import net.dv8tion.jda.core.events.guild.update.GuildUpdateNotificationLevelEven
 import net.dv8tion.jda.core.events.guild.update.GuildUpdateOwnerEvent;
 import net.dv8tion.jda.core.events.guild.update.GuildUpdateRegionEvent;
 import net.dv8tion.jda.core.events.guild.update.GuildUpdateVerificationLevelEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceDeafenEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceGuildDeafenEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceGuildMuteEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMuteEvent;
 import net.dv8tion.jda.core.events.message.MessageDeleteEvent;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.MessageUpdateEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.events.role.RoleCreateEvent;
 import net.dv8tion.jda.core.events.role.RoleDeleteEvent;
@@ -83,7 +47,8 @@ public class ServerLogs extends ListenerAdapter {
 	
 	@Override
 	public void onMessageDelete(MessageDeleteEvent e) {
-		if (e.getChannel().equals(e.getGuild().getTextChannelById("569465506369765396"))) {
+		if (e.getChannel().equals(e.getGuild().getTextChannelById("569465506369765396"))
+				|| e.getChannel().equals(e.getGuild().getTextChannelById("577877034240311337"))) {
 			return;
 		}
 		EmbedBuilder eb = new EmbedBuilder();
@@ -91,7 +56,6 @@ public class ServerLogs extends ListenerAdapter {
 		eb.setAuthor("Message Deleted",null, "https://cdn4.iconfinder.com/data/icons/social-messaging-ui-coloricon-1/21/52-512.png");
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 		      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM messageLog");
-		      EmbedBuilder qeb = new EmbedBuilder();
 		      while (rs.next())
 		      {
 		        long Timestamp = rs.getLong("Timestamp");
@@ -131,7 +95,8 @@ public class ServerLogs extends ListenerAdapter {
 	
 	@Override
 	public void onMessageUpdate(MessageUpdateEvent e) {
-		if (e.getChannel().equals(e.getGuild().getTextChannelById("569465506369765396"))) {
+		if (e.getChannel().equals(e.getGuild().getTextChannelById("569465506369765396"))
+				|| e.getChannel().equals(e.getGuild().getTextChannelById("577877034240311337"))) {
 			return;
 		}
 		if (e.getMessage().getContentRaw() != null && e.getMessage().getContentRaw() != "" && !e.getAuthor().isBot()) {

@@ -1,9 +1,7 @@
 package me.darth.darthbot.main;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Category;
 import net.dv8tion.jda.core.entities.Channel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
@@ -18,7 +16,6 @@ public class PublicRooms extends ListenerAdapter {
 	
 	public static boolean availableChannel(Channel c) {
 		List<VoiceChannel> channels = category.getVoiceChannels();
-		boolean availableChannel = false;
 		for(int x = 0 ; x < channels.size() ; x++) {
 			if (channels.get(x).getMembers().isEmpty() && !channels.get(x).equals(c)) {
 				return true;
