@@ -53,7 +53,7 @@ public class ServerLogs extends ListenerAdapter {
 		}
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.orange);
-		eb.setAuthor("Message Deleted",null, "https://cdn4.iconfinder.com/data/icons/social-messaging-ui-coloricon-1/21/52-512.png");
+		eb.setAuthor("Message Deleted" ,null, e.getGuild().getIconUrl());
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 		      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM messageLog");
 		      while (rs.next())
@@ -120,7 +120,7 @@ public class ServerLogs extends ListenerAdapter {
 		
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.orange);
-		eb.setAuthor("Message Edited",null, "https://cdn4.iconfinder.com/data/icons/social-messaging-ui-coloricon-1/21/52-512.png");
+		eb.setAuthor("Message Edited", null, e.getGuild().getIconUrl());
 		String msg1 = null;
 		String msg2 = null;
 		boolean send = false;
@@ -227,7 +227,7 @@ public class ServerLogs extends ListenerAdapter {
 	public void onGuildUpdateIcon(GuildUpdateIconEvent e) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.red);
-		eb.setAuthor("Server Icon Updated",null, e.getNewIconUrl());
+		eb.setAuthor("Server Icon Updated", null, e.getNewIconUrl());
 		eb.setDescription("The server icon has been updated");
 		eb.setFooter("Old Icon: ", e.getOldIconUrl());
 		eb.setTimestamp(Instant.from(ZonedDateTime.now()));

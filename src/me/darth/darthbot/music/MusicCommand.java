@@ -67,10 +67,10 @@ public class MusicCommand extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if(e.getGuild() == null) {
+		if(e.getGuild() == null || e.getAuthor().isFake()) {
 			return;
 		}
-		EmbedBuilder eb = new EmbedBuilder().setAuthor("Music", null, me.darth.darthbot.main.Main.g.getIconUrl()).setColor(Color.orange);
+		EmbedBuilder eb = new EmbedBuilder().setAuthor("Music", null, e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setColor(Color.orange);
 		VoiceChannel voiceChannel = e.getGuild().getMember(e.getMember().getUser()).getVoiceState().getChannel();
 		if (args[0].equalsIgnoreCase("!join") || args[0].equalsIgnoreCase("!summon")) {
 			if(voiceChannel == null){
@@ -95,7 +95,7 @@ public class MusicCommand extends ListenerAdapter {
 			} catch (ArrayIndexOutOfBoundsException e1) {
 				if (args[0].equalsIgnoreCase("!queue") || args[0].equalsIgnoreCase("!q")) {
 					eb.setColor(Color.yellow);
-					eb.setAuthor("Music - Queue", null, me.darth.darthbot.main.Main.g.getIconUrl());
+					eb.setAuthor("Music - Queue", null, e.getJDA().getSelfUser().getEffectiveAvatarUrl());
 					ArrayList<AudioTrack> list = new ArrayList<AudioTrack>(manager.getPlayer(e.getGuild()).getListener().getTracks());
 					list.add(0, manager.getPlayer(e.getGuild()).getAudioPlayer().getPlayingTrack());
 					int x = 0;
@@ -129,10 +129,14 @@ public class MusicCommand extends ListenerAdapter {
 					return;
 				}
 			}
+			if (manager.getPlayer(e.getGuild()).getListener().getTracks().size() > 20) {
+				e.getChannel().sendMessage(":no_entry: The queue is full!").queue();
+				return;
+			}
 			if (!e.getMessage().getContentRaw().toLowerCase().contains("youtube.com")) {
-				manager.loadTrack(e.getChannel(), ytsearch(e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getChannel()));
+				manager.loadTrack(e.getChannel(), ytsearch(e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getChannel()), e.getJDA().getSelfUser().getEffectiveAvatarUrl());
 			} else {
-				manager.loadTrack(e.getChannel(), e.getMessage().getContentRaw().replace(args[0]+" ", ""));
+				manager.loadTrack(e.getChannel(), e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getJDA().getSelfUser().getEffectiveAvatarUrl());
 			}
 		}
 		if (args[0].equalsIgnoreCase("!stop") || args[0].equalsIgnoreCase("!leave")) {

@@ -257,6 +257,9 @@ public class Vote extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+		if (!e.getGuild().getId().equals("568849490425937940")) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!upvote") || args[0].equalsIgnoreCase("!downvote")) {
 			String cardID = cardID(e.getMessage().getContentRaw().split(" "), e.getMessage().getContentRaw().split("/"));
@@ -297,7 +300,7 @@ public class Vote extends ListenerAdapter {
 					}
 				}
 				e.getChannel().sendMessage(e.getMember().getAsMention()+", successfully added vote!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
-				listSort();
+				//listSort();
 			} else {
 				e.getChannel().sendMessage(e.getMember().getAsMention()+", you have already voted on this suggestion!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
 			}
@@ -376,6 +379,9 @@ public class Vote extends ListenerAdapter {
 				Message msg = e.getChannel().sendMessage(eb.build()).complete();
 				msg.addReaction(me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getEmoteById("574532922321797120")).queue();
 				msg.addReaction(me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getEmoteById("574532942437810177")).queue();
+				if (!e.getMessage().getContentRaw().contains(" ")) {
+					e.getMessage().delete().queue();
+				}
 			} catch (MalformedURLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -450,7 +456,7 @@ public class Vote extends ListenerAdapter {
 						eb.setColor(Color.green);
 					}
 					msg.editMessage(eb.build()).queue();
-					listSort();
+					//listSort();
 					
 				} else {
 					//e.getChannel().sendMessage(e.getMember().getAsMention()+", you have already voted on this suggestion!").complete().delete().queueAfter(15, TimeUnit.SECONDS);

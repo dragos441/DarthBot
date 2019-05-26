@@ -1,8 +1,19 @@
 package me.darth.darthbot.commands;
 
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.http.client.methods.HttpPost;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.julienvey.trello.Trello;
 import com.julienvey.trello.domain.Card;
@@ -19,6 +30,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class ReportBug extends ListenerAdapter {
 	
+	@SuppressWarnings("deprecation")
 	public static void makeCard(String[] args, Message msg, User author, TextChannel chnl, Boolean bug) {
 		String [] cardsplit = msg.getContentStripped().replace(args[0], "").split(" - ");
 		String desc = null;
@@ -27,36 +39,61 @@ public class ReportBug extends ListenerAdapter {
 		} catch (ArrayIndexOutOfBoundsException e1) {
 			desc = "*No Description Set*";
 		}
-		Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
-		Card c = new Card();
+		String shortUrl = null;
+		String cardname = null;
+		String carddesc = null;
+		String board = null;
+		EmbedBuilder eb = new EmbedBuilder();
 		if (bug) {
-			c.setName("[BUG]"+cardsplit[0]);
-			c.setDesc("**Bug:**"+cardsplit[0]
+			cardname = URLEncoder.encode("[BUG]"+cardsplit[0]);
+			carddesc = URLEncoder.encode("**Bug:**"+cardsplit[0]
 					+ "\n**Details:** "+desc
 					+ "\n\n---\n\n"
 					+ "> Reported by `"+author.getName()+"#"+author.getDiscriminator()+"`"
 					+ "\n> Reporter ID: `"+author.getId()+"`");
-			c = trello.createCard("5cbc6c61a0685f1423e3055d", c);
+			board = "5cbc6c61a0685f1423e3055d";
 		} else {
-			c.setName(cardsplit[0]);
-			c.setDesc("**Suggestion:** "+cardsplit[0]
+			cardname = URLEncoder.encode(cardsplit[0]);
+			carddesc = URLEncoder.encode("**Suggestion:** "+cardsplit[0]
 					+ "\n**Details:** "+desc
 					+ "\n\n---\n\n"
 					+ "> Submitted by `"+author.getName()+"#"+author.getDiscriminator()+"`"
 					+ "\n> Submitter ID: `"+author.getId()+"`\n\n---\n\n**Vote ID's:** ");
-			Card nc = trello.createCard("5cbc6c5a24c96885903fde3e", c);
-			c.setPos(9999);;
-			me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getTextChannelById("575440909018202136").sendMessage("**NEW SUGGESTION:** "
-			+nc.getShortUrl()).complete().delete().queueAfter(5, TimeUnit.SECONDS);
+			board = "5cbc6c5a24c96885903fde3e";
+			eb.setFooter("Your suggestion will automatically appear in #suggestions shortly!", null);
 		}
-		EmbedBuilder eb = new EmbedBuilder();
-		eb.setAuthor("Successfully submitted to Trello!", c.getShortUrl(), "https://cdn3.iconfinder.com/data/icons/budicon-chroma-communication/24/email-forward-512.png");
+		URL url;
+		try {
+			url = new URL("https://api.trello.com/1/cards?name="+cardname+"&desc="+carddesc+"&pos=bottom&idList="+board+"&keepFromSource=all"
+					+ "&key=36c6ca5833a315746f43a1d6eee885b4&token=dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847");
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("POST");
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+			    content.append(inputLine);
+			}
+			in.close();
+			JSONObject obj = new JSONObject(content.toString());
+			shortUrl = obj.getString("shortUrl").toString();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		eb.setAuthor("Successfully submitted to Trello!", shortUrl, "https://cdn3.iconfinder.com/data/icons/budicon-chroma-communication/24/email-forward-512.png");
 		eb.addField("Submission", cardsplit[0], true);
 		eb.addField("Description", desc, true);
 		eb.addField("Submitted by", author.getName()+"#"+author.getDiscriminator(), true);
-		eb.setDescription("**"+cardsplit[0]+"** has been successfully forwarded to Trello. View your card here: "+c.getShortUrl());
+		eb.setDescription("**"+cardsplit[0]+"** has been successfully forwarded to Trello. View your card here: "+shortUrl);
 		eb.setColor(Color.blue);
 		chnl.sendMessage(eb.build()).queue();
+		if (!bug) {
+			me.darth.darthbot.main.Main.g.getTextChannelById("575440909018202136").sendMessage(shortUrl).queue();
+		}
 	}
 	
 	@Override

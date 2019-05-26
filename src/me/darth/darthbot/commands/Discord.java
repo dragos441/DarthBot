@@ -8,7 +8,7 @@ public class Discord extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!discord") || args[0].equalsIgnoreCase("!invite")) {
+		if (args[0].equalsIgnoreCase("!darthbot")) {
 			e.getChannel().sendMessage("**Join the DarthBot Official Server here:** https://discord.gg/hVgXYyv").queue();
 		}
 	}

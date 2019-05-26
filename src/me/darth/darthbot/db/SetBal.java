@@ -18,8 +18,8 @@ public class SetBal extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!setbalance") && e.getMember().getRoles().contains(e.getGuild().getRoleById("569463842552152094"))
-			|| args[0].equalsIgnoreCase("!setbal") && e.getMember().getRoles().contains(e.getGuild().getRoleById("569463842552152094"))) {
+		if (args[0].equalsIgnoreCase("!setbalance") && me.darth.darthbot.main.Main.g.getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.g.getRoleById("569463842552152094"))
+			|| args[0].equalsIgnoreCase("!setbal") && me.darth.darthbot.main.Main.g.getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.g.getRoleById("569463842552152094"))) {
 			Member target = null;
 			long bux = 0;
 			try {
@@ -59,7 +59,7 @@ public class SetBal extends ListenerAdapter {
 			      rs.close();
 			      con.close();
 			} catch (SQLException e1) {
-			    e.getChannel().sendMessage("<@393796810918985728> Error! ```"+e1+"```").queue();
+			    e.getChannel().sendMessage("<@159770472567799808> Error! ```"+e1+"```").queue();
 			}
 		}
 		

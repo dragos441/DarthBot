@@ -90,7 +90,7 @@ public class ViewProfile extends ListenerAdapter {
 				    	  }
 				    	  int reqxp = (level + 1) * 100;
 				    	  eb.addField("Chat Level", "Level "+level+" *("+xp+"/"+reqxp+"*xp*)*", true);
-				    	  eb.addField("What can I use DBux for?", "```> Win big at the !casino\n\nComing soon:\n- Lottery\n- Work Jobs/Rob Others```", false);
+				    	  eb.addField("What can I use DBux for?", "```> Win big at the !casino\n\nComing soon:\n- Work Jobs\n- Rob Others\n- Inventories```", false);
 				    	  PreparedStatement st = con.prepareStatement("UPDATE profiles SET Name = ? WHERE UserID = "+target.getUser().getIdLong());
 				    	  st.setString(1, target.getEffectiveName());
 				    	  st.executeUpdate();
@@ -116,7 +116,7 @@ public class ViewProfile extends ListenerAdapter {
 			      con.close();
 			
 			} catch (SQLException e1) {
-			    e.getChannel().sendMessage("<@393796810918985728> Error! ```"+e1+"```").queue();
+			    e.getChannel().sendMessage("<@159770472567799808> Error! ```"+e1+"```").queue();
 			}
 			
 		}

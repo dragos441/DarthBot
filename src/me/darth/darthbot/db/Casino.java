@@ -38,7 +38,7 @@ public class Casino extends ListenerAdapter {
 			eb.addField("Higher or Lower ~ !higherlower <money>", "Guess whether the next number will be higher or lower, and win 10% of your bet for each correct guess", false);
 			e.getChannel().sendMessage(eb.build()).queue();
 		}
-		if (args[0].equalsIgnoreCase("!hl") || args[0].equalsIgnoreCase("!higherlower") || args[0].equalsIgnoreCase("!highlow")) {
+		if (args[0].equalsIgnoreCase("!hl") || args[0].equalsIgnoreCase("!higherlower") || args[0].equalsIgnoreCase("!highlow") || args[0].equalsIgnoreCase("!higherorlower")) {
 			long tobet = -1;
 			try {
 				tobet = Long.parseLong(args[1]);

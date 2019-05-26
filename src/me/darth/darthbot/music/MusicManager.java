@@ -33,14 +33,15 @@ public class MusicManager {
 	}
 	
 	
-	public void loadTrack(final TextChannel channel, final String source){
-		EmbedBuilder eb = new EmbedBuilder().setAuthor("Music", null, me.darth.darthbot.main.Main.g.getIconUrl()).setColor(Color.red);
+	public void loadTrack(final TextChannel channel, final String source, String iconURl){
+		EmbedBuilder eb = new EmbedBuilder().setAuthor("Music", null, iconURl).setColor(Color.red);
 		eb.setDescription("Joining Channel & Configuring").setFooter("This may take a moment if you're loading a Playlist", null);
-		Message msg = channel.sendMessage(eb.build()).complete();
 		eb.setFooter(null, null);
 		MusicPlayer player = getPlayer(channel.getGuild());
 		channel.getGuild().getAudioManager().setSendingHandler(player.getAudioHandler());
+		Message msg = channel.sendMessage(eb.build()).complete();
 		manager.loadItemOrdered(player, source, new AudioLoadResultHandler(){
+			
 			
 			@Override
 			public void trackLoaded(AudioTrack track) {

@@ -8,11 +8,11 @@ public class autoReply extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		if (!e.getGuild().getId().equals("568849490425937940")) {
-			return;
-		}
 		if (e.getMessage().getMentionedMembers().contains(e.getGuild().getMemberById("569461469154902016"))) {
 			e.getChannel().sendMessage("My ears are burning :fire: - You can use `!commands` for a list of bot commands :)").queue();
+		}
+		if (!e.getGuild().getId().equals("568849490425937940")) {
+			return;
 		}
 		String msg = e.getMessage().getContentRaw().replace(" ", "");
 		if (msg.contains("www.") || msg.contains("http://") || msg.contains("https://") || msg.contains(".com") || msg.contains(".co.uk")
@@ -23,6 +23,9 @@ public class autoReply extends ListenerAdapter {
 				e.getMessage().delete().queue();
 				e.getChannel().sendMessage(e.getMember().getAsMention()+", no links allowed!").queue();
 			}
+		}
+		if (e.getMessage().getMentionedMembers().contains(e.getGuild().getMemberById("159770472567799808")) && e.getMessage().getContentRaw().contains("?")) {
+			e.getChannel().sendMessage("That sounds like a question, why not ask it in the <#574246600570830853>?").queue();
 		}
 	}
 	

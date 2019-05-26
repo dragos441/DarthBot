@@ -25,7 +25,11 @@ public class Info extends ListenerAdapter {
 					+" @ "+e.getGuild().getCreationTime().getHour()+":"+e.getGuild().getCreationTime().getMinute(), true);
 			eb.addField("Notification Level", ""+e.getGuild().getDefaultNotificationLevel(), true);
 			eb.addField("Verification Level", ""+e.getGuild().getVerificationLevel(), true);
-			eb.addField("Default Channel", ""+e.getGuild().getDefaultChannel().getAsMention(), true);
+			if (e.getGuild().getDefaultChannel() == null) {
+				eb.addField("Default Channel", "No Public Channels", true);
+			} else {
+				eb.addField("Default Channel", ""+e.getGuild().getDefaultChannel().getAsMention(), true);
+			}
 			e.getChannel().sendMessage(eb.build()).queue();
 			
 		}

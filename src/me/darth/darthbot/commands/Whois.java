@@ -92,9 +92,6 @@ public class Whois extends ListenerAdapter {
 			}
 			Collections.reverse(perms);
 			String permsstring = perms.toString();
-			if (target.getRoles().contains(e.getGuild().getRoleById("399332438079176715")) && !target.getRoles().contains(e.getGuild().getRoleById("393796810918985728"))) {
-				permsstring = permsstring+" , Kick Members, Ban Members";
-			}
 			eb.addField("Permissions ["+perms.size()+"]", ""+permsstring, true);
 			
 			

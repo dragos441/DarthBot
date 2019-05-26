@@ -16,6 +16,9 @@ public class Experience extends ListenerAdapter {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+		if (e.getMessage().getAuthor().isFake()) {
+			return;
+		}
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 
 			ResultSet msgs = con.createStatement().executeQuery("SELECT * FROM GuildProfiles");
@@ -47,7 +50,7 @@ public class Experience extends ListenerAdapter {
 		      con.close();
 		
 		} catch (SQLException e1) {
-		    e.getChannel().sendMessage("<@393796810918985728> Error! ```"+e1+"```").queue();
+		    e.getChannel().sendMessage("<@159770472567799808> Error! ```"+e1+"```").queue();
 		}
 	}
 	

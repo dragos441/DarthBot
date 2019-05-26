@@ -81,7 +81,7 @@ public class RandomEarn extends ListenerAdapter {
 			      rs.close();
 			      con.close();
 			} catch (SQLException e1) {
-			    e.getChannel().sendMessage("<@393796810918985728> Error! ```"+e1+"```").queue();
+			    e.getChannel().sendMessage("<@159770472567799808> Error! ```"+e1+"```").queue();
 			}
 			
 			if (!e.getGuild().getId().equals("575023671014588416")) {

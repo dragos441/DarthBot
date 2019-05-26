@@ -1,10 +1,14 @@
 package me.darth.darthbot.main;
 
+import java.util.Date;
+
 import me.darth.darthbot.commands.*;
 import me.darth.darthbot.db.*;
-import me.darth.darthbot.moderation.History;
+import me.darth.darthbot.moderation.*;
 import me.darth.darthbot.music.*;
 import me.darth.darthbot.testserver.*;
+import me.darth.darthbot.retalibot.*;
+import me.darth.darthbot.retalibot.submit;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
@@ -18,11 +22,16 @@ public class Main {
 	
 	public static JDA jda = null;
 	public static Guild g = null;
+	public static int updatedmin = -1;
+	//private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
+	private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
+	
+	
 	
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception {
 		jda = new JDABuilder(AccountType.BOT)
-				.setToken("NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8").buildBlocking();
+				.setToken(key).buildBlocking();
 		jda.addEventListener(new Ping());
 		jda.addEventListener(new Suggest());
 		jda.addEventListener(new ReportBug());
@@ -52,8 +61,31 @@ public class Main {
 		jda.addEventListener(new Experience());
 		jda.addEventListener(new Quiz());
 		jda.addEventListener(new History());
+		jda.addEventListener(new Kick());
+		jda.addEventListener(new Ban());
+		jda.addEventListener(new Warn());
+		jda.addEventListener(new Purge());
+		jda.addEventListener(new Mute());
+		jda.addEventListener(new GetRoles());
+		jda.addEventListener(new newApplicant());
+		jda.addEventListener(new SAC());
+		jda.addEventListener(new submit());
+		jda.addEventListener(new apply());
+		jda.addEventListener(new ServerSetup());
 		jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
 		g = jda.getGuildById("568849490425937940");
+		while (true) {
+			if (updatedmin != new Date().getMinutes()) {
+				me.darth.darthbot.main.AutoProcesses.removePunishments();
+				if (new Date().getMinutes() == 0) {
+					me.darth.darthbot.main.AutoProcesses.purgeMessages();
+				}
+				updatedmin = new Date().getMinutes();
+			} else {
+				Thread.sleep(5000);
+			}
+			
+		}
 	}
 	
 	public static Member findUser(String target) {
@@ -61,19 +93,22 @@ public class Main {
 		try {
 			member = g.getMemberById(target);
 			return member;
-		} catch (ArrayIndexOutOfBoundsException e1) {} catch (NumberFormatException e2) {} catch (IndexOutOfBoundsException e3) {}
+		} catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e1) {}
 		try {
 			member = (Member) g.getMembersByEffectiveName(target, true).get(0);
 			return member;
-		} catch (ArrayIndexOutOfBoundsException e1) {} catch (NumberFormatException e2) {} catch (IndexOutOfBoundsException e3) {}
+		} catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e1) {}
 		try {
 			member = (Member) g.getMembersByName(target, true).get(0);
 			return member;
-		} catch (ArrayIndexOutOfBoundsException e1) {} catch (NumberFormatException e2) {} catch (IndexOutOfBoundsException e3) {}
+		} catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e1) {}
 		try {
 			member = (Member) g.getMembersByNickname(target, true).get(0);
 			return member;
-		} catch (ArrayIndexOutOfBoundsException e1) {} catch (NumberFormatException e2) {} catch (IndexOutOfBoundsException e3) {}
+		} catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e1) {}
+		try {
+			member = (Member) g.getMemberById(target);
+		} catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e1) {}
 		return null;	
 	}
 	
@@ -88,6 +123,12 @@ public class Main {
 				if (jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("575729381452939274"))) {
 					eb.setFooter(m.getUser().getName()+" is a Master of Hunting Bugs on the DarthBot Discord!", "https://i.imgur.com/G6NedwO.png");
 				}
+				
+				if (jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("575729381452939274"))
+				&& jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("575729381452939274"))) {
+					eb.setFooter(m.getUser().getName()+" is a Master Bug Hunter and an Ideas Connoisseur on the DarthBot Discord!", "https://i.imgur.com/lesRIbp.png");
+				}
+				
 				if (jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("569464005416976394"))) {
 					eb.setFooter(m.getUser().getName()+" is a Server Moderator on the DarthBot Discord!", "https://i.imgur.com/P0Fkt4t.png");
 				}

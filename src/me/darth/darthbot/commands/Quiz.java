@@ -32,6 +32,7 @@ public class Quiz extends ListenerAdapter {
 	HashMap<Long, String> ansmap = new HashMap<Long, String>();
 	HashMap<Long, Long> msgmap = new HashMap<Long, Long>();
 	HashMap<Long, Boolean> isactive = new HashMap<Long, Boolean>();
+	HashMap<Long, Long> timestarted = new HashMap<Long, Long>();
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -45,6 +46,7 @@ public class Quiz extends ListenerAdapter {
 				+ansmap.get(e.getGuild().getIdLong())+"` by "+e.getMember().getAsMention()+" in `"+time+"secs`", false).setColor(Color.green).build()).queue();
 				ansmap.remove(e.getGuild().getIdLong());
 				msgmap.remove(e.getGuild().getIdLong());
+				timestarted.remove(e.getGuild().getIdLong());
 				int prize = Integer.parseInt(msg.getEmbeds().get(0).getFooter().getText().replace("Type the correct answer in chat to win a prize! | $", ""));
 				try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 				      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getIdLong());
@@ -69,6 +71,10 @@ public class Quiz extends ListenerAdapter {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!quiz")) {
+			if (isactive.get(e.getGuild().getIdLong()) != null && isactive.get(e.getGuild().getIdLong()) && new Date().getTime() - timestarted.get(e.getGuild().getIdLong()) > 60000) {
+				isactive.remove(e.getGuild().getIdLong());
+				timestarted.remove(e.getGuild().getIdLong());
+			}
 			URL url;
 			try {
 				try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
@@ -124,6 +130,7 @@ public class Quiz extends ListenerAdapter {
 				Message msg = e.getChannel().sendMessage(eb.build()).complete();
 				ansmap.put(e.getGuild().getIdLong(), answer);
 				msgmap.put(e.getGuild().getIdLong(), msg.getIdLong());
+				timestarted.put(e.getGuild().getIdLong(), new Date().getTime());
 				//e.getChannel().sendMessage(answer).queue();
 				
 				
