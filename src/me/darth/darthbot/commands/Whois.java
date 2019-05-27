@@ -25,7 +25,7 @@ public class Whois extends ListenerAdapter {
 				if (!e.getMessage().getMentionedMembers().isEmpty()) {
 					target = e.getMessage().getMentionedMembers().get(0);
 				} else {
-					target = me.darth.darthbot.main.Main.findUser(args[1]);
+					target = me.darth.darthbot.main.Main.findUser(args[1], e.getGuild());
 					if (target == null) {
 						target = e.getMember();
 					}

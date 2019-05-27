@@ -98,12 +98,13 @@ public class Casino extends ListenerAdapter {
     				eb.setColor(Color.yellow);
     				eb.setAuthor("Casino ~ Higher or Lower", null, e.getAuthor().getEffectiveAvatarUrl());
     				eb.setDescription("__**Instructions**__\nReact with :arrow_up: for Upper\nReact with :arrow_down: for Lower"
-    						+ "\nReact with :moneybag: to Cashout\n:newspaper: **Info** The minimum is 0, and the maximum is 10"
+    						+ "\nReact with :moneybag: to Cashout\n:newspaper: **Info** The minimum is 1, and the maximum is 100"
     						+ "\n:bulb: **Tip** You won't get any money unless you cashout, even if you lose!");
     				e.getChannel().sendMessage(eb.build()).queue();
     				eb.setFooter(e.getAuthor().getId(), null);
     				eb.setDescription("*Starting Bet: $*"+args[1]+"\n**Cashout Prize: $**"+args[1]+"");
-    				int rand = new Random().nextInt(11);
+    				int rand = new Random().nextInt(100);
+    				rand++;
     				eb.addField("Higher or Lower: ", ""+rand, false);
     				Message msg = e.getChannel().sendMessage(eb.build()).complete();
     				msg.addReaction("⬆").queue();
@@ -187,6 +188,11 @@ public class Casino extends ListenerAdapter {
     			int usernum = new Random().nextInt(12);	
     			usernum++;
     			botnum++;
+    			try {
+	    			if (e.getMember().getRoles().contains(me.darth.darthbot.main.Main.g.getRoleById("582164371455606784")) && botnum > 1) {
+	    				botnum = botnum - 1;
+	    			}
+    			} catch (NullPointerException e1) {}
     			eb.addField("Your Roll", "`"+usernum+"`", false);
     			eb.addField("Bot's Roll", "*Rolling...*", false);
     			msg.editMessage(eb.build()).queueAfter(1, TimeUnit.SECONDS);
@@ -253,7 +259,7 @@ public class Casino extends ListenerAdapter {
 				try {
 					num = Integer.parseInt(e.getChannel().getMessageById(e.getMessageId()).complete().getEmbeds().get(0).getFields().get(num).getValue());
 				} catch (IndexOutOfBoundsException e1) {con.close(); return;} catch (NumberFormatException e2) { con.close();return;}
-				int rand = new Random().nextInt(11);
+				int rand = new Random().nextInt(101);
 				/*if (bux > 10000) {
 					if (rand < 4 && new Random().nextInt(10) <= 3) {
 						rand++;
@@ -334,7 +340,7 @@ public class Casino extends ListenerAdapter {
 				try {
 					num = Integer.parseInt(e.getChannel().getMessageById(e.getMessageId()).complete().getEmbeds().get(0).getFields().get(num).getValue());
 				} catch (IndexOutOfBoundsException e1) {con.close(); return;} catch (NumberFormatException e2) { con.close();return;}
-				int rand = new Random().nextInt(11);
+				int rand = new Random().nextInt(101);
 				EmbedBuilder eb = new EmbedBuilder(oldeb);
 				eb.addField("Higher or Lower:", ""+rand, false);
 				if (!e.getMember().getUser().isBot()) {

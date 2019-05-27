@@ -1,5 +1,6 @@
 package me.darth.darthbot.main;
 
+import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -11,6 +12,8 @@ public class autoReply extends ListenerAdapter {
 		if (e.getMessage().getMentionedMembers().contains(e.getGuild().getMemberById("569461469154902016"))) {
 			e.getChannel().sendMessage("My ears are burning :fire: - You can use `!commands` for a list of bot commands :)").queue();
 		}
+		
+		//temp anti link system
 		if (!e.getGuild().getId().equals("568849490425937940")) {
 			return;
 		}
@@ -38,5 +41,12 @@ public class autoReply extends ListenerAdapter {
 	    {
 	    	e.getChannel().sendMessage("Responding to DMs is a bit beyond me yet. If you're looking for Support, join the DarthBot Server! https://discord.gg/hVgXYyv").queue();
 	    });
+	}
+	
+	@Override
+	public void onGuildJoin(GuildJoinEvent e) {
+		if (e.getGuild().getDefaultChannel() != null) {
+			e.getGuild().getDefaultChannel().sendMessage("This server looks pretty cool, even cooler now I'm here :sunglasses: - Customise me by using the command `!setup`!").queue();
+		}
 	}
 }

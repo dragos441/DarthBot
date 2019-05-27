@@ -79,6 +79,7 @@ public class Main {
 				me.darth.darthbot.main.AutoProcesses.removePunishments();
 				if (new Date().getMinutes() == 0) {
 					me.darth.darthbot.main.AutoProcesses.purgeMessages();
+					me.darth.darthbot.commands.Vote.listSort();
 				}
 				updatedmin = new Date().getMinutes();
 			} else {
@@ -88,26 +89,26 @@ public class Main {
 		}
 	}
 	
-	public static Member findUser(String target) {
+	public static Member findUser(String target, Guild guild) {
 		Member member = null;
 		try {
-			member = g.getMemberById(target);
+			member = guild.getMemberById(target);
 			return member;
 		} catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e1) {}
 		try {
-			member = (Member) g.getMembersByEffectiveName(target, true).get(0);
+			member = (Member) guild.getMembersByEffectiveName(target, true).get(0);
 			return member;
 		} catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e1) {}
 		try {
-			member = (Member) g.getMembersByName(target, true).get(0);
+			member = (Member) guild.getMembersByName(target, true).get(0);
 			return member;
 		} catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e1) {}
 		try {
-			member = (Member) g.getMembersByNickname(target, true).get(0);
+			member = (Member) guild.getMembersByNickname(target, true).get(0);
 			return member;
 		} catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e1) {}
 		try {
-			member = (Member) g.getMemberById(target);
+			member = (Member) guild.getMemberById(target);
 		} catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e1) {}
 		return null;	
 	}

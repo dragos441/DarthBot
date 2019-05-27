@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Category;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -17,23 +18,26 @@ public class ServerSetup extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!setup")) {
+		if (args[0].equalsIgnoreCase("!enable") || args[0].equalsIgnoreCase("!disable") || args[0].equalsIgnoreCase("!setup")) {
+			if (!e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
+				e.getChannel().sendMessage(":no_entry: You must have the **Administrator** permission to manage the bot!").queue();
+				return;
+			}
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 				EmbedBuilder eb = new EmbedBuilder().setAuthor("Server Management", null, e.getGuild().getIconUrl()).setColor(Color.blue);
-				eb.setFooter("Use | !setup <Feature> 0 | to disable a feature!", null);
-				if (args.length < 3) {
-					eb.addField("Server Setup", "`!setup JoinLog <Channel>` Setup the channel for welcome/leave messages to be logged\n"
-							+ "`!setup ActionLog <Channel>` Setup the action log channel to log all notable events on the server\n"
-							+ "`!setup StaffRole <Role>` Setup the role that can use Punishment Commands (Ban, Mute, Kick etc)\n"
-							+ "`!setup PublicRooms <Category>` Setup the Category that will have automatic public rooms", true);
+				if (args.length < 2) {
+					eb.addField("Server Setup", "`!enable JoinLog <Channel>` Setup the channel for welcome/leave messages to be logged\n"
+							+ "`!enable ActionLog <Channel>` Setup the action log channel to log all notable events on the server\n"
+							+ "`!enable Moderation <Role>` Setup the role that can use Punishment Commands (Ban, Mute, Kick etc)\n"
+							+ "`!enable PublicRooms <Category>` Setup the Category that will have automatic public rooms", false);
+					eb.addField("Disabling Features", "__!disable <Feature>__\n*Example: `!disable JoinLog`*", false);
 					e.getChannel().sendMessage(eb.build()).queue();
 					return;
 				}
 				if (args[1].equalsIgnoreCase("JoinLog")) {
 					TextChannel channel = null;
-					if (!args[2].equals("0")) {
+					if (!args[0].equalsIgnoreCase("!disable")) {
 						if (!e.getMessage().getMentionedChannels().isEmpty()) {
 							channel = e.getMessage().getMentionedChannels().get(0);
 						} else if (!e.getGuild().getTextChannelsByName(e.getMessage().getContentRaw().replace(args[0]+" "+args[1]+" ", ""), true).isEmpty()) {
@@ -58,7 +62,7 @@ public class ServerSetup extends ListenerAdapter {
 				}
 				if (args[1].equalsIgnoreCase("ActionLog")) {
 					TextChannel channel = null;
-					if (!args[2].equals("0")) {
+					if (!args[0].equalsIgnoreCase("!disable")) {
 						if (!e.getMessage().getMentionedChannels().isEmpty()) {
 							channel = e.getMessage().getMentionedChannels().get(0);
 						} else if (!e.getGuild().getTextChannelsByName(e.getMessage().getContentRaw().replace(args[0]+" "+args[1]+" ", ""), true).isEmpty()) {
@@ -81,9 +85,9 @@ public class ServerSetup extends ListenerAdapter {
 					eb.setDescription("Disabled Action Log!");
 					e.getChannel().sendMessage(eb.build()).queue();
 				}
-				if (args[1].equalsIgnoreCase("StaffRole")) {
+				if (args[1].equalsIgnoreCase("Moderation")) {
 					Role role = null;
-					if (!args[2].equals("0")) {
+					if (!args[0].equalsIgnoreCase("!disable")) {
 						if (!e.getMessage().getMentionedRoles().isEmpty()) {
 							role = e.getMessage().getMentionedRoles().get(0);
 						} else if (!e.getGuild().getRolesByName(e.getMessage().getContentRaw().replace(args[0]+" "+args[1]+" ", ""), true).isEmpty()) {
@@ -108,7 +112,7 @@ public class ServerSetup extends ListenerAdapter {
 				}
 				if (args[1].equalsIgnoreCase("PublicRooms")) {
 					Category cat = null;
-					if (!args[2].equals("0")) {
+					if (!args[0].equalsIgnoreCase("!disable")) {
 						if (!e.getGuild().getCategoriesByName(e.getMessage().getContentRaw().replace(args[0]+" "+args[1]+" ", ""), true).isEmpty()) {
 							cat = e.getGuild().getCategoriesByName(e.getMessage().getContentRaw().replace(args[0]+" "+args[1]+" ", ""), true).get(0);
 						} else {

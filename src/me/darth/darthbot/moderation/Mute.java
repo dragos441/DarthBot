@@ -37,7 +37,7 @@ public class Mute extends ListenerAdapter {
 			      {
 			        long ModRoleID = rs.getLong("Moderator");
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system!").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {
@@ -51,7 +51,7 @@ public class Mute extends ListenerAdapter {
 			       if (!e.getMessage().getMentionedMembers().isEmpty()) {
 			    	   target = e.getMessage().getMentionedMembers().get(0);
 			       } else {
-			    	   target = me.darth.darthbot.main.Main.findUser(e.getMessage().getContentRaw().replace(args[0]+" ", ""));
+			    	   target = me.darth.darthbot.main.Main.findUser(e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getGuild());
 			       }
 			       if (target == null) {
 			    	   e.getChannel().sendMessage(":no_entry: User not found!").queue();
@@ -79,7 +79,7 @@ public class Mute extends ListenerAdapter {
 			if (!e.getMessage().getMentionedMembers().isEmpty()) {
 				target = e.getMessage().getMentionedMembers().get(0);
 			} else {
-				me.darth.darthbot.main.Main.findUser(args[1]);
+				me.darth.darthbot.main.Main.findUser(args[1], e.getGuild());
 			}
 			if (target == null) {
 				e.getChannel().sendMessage("User not found!").queue();
@@ -95,7 +95,7 @@ public class Mute extends ListenerAdapter {
 			      {
 			        long ModRoleID = rs.getLong("Moderator");
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system!").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {

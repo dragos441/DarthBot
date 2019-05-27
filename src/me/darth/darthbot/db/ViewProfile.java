@@ -28,14 +28,16 @@ public class ViewProfile extends ListenerAdapter {
 				if (!e.getMessage().getMentionedMembers().isEmpty()) {
 					target = e.getMessage().getMentionedMembers().get(0);
 				} else {
-					target = me.darth.darthbot.main.Main.findUser(e.getMessage().getContentRaw().replace(args[0]+" ", ""));
+					target = me.darth.darthbot.main.Main.findUser(e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getGuild());
 				}
 			} catch (ArrayIndexOutOfBoundsException e1) {
 				target = e.getMember();
 			}
-			
-			if (target == null) {
+			if (args.length < 2) {
 				target = e.getMember();
+			}
+			if (target == null) {
+				e.getChannel().sendMessage(":no_entry: User not found!").queue();
 			}
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 
@@ -90,7 +92,7 @@ public class ViewProfile extends ListenerAdapter {
 				    	  }
 				    	  int reqxp = (level + 1) * 100;
 				    	  eb.addField("Chat Level", "Level "+level+" *("+xp+"/"+reqxp+"*xp*)*", true);
-				    	  eb.addField("What can I use DBux for?", "```> Win big at the !casino\n\nComing soon:\n- Work Jobs\n- Rob Others\n- Inventories```", false);
+				    	  eb.addField("What can I use DBux for?", "```> Win big at the !casino\n\nComing soon:\n- Work Jobs\n- Rob Others\n- Inventories\n- Store```", false);
 				    	  PreparedStatement st = con.prepareStatement("UPDATE profiles SET Name = ? WHERE UserID = "+target.getUser().getIdLong());
 				    	  st.setString(1, target.getEffectiveName());
 				    	  st.executeUpdate();

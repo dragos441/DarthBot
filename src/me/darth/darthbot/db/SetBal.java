@@ -18,8 +18,8 @@ public class SetBal extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!setbalance") && me.darth.darthbot.main.Main.g.getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.g.getRoleById("569463842552152094"))
-			|| args[0].equalsIgnoreCase("!setbal") && me.darth.darthbot.main.Main.g.getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.g.getRoleById("569463842552152094"))) {
+		if (args[0].equalsIgnoreCase("!setbalance") && me.darth.darthbot.main.Main.g.getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.g.getRoleById("569464005416976394"))
+			|| args[0].equalsIgnoreCase("!setbal") && me.darth.darthbot.main.Main.g.getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.g.getRoleById("569464005416976394"))) {
 			Member target = null;
 			long bux = 0;
 			try {
@@ -34,7 +34,7 @@ public class SetBal extends ListenerAdapter {
 			if (!e.getMessage().getMentionedMembers().isEmpty()) {
 				target = e.getMessage().getMentionedMembers().get(0);
 			} else {
-				target = me.darth.darthbot.main.Main.findUser(args[1]);
+				target = me.darth.darthbot.main.Main.findUser(args[1], e.getGuild());
 				if (target == null) {
 					e.getChannel().sendMessage("User not found!").queue();
 				}

@@ -28,7 +28,7 @@ public class Purge extends ListenerAdapter {
 			      {
 			        long ModRoleID = rs.getLong("Moderator");
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system!").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {

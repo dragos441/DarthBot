@@ -175,7 +175,7 @@ public class Vote extends ListenerAdapter {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public void listSort() {
+	public static void listSort() {
 		if (lastUpdated > new Date().getMinutes() - 5) {
 			return;
 		}
@@ -265,9 +265,17 @@ public class Vote extends ListenerAdapter {
 			String cardID = cardID(e.getMessage().getContentRaw().split(" "), e.getMessage().getContentRaw().split("/"));
 			int votes = getVotes(cardID);
 			if (args[0].equalsIgnoreCase("!upvote")) {
-				votes=votes+1;
+				if (e.getMember().getRoles().contains(e.getGuild().getRoleById("582164371455606784"))) {
+					votes=votes+3;
+				} else {
+					votes=votes+1;
+				}
 			} else {
-				votes=votes-1;
+				if (e.getMember().getRoles().contains(e.getGuild().getRoleById("582164371455606784"))) {
+					votes=votes-3;
+				} else {
+					votes=votes-1;
+				}
 			}
 			if (votes == -99999) {
 				return;

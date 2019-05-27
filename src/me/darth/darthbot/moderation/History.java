@@ -48,7 +48,7 @@ public class History extends ListenerAdapter {
 			} else if (!e.getMessage().getMentionedMembers().isEmpty()) {
 				target = e.getMessage().getMentionedMembers().get(0);
 			} else {
-				target = me.darth.darthbot.main.Main.findUser(e.getMessage().getContentRaw().replace(args[0]+" ", ""));
+				target = me.darth.darthbot.main.Main.findUser(e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getGuild());
 			}
 			
 			if (target == null) {
@@ -79,7 +79,6 @@ public class History extends ListenerAdapter {
 			    	  map.put(0, type+","+cal.getTimeInMillis()+","+reason+","+punisher+","+expiry);
 			    	  counter++;
 			      }
-			      eb.setAuthor(target.getEffectiveName()+"'s Punishment History ("+map.size()+"/"+counter+")", null, target.getUser().getEffectiveAvatarUrl());
 			      for (int x = 0 ; x < 9 ; x++) {
 			    	  try {
 				    	  String[] data = map.get(x).split(",");
@@ -102,11 +101,22 @@ public class History extends ListenerAdapter {
 				    			  active=false;
 				    		  }
 				    		  eb.addField("Temporarily Banned on "+ft+" (Active: "+active+")", "**Reason:** `"+reason+"` **by "+punisher+"**\n**Expires:** "+exp.getTime(), false);
-				      	  } else {
-				    		  eb.addField(type+" @ "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
+				    	  } else if (type.equals("TEMPMUTE")) {
+				    		  Calendar exp = Calendar.getInstance();
+				    		  exp.setTimeInMillis(Long.parseLong(data[4]));
+				    		  boolean active = true;
+				    		  if (new Date().getTime() > exp.getTimeInMillis()) {
+				    			  active=false;
+				    		  }
+				    		  eb.addField("Temporarily Muted on "+ft+" (Active: "+active+")", "**Reason:** `"+reason+"` **by "+punisher+"**\n**Expires:** "+exp.getTime(), false);
+				    	  } else if (type.equals("WARN")) {
+				    		  eb.addField("Warned on "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
+				    	  } else {
+				    		  eb.addField(type+" on "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
 				    	  }
 			    	  } catch (NullPointerException e1) {}
 			      }
+			      eb.setAuthor(target.getEffectiveName()+"'s Punishment History ("+eb.getFields().size()+"/"+counter+")", null, target.getUser().getEffectiveAvatarUrl());
 			      if (eb.getFields().size() == 0) {
 			    	 eb.setTitle(":angel: No punishments found!");
 			    	 eb.setColor(Color.green);

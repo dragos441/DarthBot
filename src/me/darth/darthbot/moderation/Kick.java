@@ -29,7 +29,7 @@ public class Kick extends ListenerAdapter {
 			if (!e.getMessage().getMentionedMembers().isEmpty()) {
 				target = e.getMessage().getMentionedMembers().get(0);
 			} else {
-				me.darth.darthbot.main.Main.findUser(args[1]);
+				me.darth.darthbot.main.Main.findUser(args[1], e.getGuild());
 			}
 			if (target == null) {
 				e.getChannel().sendMessage("User not found!").queue();
@@ -41,7 +41,7 @@ public class Kick extends ListenerAdapter {
 			      {
 			        long ModRoleID = rs.getLong("Moderator");
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system!").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {

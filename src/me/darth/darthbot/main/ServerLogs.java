@@ -205,7 +205,7 @@ public class ServerLogs extends ListenerAdapter {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.red);
 		eb.setAuthor("User Banned",null, e.getUser().getAvatarUrl());
-		eb.setDescription("User "+e.getUser().getAsMention()+" has been banned ");
+		eb.setDescription("User "+e.getUser().getAsMention()+" has been banned");
 		eb.setFooter("Banned User ID: "+e.getUser().getId(), e.getUser().getAvatarUrl());
 		eb.setTimestamp(Instant.from(ZonedDateTime.now()));
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {

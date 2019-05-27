@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +17,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.HierarchyException;
@@ -35,7 +38,7 @@ public class Ban extends ListenerAdapter {
 			      {
 			        long ModRoleID = rs.getLong("Moderator");
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system!").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {
@@ -51,11 +54,16 @@ public class Ban extends ListenerAdapter {
 		        		User m = banlist.get(x).getUser();
 		        		if (m.getName().equalsIgnoreCase(tounban) || m.getId().equals(tounban)) {
 		        			e.getGuild().getController().unban(m).queue();
-		        			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.green).setDescription(":white_check_mark: **"+m.getName()+"** has been unbanned!").build()).queue();
+		        			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.green).setDescription(":white_check_mark: **"+m.getName()+"#"+m.getDiscriminator()+"** has been unbanned!").build()).queue();
 		        			con.prepareStatement("UPDATE ModHistory SET Active = 0 WHERE GuildID = "+e.getGuild().getIdLong()+" AND PunishedID = "
 		        				+m.getIdLong()+" AND Type = 'BAN' OR GuildID = "+e.getGuild().getIdLong()+" AND PunishedID = "
 		        				+m.getIdLong()+" AND Type = 'TEMPBAN'").execute();
-		        			rs.close();
+			  			    TextChannel logchannel = e.getGuild().getTextChannelById(rs.getLong("LogChannel"));
+			  			    EmbedBuilder eb = new EmbedBuilder().setAuthor("Member Unbanned", null, m.getEffectiveAvatarUrl()).setDescription("User "+m.getAsMention()+" "
+			  			    		+ "has been unbanned").addField("Unbanned by", e.getMember().getAsMention(), true).setTimestamp(Instant.from(ZonedDateTime.now()))
+			  			    		.setFooter("User ID"+m.getId(), null).setColor(Color.green);
+			  			    logchannel.sendMessage(eb.build()).queue();
+			  			    rs.close();
 			  			    con.close();
 			  			    return;
 		        		}
@@ -74,7 +82,7 @@ public class Ban extends ListenerAdapter {
 			if (!e.getMessage().getMentionedMembers().isEmpty()) {
 				target = e.getMessage().getMentionedMembers().get(0);
 			} else {
-				me.darth.darthbot.main.Main.findUser(args[1]);
+				me.darth.darthbot.main.Main.findUser(args[1], e.getGuild());
 			}
 			if (target == null) {
 				e.getChannel().sendMessage("User not found!").queue();
@@ -90,7 +98,7 @@ public class Ban extends ListenerAdapter {
 			      {
 			        long ModRoleID = rs.getLong("Moderator");
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system!").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {
@@ -201,6 +209,7 @@ public class Ban extends ListenerAdapter {
 		          	
 			      rs.close();
 			      con.close();
+			      
 			} catch (SQLException e1) {
 			   e1.printStackTrace();
 			}

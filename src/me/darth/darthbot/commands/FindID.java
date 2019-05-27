@@ -83,8 +83,8 @@ public class FindID extends ListenerAdapter {
 				eb.setDescription("**ID:** `"+c.getId()
 					+"`\n**As Mention:** `<#"+c.getId()+">`");
 				e.getChannel().sendMessage(eb.build()).queue();
-			} else if (me.darth.darthbot.main.Main.findUser(target) != null) {
-				Member m = me.darth.darthbot.main.Main.findUser(target);
+			} else if (me.darth.darthbot.main.Main.findUser(target, e.getGuild()) != null) {
+				Member m = me.darth.darthbot.main.Main.findUser(target, e.getGuild());
 				eb.setAuthor("Information about "+m.getEffectiveName(), null, m.getUser().getEffectiveAvatarUrl());
 				eb.setDescription(m.getAsMention()
 					+ "\n**ID:** `"+m.getUser().getId()
