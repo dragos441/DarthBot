@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -34,10 +35,12 @@ public class FAQ extends ListenerAdapter {
 				&& e.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!r") && e.getAuthor().getId().equals("159770472567799808")) {
 			String[] args = e.getMessage().getContentRaw().split(" ");
 			MessageEmbed msg = e.getChannel().getMessageById(args[1]).complete().getEmbeds().get(0);
-			EmbedBuilder eb = new EmbedBuilder().setAuthor(msg.getAuthor().getName().split("#")[0], null, msg.getAuthor().getIconUrl()).addField("Question: "+msg.getFields().get(0).getValue(), 
-				e.getMessage().getContentRaw().replace(args[0]+" ", "").replace(args[1]+" ", ""), false).setColor(Color.green);
+			Member sender = e.getGuild().getMemberById(msg.getFooter().getText());
+			EmbedBuilder eb = new EmbedBuilder().setAuthor(msg.getFields().get(0).getValue()).setColor(Color.green)
+					.setDescription(e.getMessage().getContentRaw().replace(args[0]+" ", "").replace(args[1]+" ", ""))
+					.setFooter(msg.getAuthor().getName()+" ("+sender.getUser().getId()+")", sender.getUser().getEffectiveAvatarUrl());
 			e.getGuild().getTextChannelById("574246600570830853").sendMessage(eb.build()).queue();
-			e.getGuild().getTextChannelById("574246600570830853").sendMessage(e.getGuild().getMemberById(msg.getFooter().getText()).getAsMention()+" - Your question has been"
+			e.getGuild().getTextChannelById("574246600570830853").sendMessage(sender.getAsMention()+" - Your question has been"
 					+ " answered!").complete().delete().queueAfter(30, TimeUnit.SECONDS);
 			e.getChannel().sendMessage("`#574246600570830853` successfully answered").complete().delete().queueAfter(10, TimeUnit.SECONDS);
 			e.getChannel().getMessageById(args[1]).complete().delete().queue();

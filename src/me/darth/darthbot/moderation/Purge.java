@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -13,6 +15,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -24,9 +27,11 @@ public class Purge extends ListenerAdapter {
 		if (args[0].equalsIgnoreCase("!purge")) {
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getIdLong());
+			      TextChannel logchannel = null;
 			      while (rs.next())
 			      {
 			        long ModRoleID = rs.getLong("Moderator");
+			        logchannel = e.getGuild().getTextChannelById(rs.getLong("LogChannel"));
 			        if (ModRoleID == 0L) {
 			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
 			        	return;
@@ -64,6 +69,10 @@ public class Purge extends ListenerAdapter {
 			      e.getChannel().deleteMessages(todelete).queue();
 			      num=num-1;
 			      e.getChannel().sendMessage(":white_check_mark: Successfully purged `"+num+"` messages!").complete().delete().queueAfter(5, TimeUnit.SECONDS);
+			      EmbedBuilder eb = new EmbedBuilder().setAuthor("Messages Purged", null, e.getMember().getUser().getEffectiveAvatarUrl()).setDescription("User "+e.getMember().getAsMention()+" "
+	  			    		+ "has purged `"+num+"` messages in "+e.getChannel().getAsMention()+".").setTimestamp(Instant.from(ZonedDateTime.now()))
+	  			    		.setFooter("User ID"+e.getMember().getUser().getId(), null).setColor(Color.red);
+	  			    logchannel.sendMessage(eb.build()).queue();
 			      rs.close();
 			      con.close();
 			} catch (SQLException e1) {

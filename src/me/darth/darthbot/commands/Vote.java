@@ -374,7 +374,7 @@ public class Vote extends ListenerAdapter {
 				if (sm == null) {
 					eb.setAuthor(obj.getString("desc").toString().split("\n")[5].replace("> ", "").replace("`", "").replace("`", ""), link, me.darth.darthbot.main.Main.g.getIconUrl());
 				} else {
-					eb.setAuthor("Submitted by "+sm.getUser().getName(), link, sm.getUser().getEffectiveAvatarUrl());
+					eb.setAuthor("Submitted by "+sm.getUser().getName()+"#"+sm.getUser().getDiscriminator(), link, sm.getUser().getEffectiveAvatarUrl());
 				}
 				if (votes < 0) {
 					eb.setColor(Color.red);

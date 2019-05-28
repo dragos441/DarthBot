@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -33,9 +35,11 @@ public class Mute extends ListenerAdapter {
 		if (args[0].equalsIgnoreCase("!unmute")) {
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getIdLong());
+			      TextChannel logchannel = null;
 			      while (rs.next())
 			      {
 			        long ModRoleID = rs.getLong("Moderator");
+			        logchannel = e.getGuild().getTextChannelById(rs.getLong("LogChannel"));
 			        if (ModRoleID == 0L) {
 			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
 			        	return;
@@ -66,6 +70,10 @@ public class Mute extends ListenerAdapter {
 			       con.prepareStatement("UPDATE ModHistory SET Active = 0 WHERE GuildID = "+e.getGuild().getIdLong()+" AND PunishedID = "
 			       +target.getUser().getIdLong()+" AND Type = 'TEMPMUTE' OR GuildID = "+e.getGuild().getIdLong()+" AND PunishedID = "
 					       +target.getUser().getIdLong()+" AND Type = 'MUTE'").execute();
+			       EmbedBuilder eb = new EmbedBuilder().setAuthor("Member Unmuted", null, target.getUser().getEffectiveAvatarUrl()).setDescription("User "+target.getAsMention()+" "
+	  			    		+ "has been unmuted").addField("Unmuted by", e.getMember().getAsMention(), true).setTimestamp(Instant.from(ZonedDateTime.now()))
+	  			    		.setFooter("User ID"+target.getUser().getId(), null).setColor(Color.red);
+	  			    logchannel.sendMessage(eb.build()).queue();
 			      }
 		          	
 			      rs.close();

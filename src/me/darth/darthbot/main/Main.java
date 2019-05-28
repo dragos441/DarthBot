@@ -75,16 +75,17 @@ public class Main {
 		jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
 		g = jda.getGuildById("568849490425937940");
 		while (true) {
-			if (updatedmin != new Date().getMinutes()) {
+			int min = new Date().getMinutes();
+			if (updatedmin != min) {
 				me.darth.darthbot.main.AutoProcesses.removePunishments();
-				if (new Date().getMinutes() == 0) {
+				if (min == 0) {
 					me.darth.darthbot.main.AutoProcesses.purgeMessages();
 					me.darth.darthbot.commands.Vote.listSort();
+					jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
 				}
-				updatedmin = new Date().getMinutes();
-			} else {
-				Thread.sleep(5000);
+				updatedmin = min;
 			}
+			Thread.sleep(5000);
 			
 		}
 	}

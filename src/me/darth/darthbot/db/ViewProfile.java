@@ -91,7 +91,11 @@ public class ViewProfile extends ListenerAdapter {
 				    		  eb.addField("DBux $$$", "**$"+DBux+"**", true);
 				    	  }
 				    	  int reqxp = (level + 1) * 100;
-				    	  eb.addField("Chat Level", "Level "+level+" *("+xp+"/"+reqxp+"*xp*)*", true);
+				    	  if (reqxp > xp) {
+				    		  eb.addField("Chat Level", "Level "+level+" *("+xp+"/"+reqxp+"*xp*)*", true);
+				    	  } else {
+				    		  eb.addField("Chat Level", "⬆**Level Up!**⬆", true); 
+				    	  }
 				    	  eb.addField("What can I use DBux for?", "```> Win big at the !casino\n\nComing soon:\n- Work Jobs\n- Rob Others\n- Inventories\n- Store```", false);
 				    	  PreparedStatement st = con.prepareStatement("UPDATE profiles SET Name = ? WHERE UserID = "+target.getUser().getIdLong());
 				    	  st.setString(1, target.getEffectiveName());
