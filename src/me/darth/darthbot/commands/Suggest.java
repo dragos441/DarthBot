@@ -24,6 +24,10 @@ public class Suggest extends ListenerAdapter {
 				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!suggest Idea - Description`").queue();
 				return;
 			}
+			if (e.getMessage().getContentRaw().contains("\n")) {
+				e.getChannel().sendMessage(":no_entry: Please don't include line-breaks in your suggestion!\n(eg\nthese\nthings)").queue();
+				return;
+			}
 			EmbedBuilder dupes = new EmbedBuilder().setAuthor("Possible Duplicates Found", null, e.getGuild().getIconUrl());
 			dupes.setDescription("Please check that the below cards aren't a duplicate of what you're submitting. If none of them are, **react with a :white_check_mark:"
 					+ "to your message above to submit it!**");

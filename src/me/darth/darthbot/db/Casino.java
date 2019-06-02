@@ -177,7 +177,7 @@ public class Casino extends ListenerAdapter {
     			canBet.close();
     			EmbedBuilder eb = new EmbedBuilder();
     			eb.setColor(Color.yellow);
-    			eb.setAuthor("Casino ~ Double or Nothing", null, e.getAuthor().getAvatarUrl());
+    			eb.setAuthor("Casino ~ Double or Nothing", null, e.getAuthor().getEffectiveAvatarUrl());
     			eb.setFooter("To Win: Roll higher than the bot!", null);
     			eb.setDescription("**Betting `$"+tobet+"`**");
     			eb.addField("Your Roll", "*Rolling Dice...*", false);

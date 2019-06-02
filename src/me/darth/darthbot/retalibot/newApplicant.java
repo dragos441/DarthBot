@@ -1,9 +1,5 @@
 package me.darth.darthbot.retalibot;
 
-import java.nio.channels.Channel;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
@@ -36,7 +32,6 @@ public class newApplicant extends ListenerAdapter {
 			}
 			TextChannel c = e.getGuild().getTextChannelById(cid);
 			c.getManager().putPermissionOverride(target, EnumSet.of(Permission.MESSAGE_READ, Permission.MESSAGE_WRITE), null).complete();
-			Calendar cal = Calendar.getInstance();
 			String mid = c.sendMessage("**"+target.getAsMention()+" | Stage 1**"
 				+ "\nThanks for showing an interest in the Staff team! We will be reviewing your application over the course of the next week, and you will be notified of the status of your application here!"
 				+ "\n\n**Stage:**\n**1)** Reviewing your application in detail :stopwatch: \n**2)** Invited for an Interview\n**3)** Attended Interview:\n**4)** Making Final Decision:"

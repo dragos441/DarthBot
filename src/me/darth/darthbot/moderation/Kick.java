@@ -10,9 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.ExecutionException;
 
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -100,7 +98,7 @@ public class Kick extends ListenerAdapter {
 		
 		          	e.getChannel().sendMessage(eb.build()).queue();
 	  			    eb = new EmbedBuilder().setAuthor("Member Kicked", null, target.getUser().getEffectiveAvatarUrl()).setDescription("User "+target.getAsMention()+" "
-	  			    		+ "has been kicked").addField("Kicked by", e.getMember().getAsMention(), true).setTimestamp(Instant.from(ZonedDateTime.now()))
+	  			    		+ "has been kicked").addField("Kicked by", e.getMember().getAsMention(), true).addField("Reason", reason, false).setTimestamp(Instant.from(ZonedDateTime.now()))
 	  			    		.setFooter("User ID"+target.getUser().getId(), null).setColor(Color.red);
 	  			    logchannel.sendMessage(eb.build()).queue();
 		          	

@@ -21,7 +21,13 @@ public class Experience extends ListenerAdapter {
 		}
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 
-			ResultSet msgs = con.createStatement().executeQuery("SELECT * FROM GuildProfiles");
+			ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
+			while (rs.next()) {
+				if (rs.getInt("doExperience") == 0) {
+					return;
+				}
+			}
+			ResultSet msgs = con.createStatement().executeQuery("SELECT * FROM GuildProfiles WHERE GuildID = "+e.getGuild().getId());
 		    while (msgs.next()) {
 		    	long UserID = msgs.getLong("UserID");
 				long GuildID = msgs.getLong("GuildID");

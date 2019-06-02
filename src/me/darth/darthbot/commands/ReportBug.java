@@ -9,16 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.http.client.methods.HttpPost;
-import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.julienvey.trello.Trello;
-import com.julienvey.trello.domain.Card;
-import com.julienvey.trello.impl.TrelloImpl;
-import com.julienvey.trello.impl.http.ApacheHttpClient;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -50,7 +41,9 @@ public class ReportBug extends ListenerAdapter {
 					+ "\n**Details:** "+desc
 					+ "\n\n---\n\n"
 					+ "> Reported by `"+author.getName()+"#"+author.getDiscriminator()+"`"
-					+ "\n> Reporter ID: `"+author.getId()+"`");
+					+ "\n> Reporter ID: `"+author.getId()+"`"
+					+ "\n\n**Information:**\nGuild: `"+msg.getGuild()+"`"
+					+ "\nPerms: `"+msg.getMember().getPermissions()+"`");
 			board = "5cbc6c61a0685f1423e3055d";
 		} else {
 			cardname = URLEncoder.encode(cardsplit[0]);

@@ -36,9 +36,9 @@ public class FAQ extends ListenerAdapter {
 			String[] args = e.getMessage().getContentRaw().split(" ");
 			MessageEmbed msg = e.getChannel().getMessageById(args[1]).complete().getEmbeds().get(0);
 			Member sender = e.getGuild().getMemberById(msg.getFooter().getText());
-			EmbedBuilder eb = new EmbedBuilder().setAuthor(msg.getFields().get(0).getValue()).setColor(Color.green)
+			EmbedBuilder eb = new EmbedBuilder().setTitle(msg.getFields().get(0).getValue()).setColor(Color.green)
 					.setDescription(e.getMessage().getContentRaw().replace(args[0]+" ", "").replace(args[1]+" ", ""))
-					.setFooter(msg.getAuthor().getName()+" ("+sender.getUser().getId()+")", sender.getUser().getEffectiveAvatarUrl());
+					.setFooter(msg.getAuthor().getName().split("#")[0], sender.getUser().getEffectiveAvatarUrl());
 			e.getGuild().getTextChannelById("574246600570830853").sendMessage(eb.build()).queue();
 			e.getGuild().getTextChannelById("574246600570830853").sendMessage(sender.getAsMention()+" - Your question has been"
 					+ " answered!").complete().delete().queueAfter(30, TimeUnit.SECONDS);

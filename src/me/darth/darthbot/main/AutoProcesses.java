@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Category;
 import net.dv8tion.jda.core.entities.Guild;
 
 public class AutoProcesses {

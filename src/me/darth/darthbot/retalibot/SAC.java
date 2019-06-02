@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class SAC extends ListenerAdapter {
@@ -32,6 +31,7 @@ public class SAC extends ListenerAdapter {
 		
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent e) {
 		if (e.getChannel().equals(e.getGuild().getTextChannelById("543562394702446593"))) {

@@ -72,21 +72,25 @@ public class Main {
 		jda.addEventListener(new submit());
 		jda.addEventListener(new apply());
 		jda.addEventListener(new ServerSetup());
+		jda.addEventListener(new Lock());
+		jda.addEventListener(new LevelRoles());
 		jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
 		g = jda.getGuildById("568849490425937940");
 		while (true) {
 			int min = new Date().getMinutes();
-			if (updatedmin != min) {
+			if (min != updatedmin) {
 				me.darth.darthbot.main.AutoProcesses.removePunishments();
-				if (min == 0) {
+				if (min == 1) {
 					me.darth.darthbot.main.AutoProcesses.purgeMessages();
 					me.darth.darthbot.commands.Vote.listSort();
 					jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
 				}
+				if (min % 5 == 0) {
+					me.darth.darthbot.main.Leaderboards.GlobalLeaderboard();
+				}
 				updatedmin = min;
 			}
 			Thread.sleep(5000);
-			
 		}
 	}
 	

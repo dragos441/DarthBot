@@ -72,6 +72,9 @@ public class ProfileGen extends ListenerAdapter {
 		        long UserID = rs.getLong("UserID");
 		        if (UserID == e.getAuthor().getIdLong()) {
 		        	found = true;
+		        	if (!rs.getString("Name").equalsIgnoreCase(e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator())) {
+		        		con.prepareStatement("UPDATE profiles SET Name = '"+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+"' WHERE UserID = "+e.getAuthor().getIdLong()).execute();
+		        	}
 		        }
 		      }
 		      if (!found) {

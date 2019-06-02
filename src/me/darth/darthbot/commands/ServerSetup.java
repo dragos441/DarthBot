@@ -3,7 +3,6 @@ package me.darth.darthbot.commands;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -30,10 +29,22 @@ public class ServerSetup extends ListenerAdapter {
 					eb.addField("Server Setup", "`!enable JoinLog <Channel>` Setup the channel for welcome/leave messages to be logged\n"
 							+ "`!enable ActionLog <Channel>` Setup the action log channel to log all notable events on the server\n"
 							+ "`!enable Moderation <Role>` Setup the role that can use Punishment Commands (Ban, Mute, Kick etc)\n"
-							+ "`!enable PublicRooms <Category>` Setup the Category that will have automatic public rooms", false);
+							+ "`!enable PublicRooms <Category>` Setup the Category that will have automatic public rooms\n"
+							+ "`!enable Experience` Enabled the Level/Experience Feature `Enabled by default`", false);
 					eb.addField("Disabling Features", "__!disable <Feature>__\n*Example: `!disable JoinLog`*", false);
 					e.getChannel().sendMessage(eb.build()).queue();
 					return;
+				}
+				if (args[1].equalsIgnoreCase("Experience")) {
+					if (!args[0].equalsIgnoreCase("!disable")) {
+						con.prepareStatement("UPDATE GuildInfo SET doExperience = 1 WHERE GuildID = "+e.getGuild().getIdLong()).execute();
+						eb.setDescription(":white_check_mark: Experience and Levels have been enabled!");
+						e.getChannel().sendMessage(eb.build()).queue();
+						return;
+					}
+					con.prepareStatement("UPDATE GuildInfo SET doExperience = 0 WHERE GuildID = "+e.getGuild().getIdLong()).execute();
+					eb.setDescription("Disabled Experience and Levels!");
+					e.getChannel().sendMessage(eb.build()).queue();
 				}
 				if (args[1].equalsIgnoreCase("JoinLog")) {
 					TextChannel channel = null;
@@ -124,15 +135,21 @@ public class ServerSetup extends ListenerAdapter {
 							e.getChannel().sendMessage(":no_entry: Couldn't find category!").queue();
 							return;
 						}
+						if (!cat.getVoiceChannels().isEmpty()) {
+							e.getChannel().sendMessage(":no_entry: The Public Rooms category must be set to a category without any existing Voice Channels!").queue();
+							return;
+						}
 						cat.createVoiceChannel("Voice #1").queue();
 						con.prepareStatement("UPDATE GuildInfo SET PublicCategory = "+cat.getIdLong()+" WHERE GuildID = "+e.getGuild().getIdLong()).execute();
 						eb.setDescription(":white_check_mark: "+cat.getName()+" has been set as the Public Room Category!");
 						e.getChannel().sendMessage(eb.build()).queue();
+						return;
 					}
 					con.prepareStatement("UPDATE GuildInfo SET PublicCategory = 0 WHERE GuildID = "+e.getGuild().getIdLong()).execute();
 					eb.setDescription("Disabled Public Rooms!");
 					e.getChannel().sendMessage(eb.build()).queue();
 				}
+				con.close();
 			} catch (SQLException e1) {
 				
 			}

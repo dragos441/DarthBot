@@ -18,6 +18,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class History extends ListenerAdapter {
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		if (e.getGuild().getId().equals("393499439739961366")) {

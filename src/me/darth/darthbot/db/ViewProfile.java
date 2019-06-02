@@ -65,8 +65,8 @@ public class ViewProfile extends ListenerAdapter {
 				    	  found = true;
 				    	  Member m = e.getGuild().getMemberById(UserID);
 				    	  eb.setColor(Color.green);
-				    	  eb.setAuthor(target.getEffectiveName()+"'s Profile", null, target.getUser().getAvatarUrl());
-				    	  eb.setThumbnail(target.getUser().getAvatarUrl());
+				    	  eb.setAuthor(target.getEffectiveName()+"'s Profile", null, target.getUser().getEffectiveAvatarUrl());
+				    	  eb.setThumbnail(target.getUser().getEffectiveAvatarUrl());
 				    	  eb.addField("User", target.getAsMention(), true);
 				    	  List<Role> rolesRaw = m.getRoles();
 				    	  List<String> roles = new ArrayList<String>();

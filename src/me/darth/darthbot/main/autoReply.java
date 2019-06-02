@@ -1,6 +1,7 @@
 package me.darth.darthbot.main;
 
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -9,6 +10,10 @@ public class autoReply extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+		if (e.getAuthor().getId().equals("159770472567799808") && e.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!say")) {
+			e.getMessage().delete().queue();
+			e.getChannel().sendMessage(e.getMessage().getContentRaw().replace(e.getMessage().getContentRaw().split(" ")[0]+" ", "")).queue();
+		}
 		if (e.getMessage().getMentionedMembers().contains(e.getGuild().getMemberById("569461469154902016"))) {
 			e.getChannel().sendMessage("My ears are burning :fire: - You can use `!commands` for a list of bot commands :)").queue();
 		}
@@ -47,6 +52,14 @@ public class autoReply extends ListenerAdapter {
 	public void onGuildJoin(GuildJoinEvent e) {
 		if (e.getGuild().getDefaultChannel() != null) {
 			e.getGuild().getDefaultChannel().sendMessage("This server looks pretty cool, even cooler now I'm here :sunglasses: - Customise me by using the command `!setup`!").queue();
+			me.darth.darthbot.main.Main.g.getVoiceChannelById("583379618682241048").getManager().setName("Serving "+e.getJDA().getGuilds().size()+" Guilds!").queue();
+		}
+	}
+	@Override
+	public void onGuildLeave(GuildLeaveEvent e) {
+		if (e.getGuild().getDefaultChannel() != null) {
+			e.getGuild().getDefaultChannel().sendMessage("This server looks pretty cool, even cooler now I'm here :sunglasses: - Customise me by using the command `!setup`!").queue();
+			me.darth.darthbot.main.Main.g.getVoiceChannelById("583379618682241048").getManager().setName("Serving "+e.getJDA().getGuilds().size()+" Guilds!").queue();
 		}
 	}
 }

@@ -8,14 +8,11 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -94,8 +91,10 @@ public class Ban extends ListenerAdapter {
 			String durstring = "";
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getIdLong());
+			      TextChannel logchannel = null;
 			      while (rs.next())
 			      {
+			    	logchannel = e.getGuild().getTextChannelById(rs.getLong("LogChannel"));
 			        long ModRoleID = rs.getLong("Moderator");
 			        if (ModRoleID == 0L) {
 			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
@@ -206,6 +205,17 @@ public class Ban extends ListenerAdapter {
 				      		+ "("+System.currentTimeMillis()+", "+e.getGuild().getIdLong()+", "+target.getUser().getIdLong()+", "+e.getAuthor().getIdLong()
 				      		+ ", '"+type+"', '"+reason+"', "+expires+", 1)").execute();
 		          	e.getChannel().sendMessage(eb.build()).queue();
+		          	if (temp) {
+		  			    eb = new EmbedBuilder().setAuthor("Member Banned", null, target.getUser().getEffectiveAvatarUrl()).setDescription("User "+target.getAsMention()+" "
+		  			    		+ "has been Banned").addField("Length", durstring+unit, false).addField("Banned by", e.getMember().getAsMention(), true).addField("Reason", reason, false).setTimestamp(Instant.from(ZonedDateTime.now()))
+		  			    		.setFooter("User ID"+target.getUser().getId(), null).setColor(Color.red);
+		  			    logchannel.sendMessage(eb.build()).queue();
+		          	} else {
+		  			    eb = new EmbedBuilder().setAuthor("Member Banned", null, target.getUser().getEffectiveAvatarUrl()).setDescription("User "+target.getAsMention()+" "
+		  			    		+ "has been Banned").addField("Banned by", e.getMember().getAsMention(), true).addField("Reason", reason, false).setTimestamp(Instant.from(ZonedDateTime.now()))
+		  			    		.setFooter("User ID"+target.getUser().getId(), null).setColor(Color.red);
+		  			    logchannel.sendMessage(eb.build()).queue();
+		          	}
 		          	
 			      rs.close();
 			      con.close();
