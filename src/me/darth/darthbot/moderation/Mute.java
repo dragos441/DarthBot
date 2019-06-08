@@ -29,6 +29,10 @@ public class Mute extends ListenerAdapter {
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!unmute")) {
+			if (args.length < 2) {
+				e.getChannel().sendMessage("Invalid Syntax: `!unmute <User>`").queue();
+				return;
+			}
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getIdLong());
 			      TextChannel logchannel = null;
@@ -37,7 +41,7 @@ public class Mute extends ListenerAdapter {
 			        long ModRoleID = rs.getLong("Moderator");
 			        logchannel = e.getGuild().getTextChannelById(rs.getLong("LogChannel"));
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup Moderation <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {
@@ -80,6 +84,10 @@ public class Mute extends ListenerAdapter {
 			}
 		}
 		if (args[0].equalsIgnoreCase("!mute")) {
+			if (args.length < 2) {
+				e.getChannel().sendMessage("Invalid Syntax: `!mute <User> (Time) <Reason>`").queue();
+				return;
+			}
 			Member target = null;
 			if (!e.getMessage().getMentionedMembers().isEmpty()) {
 				target = e.getMessage().getMentionedMembers().get(0);
@@ -102,7 +110,7 @@ public class Mute extends ListenerAdapter {
 			        long ModRoleID = rs.getLong("Moderator");
 			        logchannel = e.getGuild().getTextChannelById(rs.getLong("LogChannel"));
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup Moderation <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {

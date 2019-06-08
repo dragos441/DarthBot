@@ -189,7 +189,7 @@ public class Casino extends ListenerAdapter {
     			usernum++;
     			botnum++;
     			try {
-	    			if (e.getMember().getRoles().contains(me.darth.darthbot.main.Main.g.getRoleById("582164371455606784")) && botnum > 1) {
+	    			if (e.getMember().getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("582164371455606784")) && botnum > 1) {
 	    				botnum = botnum - 1;
 	    			}
     			} catch (NullPointerException e1) {}

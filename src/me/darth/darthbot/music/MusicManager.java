@@ -33,7 +33,7 @@ public class MusicManager {
 	}
 	
 	
-	public void loadTrack(final TextChannel channel, final String source, String iconURl){
+	public void loadTrack(final TextChannel channel, final String source, String iconURl, Guild g){
 		EmbedBuilder eb = new EmbedBuilder().setAuthor("Music", null, iconURl).setColor(Color.red);
 		eb.setDescription("Joining Channel & Configuring").setFooter("This may take a moment if you're loading a Playlist", null);
 		eb.setFooter(null, null);
@@ -53,7 +53,7 @@ public class MusicManager {
 					m=m+1;
 				}
 				eb.setDescription("Added track **"+track.getInfo().title+"** to the queue! `"+m+":"+s+"`");
-				player.playTrack(track);
+				player.playTrack(track, g);
 				msg.editMessage(eb.build()).queue();
 			}
 			
@@ -73,7 +73,7 @@ public class MusicManager {
 					if (i < 20) {
 						eb.addField("#"+player.getListener().getTrackSize()+" - "+track.getInfo().title, track.getInfo().uri+" `"+m+":"+s+"`", false);
 					}
-					player.playTrack(track);
+					player.playTrack(track, g);
 				}
 				if (i > 20) {
 					int total = i - 20;

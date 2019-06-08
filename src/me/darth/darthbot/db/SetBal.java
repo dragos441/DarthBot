@@ -18,8 +18,8 @@ public class SetBal extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!setbalance") && me.darth.darthbot.main.Main.g.getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.g.getRoleById("569464005416976394"))
-			|| args[0].equalsIgnoreCase("!setbal") && me.darth.darthbot.main.Main.g.getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.g.getRoleById("569464005416976394"))) {
+		if (args[0].equalsIgnoreCase("!setbalance") && me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("569464005416976394"))
+			|| args[0].equalsIgnoreCase("!setbal") && me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("569464005416976394"))) {
 			Member target = null;
 			long bux = 0;
 			try {
@@ -50,10 +50,10 @@ public class SetBal extends ListenerAdapter {
 			        long UserID = rs.getLong("UserID");
 			        if (UserID == e.getMember().getUser().getIdLong()) {
 			        	con.prepareStatement("UPDATE profiles SET DBux = "+bux+" WHERE UserID = "+target.getUser().getIdLong()).execute();
-			        	MessageEmbed success = new EmbedBuilder().setAuthor("DarthBot ~ User Management", null, e.getGuild().getIconUrl()).setColor(Color.orange)
-			        			.setDescription(e.getMember().getAsMention()+" *("+e.getAuthor().getId()+")* set "+target.getAsMention()+"'s balance to `$"+bux+"`").build();
+			        	MessageEmbed success = new EmbedBuilder().setAuthor("Balance Set", null, e.getGuild().getIconUrl()).setColor(Color.red)
+			        			.setDescription(e.getMember().getAsMention()+" set "+target.getAsMention()+"'s balance to `$"+bux+"`").setFooter(e.getGuild().toString(), null).build();
 			        	e.getChannel().sendMessage(new EmbedBuilder().setDescription(":white_check_mark: Successfully updated "+target.getAsMention()+"'s balance to `$"+bux+"`").build()).queue();
-			        	me.darth.darthbot.main.Main.g.getTextChannelById("569883444126023680").sendMessage(success).queue();
+			        	me.darth.darthbot.main.Main.sm.getTextChannelById("569883444126023680").sendMessage(success).queue();
 			        }
 			      }
 			      rs.close();

@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +23,8 @@ public class ViewProfile extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!profile") || args[0].equalsIgnoreCase("!account") || args[0].equalsIgnoreCase("!p")
-			|| args[0].equalsIgnoreCase("!balance") || args[0].equalsIgnoreCase("!bal")) {
+			|| args[0].equalsIgnoreCase("!balance") || args[0].equalsIgnoreCase("!bal") || args[0].equalsIgnoreCase("!rank")
+			|| args[0].equalsIgnoreCase("!level")) {
 			Member target = null;
 			try {
 				if (!e.getMessage().getMentionedMembers().isEmpty()) {
@@ -88,7 +90,8 @@ public class ViewProfile extends ListenerAdapter {
 				    	  if (DBux == -1337) {
 				    		  eb.addField("DBux $$$", "$**"+Character.toString('\u221E')+"**", true);
 				    	  } else {
-				    		  eb.addField("DBux $$$", "**$"+DBux+"**", true);
+				    		  String formattedbux = new DecimalFormat("#,###").format(DBux);
+				    		  eb.addField("DBux $$$", "**$"+formattedbux+"**", true);
 				    	  }
 				    	  int reqxp = (level + 1) * 100;
 				    	  if (reqxp > xp) {

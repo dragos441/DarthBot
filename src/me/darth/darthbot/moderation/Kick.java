@@ -26,6 +26,10 @@ public class Kick extends ListenerAdapter {
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!kick")) {
+			if (args.length < 3) {
+				e.getChannel().sendMessage("Invalid Syntax: `!kick <User> <Reason>`").queue();
+				return;
+			}
 			Member target = null;
 			if (!e.getMessage().getMentionedMembers().isEmpty()) {
 				target = e.getMessage().getMentionedMembers().get(0);
@@ -44,7 +48,7 @@ public class Kick extends ListenerAdapter {
 			        long ModRoleID = rs.getLong("Moderator");
 			        logchannel = e.getGuild().getTextChannelById(rs.getLong("LogChannel"));
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup Moderation <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {

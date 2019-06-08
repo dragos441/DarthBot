@@ -34,7 +34,7 @@ public class WelcomeMessages extends ListenerAdapter {
 		if (c != null) {
 			c.sendMessage(new EmbedBuilder().setAuthor("Member Joined", null, e.getMember().getUser().getEffectiveAvatarUrl()).setColor(Color.green)
 				.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setDescription(e.getMember().getAsMention()+" has joined the server! We now have  `"+e.getGuild().getMembers().size()+"` "
-						+ "membersf!").setTimestamp(Instant.from(ZonedDateTime.now())).build()).queue();
+						+ "members!").setTimestamp(Instant.from(ZonedDateTime.now())).build()).queue();
 		}
 		
 	}

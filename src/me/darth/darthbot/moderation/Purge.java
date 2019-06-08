@@ -22,7 +22,11 @@ public class Purge extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!purge")) {
+		if (args[0].equalsIgnoreCase("!purge") || args[0].equalsIgnoreCase("!clear")) {
+			if (args.length < 2) {
+				e.getChannel().sendMessage("Invalid Syntax: `!purge <1-99>`").queue();
+				return;
+			}
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getIdLong());
 			      TextChannel logchannel = null;
@@ -31,7 +35,7 @@ public class Purge extends ListenerAdapter {
 			        long ModRoleID = rs.getLong("Moderator");
 			        logchannel = e.getGuild().getTextChannelById(rs.getLong("LogChannel"));
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup Moderation <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {

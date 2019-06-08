@@ -47,6 +47,11 @@ public class Experience extends ListenerAdapter {
 				    	  }
 				    	  xp = xp + newxp;
 				    	  con.prepareStatement("UPDATE GuildProfiles SET xp = "+xp+", xpGained = "+lastearned+", Level = "+level+" WHERE UserID = "+e.getMember().getUser().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong()).execute();
+				    	  ResultSet rewards = con.createStatement().executeQuery("SELECT * FROM RoleRewards WHERE GuildID = "+e.getGuild().getId()+" AND Level = "+level);
+				    	  while (rewards.next()) {
+				    		  e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(rewards.getLong("RoleID"))).queue();
+				    		  
+				    	  }
 				      }
 				}
 		     }

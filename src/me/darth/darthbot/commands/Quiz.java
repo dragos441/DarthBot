@@ -99,7 +99,7 @@ public class Quiz extends ListenerAdapter {
 					e.getChannel().sendMessage("There is already a quiz in progress on this server!").queue();
 					return;
 				}
-				url = new URL("https://opentdb.com/api.php?amount=1&category=15&difficulty=easy&type=multiple");
+				url = new URL("https://opentdb.com/api.php?amount=1&difficulty=easy");
 				HttpURLConnection con = (HttpURLConnection) url.openConnection();
 				con.setRequestMethod("GET");
 				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));

@@ -176,10 +176,6 @@ public class Vote extends ListenerAdapter {
 	
 	@SuppressWarnings("deprecation")
 	public static void listSort() {
-		if (lastUpdated > new Date().getMinutes() - 5) {
-			return;
-		}
-		lastUpdated = new Date().getMinutes();
 		Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
 		List<Card> cards = trello.getListCards("5cbc6c5a24c96885903fde3e");
 		//System.out.print("c: "+cards.size());
@@ -372,7 +368,7 @@ public class Vote extends ListenerAdapter {
 					eb.setTitle(shortname, link);
 				}
 				if (sm == null) {
-					eb.setAuthor(obj.getString("desc").toString().split("\n")[5].replace("> ", "").replace("`", "").replace("`", ""), link, me.darth.darthbot.main.Main.g.getIconUrl());
+					eb.setAuthor(obj.getString("desc").toString().split("\n")[5].replace("> ", "").replace("`", "").replace("`", ""), link, me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getIconUrl());
 				} else {
 					eb.setAuthor("Submitted by "+sm.getUser().getName()+"#"+sm.getUser().getDiscriminator(), link, sm.getUser().getEffectiveAvatarUrl());
 				}
@@ -385,9 +381,9 @@ public class Vote extends ListenerAdapter {
 				}
 			
 				Message msg = e.getChannel().sendMessage(eb.build()).complete();
-				msg.addReaction(me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getEmoteById("574532922321797120")).queue();
-				msg.addReaction(me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getEmoteById("574532942437810177")).queue();
-				if (!e.getMessage().getContentRaw().contains(" ")) {
+				msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532922321797120")).queue();
+				msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532942437810177")).queue();
+				if (args.length > 1) {
 					e.getMessage().delete().queue();
 				}
 			} catch (MalformedURLException e1) {
@@ -413,7 +409,7 @@ public class Vote extends ListenerAdapter {
 			if (e.getReactionEmote().getId().equals("574532922321797120") || e.getReactionEmote().getId().equals("574532942437810177")) {
 				String cardID = msg.getEmbeds().get(0).getFooter().getText();
 				Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
-				if (trello.getCard(cardID).isClosed()) {
+				if (trello.getCard(cardID).isClosed() && e.getChannel().getMessageById(e.getMessageId()).complete().getContentRaw().split(" ").length == 1) {
 					msg.delete().queue();
 				}
 				int votes = getVotes(cardID);

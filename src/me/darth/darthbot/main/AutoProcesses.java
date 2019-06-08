@@ -23,10 +23,10 @@ public class AutoProcesses {
 		    	  if (active == 1 && new Date().getTime() >= expires) {
 		    		  try {
 			    		  if (type.equals("TEMPMUTE")) {
-			    			  Guild g = me.darth.darthbot.main.Main.jda.getGuildById(guildID);
+			    			  Guild g = me.darth.darthbot.main.Main.sm.getGuildById(guildID);
 			    			  g.getController().removeSingleRoleFromMember(g.getMemberById(punishedID), g.getRolesByName("Muted", true).get(0)).queue();
 			    		  } else if (type.equals("TEMPBAN")) {
-			    			  Guild g = me.darth.darthbot.main.Main.jda.getGuildById(guildID);
+			    			  Guild g = me.darth.darthbot.main.Main.sm.getGuildById(guildID);
 			    			  g.getController().unban(punishedID+"").queue();
 			    		  }
 		    		  } catch (IllegalArgumentException | NullPointerException | IndexOutOfBoundsException e1) {e1.printStackTrace();}

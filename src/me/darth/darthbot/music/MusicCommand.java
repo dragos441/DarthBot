@@ -20,6 +20,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent;
@@ -62,6 +63,15 @@ public class MusicCommand extends ListenerAdapter {
 			e1.printStackTrace();
 		}
 		return null;
+	}
+	
+	@Override
+	public void onGuildVoiceLeave(GuildVoiceLeaveEvent e) {
+		if (e.getChannelLeft().getMembers().size() <= 1) {
+			if (manager.getPlayer(e.getGuild()).getAudioPlayer().getPlayingTrack() != null) {
+				manager.getPlayer(e.getGuild()).getAudioPlayer().setPaused(true);
+			}
+		}
 	}
 	
 	@Override
@@ -129,15 +139,27 @@ public class MusicCommand extends ListenerAdapter {
 					return;
 				}
 			}
-			if (manager.getPlayer(e.getGuild()).getListener().getTracks().size() > 20) {
-				e.getChannel().sendMessage(":no_entry: The queue is full!").queue();
+			if (e.getMessage().getContentRaw().contains("?list=")) {
+				e.getChannel().sendMessage(":no_entry: Adding playlists is currently unavailable!").queue();
 				return;
 			}
-			if (!e.getMessage().getContentRaw().toLowerCase().contains("youtube.com")) {
-				manager.loadTrack(e.getChannel(), ytsearch(e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getChannel()), e.getJDA().getSelfUser().getEffectiveAvatarUrl());
-			} else {
-				manager.loadTrack(e.getChannel(), e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getJDA().getSelfUser().getEffectiveAvatarUrl());
+			ArrayList<AudioTrack> list = new ArrayList<AudioTrack>(manager.getPlayer(e.getGuild()).getListener().getTracks());
+			long time = 0;
+			for (int x = 0 ; x < list.size() ; x++) {
+				time = time + list.get(x).getDuration();
 			}
+			time = time / 1000;
+			if (time > 36000) {
+				e.getChannel().sendMessage(":no_entry: The queue is already over 10 hours long!").queue();
+				return;
+			}
+			
+			if (!e.getMessage().getContentRaw().toLowerCase().contains("youtube.com")) {
+				manager.loadTrack(e.getChannel(), ytsearch(e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getChannel()), e.getJDA().getSelfUser().getEffectiveAvatarUrl(), e.getGuild());
+			} else {
+				manager.loadTrack(e.getChannel(), e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getJDA().getSelfUser().getEffectiveAvatarUrl(), e.getGuild());
+			}
+			manager.getPlayer(e.getGuild()).getAudioPlayer().setPaused(false);
 		}
 		if (args[0].equalsIgnoreCase("!stop") || args[0].equalsIgnoreCase("!leave")) {
 			manager.getPlayer(e.getGuild()).getListener().getTracks().clear();
@@ -192,7 +214,7 @@ public class MusicCommand extends ListenerAdapter {
 			try {
 				Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
 				if (e.getChannel().getMessageById(e.getMessageId()).complete().getEmbeds().get(0).getAuthor().getName().equals("Music - Queue")) {
-					EmbedBuilder eb = new EmbedBuilder().setColor(Color.yellow).setAuthor("Music - Queue", null, me.darth.darthbot.main.Main.g.getIconUrl());
+					EmbedBuilder eb = new EmbedBuilder().setColor(Color.yellow).setAuthor("Music - Queue", null, e.getGuild().getIconUrl());
 					int start = Integer.parseInt(msg.getEmbeds().get(0).getFooter().getText().replace("(", "").replace(")", "").split("/")[0]);
 					ArrayList<AudioTrack> list = new ArrayList<AudioTrack>(manager.getPlayer(e.getGuild()).getListener().getTracks());
 					if (manager.getPlayer(e.getGuild()).getAudioPlayer().getPlayingTrack() != null) {
@@ -219,7 +241,7 @@ public class MusicCommand extends ListenerAdapter {
 			try {
 				Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
 				if (e.getChannel().getMessageById(e.getMessageId()).complete().getEmbeds().get(0).getAuthor().getName().equals("Music - Queue")) {
-					EmbedBuilder eb = new EmbedBuilder().setColor(Color.yellow).setAuthor("Music - Queue", null, me.darth.darthbot.main.Main.g.getIconUrl());
+					EmbedBuilder eb = new EmbedBuilder().setColor(Color.yellow).setAuthor("Music - Queue", null, e.getGuild().getIconUrl());
 					int start = Integer.parseInt(msg.getEmbeds().get(0).getFooter().getText().replace("(", "").replace(")", "").split("/")[0]);
 					ArrayList<AudioTrack> list = new ArrayList<AudioTrack>(manager.getPlayer(e.getGuild()).getListener().getTracks());
 					if (manager.getPlayer(e.getGuild()).getAudioPlayer().getPlayingTrack() != null) {
@@ -252,7 +274,7 @@ public class MusicCommand extends ListenerAdapter {
 			try {
 				Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
 				if (e.getChannel().getMessageById(e.getMessageId()).complete().getEmbeds().get(0).getAuthor().getName().equals("Music - Queue")) {
-					EmbedBuilder eb = new EmbedBuilder().setColor(Color.yellow).setAuthor("Music - Queue", null, me.darth.darthbot.main.Main.g.getIconUrl());
+					EmbedBuilder eb = new EmbedBuilder().setColor(Color.yellow).setAuthor("Music - Queue", null, e.getGuild().getIconUrl());
 					int start = Integer.parseInt(msg.getEmbeds().get(0).getFooter().getText().replace("(", "").replace(")", "").split("/")[0]);
 					ArrayList<AudioTrack> list = new ArrayList<AudioTrack>(manager.getPlayer(e.getGuild()).getListener().getTracks());
 					if (manager.getPlayer(e.getGuild()).getAudioPlayer().getPlayingTrack() != null) {
@@ -279,7 +301,7 @@ public class MusicCommand extends ListenerAdapter {
 			try {
 				Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
 				if (e.getChannel().getMessageById(e.getMessageId()).complete().getEmbeds().get(0).getAuthor().getName().equals("Music - Queue")) {
-					EmbedBuilder eb = new EmbedBuilder().setColor(Color.yellow).setAuthor("Music - Queue", null, me.darth.darthbot.main.Main.g.getIconUrl());
+					EmbedBuilder eb = new EmbedBuilder().setColor(Color.yellow).setAuthor("Music - Queue", null, e.getGuild().getIconUrl());
 					int start = Integer.parseInt(msg.getEmbeds().get(0).getFooter().getText().replace("(", "").replace(")", "").split("/")[0]);
 					ArrayList<AudioTrack> list = new ArrayList<AudioTrack>(manager.getPlayer(e.getGuild()).getListener().getTracks());
 					if (manager.getPlayer(e.getGuild()).getAudioPlayer().getPlayingTrack() != null) {

@@ -28,7 +28,7 @@ public class GuildJoin extends ListenerAdapter {
 						+ " values ("+e.getGuild().getIdLong()+", NULL, NULL);").execute();
 				EmbedBuilder eb = new EmbedBuilder().setAuthor("Database - Guild Info Generated", null, e.getGuild().getIconUrl())
 				.setDescription(e.getGuild().getName()+"'s *("+e.getGuild().getIdLong()+")* profile was generated (Method 1)").setColor(Color.green);
-				me.darth.darthbot.main.Main.g.getTextChannelById("569883444126023680").sendMessage(eb.build()).queue();	
+				me.darth.darthbot.main.Main.sm.getTextChannelById("569883444126023680").sendMessage(eb.build()).queue();	
 		    }
 		    con.close();
 			

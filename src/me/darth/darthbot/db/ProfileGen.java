@@ -63,7 +63,12 @@ public class ProfileGen extends ListenerAdapter {
 		    	  	EmbedBuilder eb = new EmbedBuilder().setAuthor("Database - Message Account Generated", null, e.getMember().getUser().getEffectiveAvatarUrl())
 							.setDescription(e.getMember().getAsMention()+"'s profile was generated").setColor(Color.green)
 							.setFooter("Guild ID: "+e.getGuild().getId()+" ("+e.getGuild().getName()+")", null);
-							me.darth.darthbot.main.Main.g.getTextChannelById("569883444126023680").sendMessage(eb.build()).queue();
+							me.darth.darthbot.main.Main.sm.getTextChannelById("569883444126023680").sendMessage(eb.build()).queue();
+			    	  ResultSet rewards = con.createStatement().executeQuery("SELECT * FROM RoleRewards WHERE GuildID = "+e.getGuild().getId()+" AND Level = 0");
+			    	  while (rewards.next()) {
+			    		  e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(rewards.getLong("RoleID"))).queue();
+			    		  
+			    	  }
 		      }
 		      found=false;
 		      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM profiles");
@@ -83,7 +88,7 @@ public class ProfileGen extends ListenerAdapter {
 		    	  	EmbedBuilder eb = new EmbedBuilder().setAuthor("Database - Account Generated", null, e.getMember().getUser().getEffectiveAvatarUrl())
 							.setDescription(e.getMember().getAsMention()+"'s profile was generated (Method 1)").setColor(Color.green)
 							.setFooter("User ID: "+e.getMember().getUser().getId(), null);
-							me.darth.darthbot.main.Main.g.getTextChannelById("569883444126023680").sendMessage(eb.build()).queue();
+							me.darth.darthbot.main.Main.sm.getTextChannelById("569883444126023680").sendMessage(eb.build()).queue();
 					
 		      }
 		      rs.close();

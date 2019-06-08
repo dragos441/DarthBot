@@ -85,7 +85,7 @@ public class ReportBug extends ListenerAdapter {
 		eb.setColor(Color.blue);
 		chnl.sendMessage(eb.build()).queue();
 		if (!bug) {
-			me.darth.darthbot.main.Main.g.getTextChannelById("575440909018202136").sendMessage(shortUrl).queue();
+			me.darth.darthbot.main.Main.sm.getTextChannelById("575440909018202136").sendMessage(shortUrl).queue();
 		}
 	}
 	
@@ -93,6 +93,14 @@ public class ReportBug extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!bug") || args[0].equalsIgnoreCase("!reportbug")) {
+			if (!e.getGuild().getId().equals("568849490425937940")) {
+				if (me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").isMember(e.getAuthor())) {
+					e.getChannel().sendMessage(":no_entry: This command can only be executed on the DarthBot Server. Luckily for you though, you're already a member, so simply copy and paste it in <#569465464590172180>!").queue();
+				} else {
+					e.getChannel().sendMessage(":no_entry: This command can only be executed on the DarthBot server! Join it by using the link in the `!DarthBot` command!").queue();	
+				}
+				return;
+			}
 			try {
 				String test = args[1];
 				test=test+"";

@@ -17,6 +17,14 @@ public class Suggest extends ListenerAdapter {
 			e.getChannel().sendMessage("Here is the Development Trello Board :smile:: https://trello.com/b/EndaJ5Op/DarthBot").queue();
 		}
 		if (args[0].equalsIgnoreCase("!suggest")) {
+			if (!e.getGuild().getId().equals("568849490425937940")) {
+				if (me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").isMember(e.getAuthor())) {
+					e.getChannel().sendMessage(":no_entry: This command can only be executed on the DarthBot Server. Luckily for you though, you're already a member, so simply copy and paste it in <#569465464590172180>!").queue();
+				} else {
+					e.getChannel().sendMessage(":no_entry: This command can only be executed on the DarthBot server! Join it by using the link in the `!DarthBot` command!").queue();	
+				}
+				return;
+			}
 			try {
 				String test = args[1];
 				test=test+"";
@@ -32,12 +40,14 @@ public class Suggest extends ListenerAdapter {
 			dupes.setDescription("Please check that the below cards aren't a duplicate of what you're submitting. If none of them are, **react with a :white_check_mark:"
 					+ "to your message above to submit it!**");
 			TreeMap<Integer, String> map = me.darth.darthbot.commands.SearchTrello.searchTrello(args);
-			while(!map.isEmpty()) {
+			int counter = 1;
+			while(!map.isEmpty() && counter <= 5) {
 				float acc = map.firstKey();
-				if (acc > 50) {
+				if (acc > 30) {
 					dupes.addField("Accuracy: "+acc+"%", map.firstEntry().getValue(), false);
 				}
 				map.remove(map.firstKey());
+				counter++;
 			}
 			if (dupes.getFields().size() > 0) {
 				e.getChannel().sendMessage(e.getMember().getAsMention()).embed(dupes.build()).queue();

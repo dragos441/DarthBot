@@ -1,5 +1,7 @@
 package me.darth.darthbot.main;
 
+import java.text.DecimalFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import me.darth.darthbot.commands.*;
@@ -9,6 +11,8 @@ import me.darth.darthbot.music.*;
 import me.darth.darthbot.testserver.*;
 import me.darth.darthbot.retalibot.*;
 import me.darth.darthbot.retalibot.submit;
+import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
@@ -20,77 +24,89 @@ import net.dv8tion.jda.core.entities.Member;
 
 public class Main {
 	
-	public static JDA jda = null;
-	public static Guild g = null;
+	//public static JDA jda = null;
+	public static ShardManager sm = null;
 	public static int updatedmin = -1;
 	//private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
 	private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
 	
 	
 	
-	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception {
-		jda = new JDABuilder(AccountType.BOT)
-				.setToken(key).buildBlocking();
-		jda.addEventListener(new Ping());
-		jda.addEventListener(new Suggest());
-		jda.addEventListener(new ReportBug());
-		jda.addEventListener(new Info());
-		jda.addEventListener(new autoReply());
-		jda.addEventListener(new PublicRooms());
-		jda.addEventListener(new Whois());
-		jda.addEventListener(new FindID());
-		jda.addEventListener(new Commands());
-		jda.addEventListener(new ProfileGen());
-		jda.addEventListener(new ViewProfile());
-		jda.addEventListener(new Casino());
-		jda.addEventListener(new logMessages());
-		jda.addEventListener(new RandomEarn());
-		jda.addEventListener(new SetBal());
-		jda.addEventListener(new ReactRole());
-		jda.addEventListener(new ChangeLog());
-		jda.addEventListener(new Daily());
-		jda.addEventListener(new GuildJoin());
-		jda.addEventListener(new ServerLogs());
-		jda.addEventListener(new MusicCommand());
-		jda.addEventListener(new SearchTrello());
-		jda.addEventListener(new Discord());
-		jda.addEventListener(new WelcomeMessages());
-		jda.addEventListener(new FAQ());
-		jda.addEventListener(new Vote());
-		jda.addEventListener(new Experience());
-		jda.addEventListener(new Quiz());
-		jda.addEventListener(new History());
-		jda.addEventListener(new Kick());
-		jda.addEventListener(new Ban());
-		jda.addEventListener(new Warn());
-		jda.addEventListener(new Purge());
-		jda.addEventListener(new Mute());
-		jda.addEventListener(new GetRoles());
-		jda.addEventListener(new newApplicant());
-		jda.addEventListener(new SAC());
-		jda.addEventListener(new submit());
-		jda.addEventListener(new apply());
-		jda.addEventListener(new ServerSetup());
-		jda.addEventListener(new Lock());
-		jda.addEventListener(new LevelRoles());
-		jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
-		g = jda.getGuildById("568849490425937940");
+		DefaultShardManagerBuilder builder = new DefaultShardManagerBuilder(key);
+		/*builder.addEventListeners(new Ping());
+		builder.addEventListeners(new Suggest());
+		builder.addEventListeners(new ReportBug());
+		builder.addEventListeners(new Info());
+		builder.addEventListeners(new autoReply());
+		builder.addEventListeners(new PublicRooms());
+		builder.addEventListeners(new Whois());
+		builder.addEventListeners(new FindID());
+		builder.addEventListeners(new Commands());
+		builder.addEventListeners(new ProfileGen());
+		builder.addEventListeners(new ViewProfile());
+		builder.addEventListeners(new Casino());
+		builder.addEventListeners(new logMessages());
+		builder.addEventListeners(new RandomEarn());
+		builder.addEventListeners(new SetBal());
+		builder.addEventListeners(new ReactRole());
+		builder.addEventListeners(new ChangeLog());
+		builder.addEventListeners(new Daily());
+		builder.addEventListeners(new GuildJoin());
+		builder.addEventListeners(new ServerLogs());
+		builder.addEventListeners(new MusicCommand());
+		builder.addEventListeners(new SearchTrello());
+		builder.addEventListeners(new DarthBot());
+		builder.addEventListeners(new WelcomeMessages());
+		builder.addEventListeners(new FAQ());
+		builder.addEventListeners(new Vote());
+		builder.addEventListeners(new Experience());
+		builder.addEventListeners(new Quiz());
+		builder.addEventListeners(new History());
+		builder.addEventListeners(new Kick());
+		builder.addEventListeners(new Ban());
+		builder.addEventListeners(new Warn());
+		builder.addEventListeners(new Purge());
+		builder.addEventListeners(new Mute());
+		builder.addEventListeners(new GetRoles());
+		builder.addEventListeners(new newApplicant());
+		builder.addEventListeners(new SAC());
+		builder.addEventListeners(new submit());
+		builder.addEventListeners(new apply());
+		builder.addEventListeners(new ServerSetup());
+		builder.addEventListeners(new Lock());
+		builder.addEventListeners(new LevelRoles());
+		builder.addEventListeners(new Leaderboards());
+		builder.addEventListeners(new Shard());
+		builder.addEventListeners(new Give());*/
+		builder.addEventListeners(new EditMsg());
+		sm = builder.build();
+		sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
+		Thread.sleep(5000);
 		while (true) {
-			int min = new Date().getMinutes();
-			if (min != updatedmin) {
-				me.darth.darthbot.main.AutoProcesses.removePunishments();
-				if (min == 1) {
-					me.darth.darthbot.main.AutoProcesses.purgeMessages();
-					me.darth.darthbot.commands.Vote.listSort();
-					jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing("!commands"), true);
+			try {
+				int min = Calendar.getInstance().get(Calendar.MINUTE);
+				if (min != updatedmin) {
+					updatedmin = min;
+					me.darth.darthbot.main.AutoProcesses.removePunishments();
+					if (key.equals("NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8")) {
+						sm.getVoiceChannelById("585917931586584586").getManager().setName("Supporting "+new DecimalFormat("#,###").format(sm.getGuilds().size())+" Servers").queue();
+						sm.getVoiceChannelById("585918083168731146").getManager().setName("Serving "+new DecimalFormat("#,###").format(sm.getUsers().size())+" Users").queue();
+					}
+					if (min == 0) {
+						System.out.print("\n"+min);
+						me.darth.darthbot.commands.Vote.listSort();
+						me.darth.darthbot.main.AutoProcesses.purgeMessages();
+						sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
+					}
+					if (min % 5 == 0) {
+						me.darth.darthbot.main.Leaderboards.GlobalLeaderboard();
+					}
 				}
-				if (min % 5 == 0) {
-					me.darth.darthbot.main.Leaderboards.GlobalLeaderboard();
-				}
-				updatedmin = min;
+				Thread.sleep(5000);
+			} catch (NullPointerException e1) {
+				e1.printStackTrace();
 			}
-			Thread.sleep(5000);
 		}
 	}
 	
@@ -121,24 +137,24 @@ public class Main {
 	public static EmbedBuilder affiliation(Member m) {
 		EmbedBuilder eb = new EmbedBuilder();
 		try {
-			if (jda.getGuildById("568849490425937940").isMember(m.getUser())) {
+			if (sm.getGuildById("568849490425937940").isMember(m.getUser())) {
 				eb.setFooter(m.getUser().getName()+" is a Member of the DarthBot Discord!", "https://i.imgur.com/OhUmIFC.png");
-				if (jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("575729770164256768"))) {
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("575729770164256768"))) {
 					eb.setFooter(m.getUser().getName()+" is a Creator of Great Ideas on the DarthBot Discord!", "https://i.imgur.com/G83T1Kh.png");
 				}
-				if (jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("575729381452939274"))) {
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("575729381452939274"))) {
 					eb.setFooter(m.getUser().getName()+" is a Master of Hunting Bugs on the DarthBot Discord!", "https://i.imgur.com/G6NedwO.png");
 				}
 				
-				if (jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("575729381452939274"))
-				&& jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("575729381452939274"))) {
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("575729381452939274"))
+				&& sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("575729381452939274"))) {
 					eb.setFooter(m.getUser().getName()+" is a Master Bug Hunter and an Ideas Connoisseur on the DarthBot Discord!", "https://i.imgur.com/lesRIbp.png");
 				}
 				
-				if (jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("569464005416976394"))) {
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("569464005416976394"))) {
 					eb.setFooter(m.getUser().getName()+" is a Server Moderator on the DarthBot Discord!", "https://i.imgur.com/P0Fkt4t.png");
 				}
-				if (jda.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(jda.getGuildById("568849490425937940").getRoleById("569463842552152094"))) {
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("569463842552152094"))) {
 					eb.setFooter(m.getUser().getName()+" is the Creator of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
 				}
 			}

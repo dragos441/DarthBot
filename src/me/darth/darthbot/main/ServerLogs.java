@@ -160,11 +160,32 @@ public class ServerLogs extends ListenerAdapter {
 		        } catch (ArrayIndexOutOfBoundsException e2) {}
 		   
 		      }
-		
+		      String final1 = "";
+		      try {
+			      for (int x = 0 ; x < msg1.length() ; x++) {
+			    	  if (x < 1000) {
+			    		  final1 = final1+msg1.toCharArray()[x];
+			    	  }
+			      }
+			      if (msg1.length() >= 1000) {
+			    	  final1=final1+"...";
+			      }
+		      } catch (NullPointerException e1) {final1=msg1;}
+		      String final2 = "";
+		      try {
+			      for (int x = 0 ; x < msg2.length() ; x++) {
+			    	  if (x < 1000) {
+			    		  final2 = final2+msg2.toCharArray()[x];
+			    	  }
+			      }
+			      if (msg2.length() >= 1000) {
+			    	  final2=final2+"...";
+			      }
+		      } catch (NullPointerException e1) {final2=msg2;}
 		      if (send) {
 		    	if (!pin) {
-		        	eb.addField("Old Message", "**Message:** "+msg2, true);
-		        	eb.addField("New Message", "**Message:** "+msg1, true);
+		    		eb.addField("New Message", "**Message:** "+final1, true);
+		        	eb.addField("Old Message", "**Message:** "+final2, true);
 		    	} else {
 		    		eb.addField("Message", "**Message:** "+msg1, true);
 		    	}
@@ -196,7 +217,7 @@ public class ServerLogs extends ListenerAdapter {
 		eb.setDescription("Private message recieved from "+e.getAuthor().getAsMention());
 		eb.addField("Message:", "**"+e.getMessage().getContentRaw()+"**", true);
 		eb.setTimestamp(Instant.from(ZonedDateTime.now()));
-		me.darth.darthbot.main.Main.jda.getGuildById("568849490425937940").getTextChannelById("569883444126023680").sendMessage(eb.build()).queue();
+		me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("569883444126023680").sendMessage(eb.build()).queue();
 		
 	}
 	
@@ -432,8 +453,16 @@ public class ServerLogs extends ListenerAdapter {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.green);
 		eb.setAuthor("Nickname Changed",null, e.getUser().getAvatarUrl());
-		eb.addField("New Nickname: ", ""+e.getNewNick(), true);
-		eb.addField("Old Nickname: ", ""+e.getPrevNick(), true);
+		String oldnick = null;
+		String newnick = null;
+		if (e.getPrevNick() == null) {
+			oldnick = e.getUser().getName();
+		}
+		if (e.getNewNick() == null) {
+			newnick = e.getUser().getName();
+		}
+		eb.addField("New Nickname: ", ""+newnick, true);
+		eb.addField("Old Nickname: ", ""+oldnick, true);
 		eb.setTimestamp(Instant.from(ZonedDateTime.now()));
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			ResultSet g = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());

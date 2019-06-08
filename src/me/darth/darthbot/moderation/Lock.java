@@ -30,7 +30,7 @@ public class Lock extends ListenerAdapter {
 			      {
 			        long ModRoleID = rs.getLong("Moderator");
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup Moderation <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {
@@ -65,7 +65,7 @@ public class Lock extends ListenerAdapter {
 			        }
 			     
 			      }
-		          	
+		          e.getMessage().delete().queue();
 			      rs.close();
 			      con.close();
 			} catch (SQLException e1) {
@@ -79,7 +79,7 @@ public class Lock extends ListenerAdapter {
 			      {
 			        long ModRoleID = rs.getLong("Moderator");
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup Moderation <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {
@@ -100,7 +100,7 @@ public class Lock extends ListenerAdapter {
         					.addField("Unlocked By", e.getMember().getAsMention(), false).setColor(Color.green);
         			e.getChannel().sendMessage(eb.build()).queue();
 			      }
-		          	
+		          e.getMessage().delete().queue();
 			      rs.close();
 			      con.close();
 			} catch (SQLException e1) {

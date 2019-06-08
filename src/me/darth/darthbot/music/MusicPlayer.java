@@ -37,11 +37,11 @@ public class MusicPlayer {
 	    return new AudioHandler(audioPlayer);
 	}
 	
-	public synchronized void playTrack(AudioTrack track){
+	public synchronized void playTrack(AudioTrack track, Guild g){
 		if (track != null) {
 			listener.queue(track);
 		} else {
-			me.darth.darthbot.main.Main.g.getAudioManager().closeAudioConnection();
+			g.getAudioManager().closeAudioConnection();
 		}
 	}
 	

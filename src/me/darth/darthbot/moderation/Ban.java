@@ -29,13 +29,17 @@ public class Ban extends ListenerAdapter {
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!unban")) {
+			if (args.length < 2) {
+				e.getChannel().sendMessage("Invalid Syntax: `!unban <User>`").queue();
+				return;
+			}
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getIdLong());
 			      while (rs.next())
 			      {
 			        long ModRoleID = rs.getLong("Moderator");
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup Moderation <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {
@@ -75,6 +79,10 @@ public class Ban extends ListenerAdapter {
 			}
 		}
 		if (args[0].equalsIgnoreCase("!ban")) {
+			if (args.length < 2) {
+				e.getChannel().sendMessage("Invalid Syntax: `!ban <User> (Time) <Reason>`").queue();
+				return;
+			}
 			Member target = null;
 			if (!e.getMessage().getMentionedMembers().isEmpty()) {
 				target = e.getMessage().getMentionedMembers().get(0);
@@ -97,7 +105,7 @@ public class Ban extends ListenerAdapter {
 			    	logchannel = e.getGuild().getTextChannelById(rs.getLong("LogChannel"));
 			        long ModRoleID = rs.getLong("Moderator");
 			        if (ModRoleID == 0L) {
-			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup StaffRole <role>)`").queue();
+			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup Moderation <role>)`").queue();
 			        	return;
 			        }
 			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {
@@ -166,11 +174,6 @@ public class Ban extends ListenerAdapter {
 			        		return;
 			        	}
 			        }
-			        try {
-			        	e.getGuild().getController().ban(target, 0,  "[By "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+"] "+reason).reason("[By "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+"] "+reason).queue();
-			        } catch (HierarchyException e1) {
-			        	e.getChannel().sendMessage(":no_entry: I can't punish that user!").queue();
-			        }
 			        target.getUser().openPrivateChannel().queue((channel) ->
 			        {
 						try {
@@ -197,6 +200,11 @@ public class Ban extends ListenerAdapter {
 			  						+"#"+target.getUser().getDiscriminator()+"** due to `"+e.getMessage().getContentRaw().split(args[1])[1]+"`");
 		  				}
 		  			}
+			        try {
+			        	e.getGuild().getController().ban(target, 0,  "[By "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+"] "+reason).reason("[By "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+"] "+reason).queue();
+			        } catch (HierarchyException e1) {
+			        	e.getChannel().sendMessage(":no_entry: I can't punish that user!").queue();
+			        }
 		  			String type = "BAN";
 		  			if (temp) {
 		  				type = "TEMPBAN";
