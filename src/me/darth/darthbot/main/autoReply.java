@@ -10,6 +10,7 @@ public class autoReply extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (e.getAuthor().getId().equals("159770472567799808") && e.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!say")) {
 			e.getMessage().delete().queue();
 			e.getChannel().sendMessage(e.getMessage().getContentRaw().replace(e.getMessage().getContentRaw().split(" ")[0]+" ", "")).queue();
@@ -17,10 +18,12 @@ public class autoReply extends ListenerAdapter {
 		if (e.getMessage().getMentionedMembers().contains(e.getGuild().getMemberById("569461469154902016"))) {
 			e.getChannel().sendMessage("My ears are burning :fire: - You can use `!commands` for a list of bot commands :)").queue();
 		}
-		if (e.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!patreon")) {
+		if (args[0].equalsIgnoreCase("!patreon")) {
 			e.getChannel().sendMessage("Feeling generous? Support the Development of the bot here >> https://www.patreon.com/darthbot :heart:").queue();
 		}
-		
+		if (args[0].equalsIgnoreCase("!rr") || args[0].equalsIgnoreCase("!rolerewards")) {
+			e.getChannel().sendMessage("Looking for role rewards? They've moved to `!lr` or `!levelrewards`!").queue();
+		}
 		
 		//temp anti link system
 		if (!e.getGuild().getId().equals("568849490425937940")) {

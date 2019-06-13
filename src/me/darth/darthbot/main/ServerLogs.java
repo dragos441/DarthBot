@@ -457,9 +457,13 @@ public class ServerLogs extends ListenerAdapter {
 		String newnick = null;
 		if (e.getPrevNick() == null) {
 			oldnick = e.getUser().getName();
+		} else {
+			oldnick = e.getPrevNick();
 		}
 		if (e.getNewNick() == null) {
 			newnick = e.getUser().getName();
+		} else {
+			newnick = e.getNewNick();
 		}
 		eb.addField("New Nickname: ", ""+newnick, true);
 		eb.addField("Old Nickname: ", ""+oldnick, true);
@@ -477,6 +481,7 @@ public class ServerLogs extends ListenerAdapter {
 			e1.printStackTrace();
 		}
 	}
+	
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent e) {
 		EmbedBuilder eb = new EmbedBuilder();

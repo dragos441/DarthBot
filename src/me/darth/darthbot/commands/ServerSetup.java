@@ -31,7 +31,7 @@ public class ServerSetup extends ListenerAdapter {
 							+ "`!enable Moderation <Role>` Setup the role that can use Punishment Commands (Ban, Mute, Kick etc)\n"
 							+ "`!enable PublicRooms <Category>` Setup the Category that will have automatic public rooms\n"
 							+ "`!enable Experience` Enabled the Level/Experience Feature `Enabled by default`\n"
-							+ "`!rolerewards` Add role rewards for when users reach specific chat levels!", false);
+							+ "`!levelrewards` Add level rewards for when users reach specific chat levels!", false);
 					eb.addField("Disabling Features", "__!disable <Feature>__\n*Example: `!disable JoinLog`*", false);
 					e.getChannel().sendMessage(eb.build()).queue();
 					return;

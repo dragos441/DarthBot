@@ -5,11 +5,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -20,17 +22,17 @@ public class LevelRoles extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!rolerewards") || args[0].equalsIgnoreCase("!rr")) {
+		if (args[0].equalsIgnoreCase("!levelrewards") || args[0].equalsIgnoreCase("!lr")) {
 			if (!e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
 				e.getChannel().sendMessage(":no_entry: You must have the **Administrator** permission to manage the bot!").queue();
 				return;
 			}
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
-				EmbedBuilder commands = new EmbedBuilder().setAuthor("Level Role Rewards", null, e.getGuild().getIconUrl())
-						.setDescription("`!rr add <Level> <Role>` Adds a role reward to a level"
-								+ "\n`!rr remove <Level>` Removes a role reward from a level"
-								+ "\n`!rr list` Lists all the current role rewards for levels"
-								+ "\n`!rr help` Displays this list of commands").setColor(Color.blue);
+				EmbedBuilder commands = new EmbedBuilder().setAuthor("Level Rewards", null, e.getGuild().getIconUrl())
+						.setDescription("`!lr add <Level> <Role>` Adds a role reward to a level"
+								+ "\n`!lr remove <Level>` Removes a role reward from a level"
+								+ "\n`!lr list` Lists all the current role rewards for levels"
+								+ "\n`!lr help` Displays this list of commands").setColor(Color.blue);
 				if (args.length <= 1 || args[1].equalsIgnoreCase("help")) {
 					e.getChannel().sendMessage(commands.build()).queue();
 					return;
@@ -103,8 +105,18 @@ public class LevelRoles extends ListenerAdapter {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM RoleRewards WHERE GuildID = "+e.getGuild().getIdLong());
 					while (rs.next()) {
 						if (rs.getInt("Level") == level) {
-							e.getChannel().sendMessage(":no_entry: That role already have a role reward! Remove it with `!rr remove "+level+"`").queue();
+							e.getChannel().sendMessage(":no_entry: That role already have a role reward! Remove it with `!lr remove "+level+"`").queue();
 							return;
+						}
+					}
+
+					List<Member> members = e.getGuild().getMembers();
+					for (int x = 0 ; x < members.size() ; x++) {
+						rs = con.createStatement().executeQuery("SELECT * FROM GuildProfiles WHERE GuildID = "+e.getGuild().getIdLong()+" AND UserID = "+members.get(x).getUser().getIdLong());
+						while (rs.next()) {
+							if (rs.getInt("Level") >= level) {
+								e.getGuild().getController().addSingleRoleToMember(members.get(x), role).queue();
+							}
 						}
 					}
 					con.prepareStatement("INSERT INTO RoleRewards (GuildID, Level, RoleID) values ("+e.getGuild().getIdLong()+", "+level+", "+role.getIdLong()+")").execute();

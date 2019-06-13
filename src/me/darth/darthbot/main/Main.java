@@ -34,7 +34,7 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 		DefaultShardManagerBuilder builder = new DefaultShardManagerBuilder(key);
-		/*builder.addEventListeners(new Ping());
+		builder.addEventListeners(new Ping());
 		builder.addEventListeners(new Suggest());
 		builder.addEventListeners(new ReportBug());
 		builder.addEventListeners(new Info());
@@ -78,8 +78,9 @@ public class Main {
 		builder.addEventListeners(new LevelRoles());
 		builder.addEventListeners(new Leaderboards());
 		builder.addEventListeners(new Shard());
-		builder.addEventListeners(new Give());*/
+		builder.addEventListeners(new Give());
 		builder.addEventListeners(new EditMsg());
+		builder.addEventListeners(new Avatar());
 		sm = builder.build();
 		sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
 		Thread.sleep(5000);
@@ -87,7 +88,6 @@ public class Main {
 			try {
 				int min = Calendar.getInstance().get(Calendar.MINUTE);
 				if (min != updatedmin) {
-					updatedmin = min;
 					me.darth.darthbot.main.AutoProcesses.removePunishments();
 					if (key.equals("NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8")) {
 						sm.getVoiceChannelById("585917931586584586").getManager().setName("Supporting "+new DecimalFormat("#,###").format(sm.getGuilds().size())+" Servers").queue();
@@ -99,9 +99,11 @@ public class Main {
 						me.darth.darthbot.main.AutoProcesses.purgeMessages();
 						sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
 					}
-					if (min % 5 == 0) {
+					if (min % 5 == 0 || updatedmin == -1) {
 						me.darth.darthbot.main.Leaderboards.GlobalLeaderboard();
+						me.darth.darthbot.main.Leaderboards.Retali8Leaderboard();
 					}
+					updatedmin = min;
 				}
 				Thread.sleep(5000);
 			} catch (NullPointerException e1) {

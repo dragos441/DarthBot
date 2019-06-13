@@ -104,9 +104,10 @@ public class PublicRooms extends ListenerAdapter {
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
-		if (!category.getVoiceChannels().contains(e.getChannelLeft()) || e.getMember().getUser().isBot()) {
+		if (!category.getVoiceChannels().contains(e.getChannelLeft()) || e.getMember().getUser().isBot() || !e.getChannelLeft().getMembers().isEmpty()) {
 			return;
 		}
+		
 		deleteChannel(e.getChannelLeft(), category);
 		
 	}
