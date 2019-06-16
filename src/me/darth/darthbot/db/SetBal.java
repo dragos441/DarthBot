@@ -18,8 +18,11 @@ public class SetBal extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!setbalance") && me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("569464005416976394"))
-			|| args[0].equalsIgnoreCase("!setbal") && me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("569464005416976394"))) {
+		if (args[0].equalsIgnoreCase("!setbalance") || args[0].equalsIgnoreCase("!setbal")) {
+			if (!me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("569463842552152094"))
+					&& !me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("589550625537392643"))) {
+				return;
+			}
 			Member target = null;
 			long bux = 0;
 			try {

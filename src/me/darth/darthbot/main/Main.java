@@ -81,33 +81,36 @@ public class Main {
 		builder.addEventListeners(new Give());
 		builder.addEventListeners(new EditMsg());
 		builder.addEventListeners(new Avatar());
+		builder.addEventListeners(new Inventories());
+		builder.addEventListeners(new Rob());
 		sm = builder.build();
 		sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
 		Thread.sleep(5000);
 		while (true) {
 			try {
-				int min = Calendar.getInstance().get(Calendar.MINUTE);
-				if (min != updatedmin) {
-					me.darth.darthbot.main.AutoProcesses.removePunishments();
-					if (key.equals("NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8")) {
+				if (key.contains("NTY")) {
+					int min = Calendar.getInstance().get(Calendar.MINUTE);
+					if (min != updatedmin) {
+						me.darth.darthbot.main.AutoProcesses.removePunishments();
 						sm.getVoiceChannelById("585917931586584586").getManager().setName("Supporting "+new DecimalFormat("#,###").format(sm.getGuilds().size())+" Servers").queue();
 						sm.getVoiceChannelById("585918083168731146").getManager().setName("Serving "+new DecimalFormat("#,###").format(sm.getUsers().size())+" Users").queue();
+						if (min == 0) {
+							me.darth.darthbot.commands.Vote.listSort();
+							me.darth.darthbot.main.AutoProcesses.purgeMessages();
+							me.darth.darthbot.main.AutoProcesses.leaveEmptyChannels();
+							sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
+						}
+						if (min % 5 == 0 || updatedmin == -1) {
+							me.darth.darthbot.main.Leaderboards.GlobalLeaderboard();
+							me.darth.darthbot.main.Leaderboards.Retali8Leaderboard();
+						}
+						updatedmin = min;
 					}
-					if (min == 0) {
-						System.out.print("\n"+min);
-						me.darth.darthbot.commands.Vote.listSort();
-						me.darth.darthbot.main.AutoProcesses.purgeMessages();
-						sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
-					}
-					if (min % 5 == 0 || updatedmin == -1) {
-						me.darth.darthbot.main.Leaderboards.GlobalLeaderboard();
-						me.darth.darthbot.main.Leaderboards.Retali8Leaderboard();
-					}
-					updatedmin = min;
+					Thread.sleep(5000);
 				}
-				Thread.sleep(5000);
-			} catch (NullPointerException e1) {
+			} catch (NullPointerException | IllegalStateException e1) {
 				e1.printStackTrace();
+				updatedmin = new Date().getMinutes();
 			}
 		}
 	}

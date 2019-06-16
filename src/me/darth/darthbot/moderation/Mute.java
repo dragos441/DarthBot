@@ -161,9 +161,9 @@ public class Mute extends ListenerAdapter {
 			    	  temp=false;
 			      }
 			      if (temp) {
-			    	  reason = e.getMessage().getContentRaw().replace(args[0], "").replace(args[1], "").replace(args[2], "");
+			    	  reason = e.getMessage().getContentRaw().replace(args[0]+" ", "").replace(target.getAsMention()+" ", "").replace(args[2], "");
 			      } else {
-			    	  reason = e.getMessage().getContentRaw().replace(args[0], "").replace(args[1], "");
+			    	  e.getMessage().getContentRaw().replace(args[0]+" ", "").replace(target.getAsMention()+" ", "");
 			      }
 			      if (reason.replace(" ", "").isEmpty()) {
 			    	  reason = "No Reason Provided";

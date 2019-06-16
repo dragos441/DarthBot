@@ -32,7 +32,8 @@ public class LevelRoles extends ListenerAdapter {
 						.setDescription("`!lr add <Level> <Role>` Adds a role reward to a level"
 								+ "\n`!lr remove <Level>` Removes a role reward from a level"
 								+ "\n`!lr list` Lists all the current role rewards for levels"
-								+ "\n`!lr help` Displays this list of commands").setColor(Color.blue);
+								+ "\n`!lr help` Displays this list of commands").setColor(Color.blue)
+						.setFooter("[TIP] Set a role reward for Level 0 for it to be automatically assigned to all users!", null);
 				if (args.length <= 1 || args[1].equalsIgnoreCase("help")) {
 					e.getChannel().sendMessage(commands.build()).queue();
 					return;

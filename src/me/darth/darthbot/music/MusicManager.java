@@ -52,8 +52,12 @@ public class MusicManager {
 					s=s-60;
 					m=m+1;
 				}
-				eb.setDescription("Added track **"+track.getInfo().title+"** to the queue! `"+m+":"+s+"`");
-				player.playTrack(track, g);
+				if (track.getDuration() / 1000 > 3600) {
+					eb.setDescription(":no_entry: Error! Track is longer than an hour!");
+				} else {
+					player.playTrack(track, g);
+					eb.setDescription("Added track **"+track.getInfo().title+"** to the queue! `"+m+":"+s+"`");
+				}
 				msg.editMessage(eb.build()).queue();
 			}
 			

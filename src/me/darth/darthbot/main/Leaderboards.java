@@ -90,7 +90,7 @@ public class Leaderboards extends ListenerAdapter {
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 		      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM profiles ORDER BY `DBux` DESC LIMIT 15");
 		      int counter = 1;
-		      while (counter <= 15 && rs.next()) {
+		      while (rs.next()) {
 		    	  String dbux = new DecimalFormat("#,###").format(rs.getLong("DBux"));
 		    	  String m = null;
 		    	  if (g.getMemberById(rs.getLong("UserID")) == null) {
@@ -120,13 +120,13 @@ public class Leaderboards extends ListenerAdapter {
 		    	  counter++;
 		      }
 		      lastUpdated = eb.build();
+		      me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("584150264509104139")
+				.getMessageById("584150350899052558").complete().editMessage(eb.build()).queue();
 		      rs.close();
 		      con.close();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
-		me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("584150264509104139")
-			.getMessageById("584150350899052558").complete().editMessage(eb.build()).queue();
 		
 	}
 	

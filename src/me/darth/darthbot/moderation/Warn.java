@@ -38,7 +38,7 @@ public class Warn extends ListenerAdapter {
 				me.darth.darthbot.main.Main.findUser(args[1], e.getGuild());
 			}
 			if (target == null) {
-				e.getChannel().sendMessage("User not found!").queue();
+				e.getChannel().sendMessage("User not found! Make sure to mention the user!").queue();
 				return;
 			}
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
@@ -68,7 +68,7 @@ public class Warn extends ListenerAdapter {
 			      
 			      
 			   
-			      String reason = e.getMessage().getContentRaw().replace(args[0], "").replace(args[1], "");
+			      String reason = e.getMessage().getContentRaw().replace(args[0]+" ", "").replace(target.getAsMention()+" ", "");
 			      if (reason.replace(" ", "").isEmpty()) {
 			    	  reason = "No Reason Provided";
 			      }

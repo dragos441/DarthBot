@@ -40,6 +40,7 @@ public class ViewProfile extends ListenerAdapter {
 			}
 			if (target == null) {
 				e.getChannel().sendMessage(":no_entry: User not found!").queue();
+				return;
 			}
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 
@@ -94,12 +95,27 @@ public class ViewProfile extends ListenerAdapter {
 				    		  eb.addField("DBux $$$", "**$"+formattedbux+"**", true);
 				    	  }
 				    	  int reqxp = (level + 1) * 100;
-				    	  if (reqxp > xp) {
-				    		  eb.addField("Chat Level", "Level "+level+" *("+xp+"/"+reqxp+"*xp*)*", true);
-				    	  } else {
-				    		  eb.addField("Chat Level", "⬆**Level Up!**⬆", true); 
-				    	  }
-				    	  eb.addField("What can I use DBux for?", "```> Win big at the !casino\n\nComing soon:\n- Work Jobs\n- Rob Others\n- Inventories\n- Store```", false);
+				    	 eb.addField("Chat Level", "Level "+level+" *("+xp+"/"+reqxp+"*xp*)*", true);
+				    	  ResultSet inv = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+target.getUser().getId());
+				    	  	while (inv.next()) {
+								String invstring = "";
+								String invraw = inv.getString("Inventory");
+								if (invraw == null || invraw.replace(" ", "").isEmpty()) {
+									eb.addField("Inventory", target.getEffectiveName()+"'s Inventory is Empty!", false);
+								} else {
+									String[] invsplit = invraw.split(",");
+									for (int x = 0 ; x < invsplit.length ; x++) {
+										if (!invsplit[x].isEmpty()) {
+											ResultSet item = con.createStatement().executeQuery("SELECT * FROM StoreItems WHERE ID = "+invsplit[x]);
+											while (item.next()) {
+												invstring=invstring+"\n**"+item.getString("Name")+"**";
+											}
+										}
+									}
+									eb.addField("Inventory", invstring, false);
+								}
+				    	  	}
+				    	  inv.close();
 				    	  PreparedStatement st = con.prepareStatement("UPDATE profiles SET Name = ? WHERE UserID = "+target.getUser().getIdLong());
 				    	  st.setString(1, target.getEffectiveName());
 				    	  st.executeUpdate();
@@ -122,10 +138,11 @@ public class ViewProfile extends ListenerAdapter {
 						
 			      }
 			      rs.close();
+			     
 			      con.close();
 			
 			} catch (SQLException e1) {
-			    e.getChannel().sendMessage("<@159770472567799808> Error! ```"+e1+"```").queue();
+			    e1.printStackTrace();
 			}
 			
 		}

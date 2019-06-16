@@ -1,10 +1,12 @@
 package me.darth.darthbot.commands;
 
 import java.awt.Color;
+import java.util.List;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.core.exceptions.HierarchyException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Avatar extends ListenerAdapter {

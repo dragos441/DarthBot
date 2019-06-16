@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import net.dv8tion.jda.core.entities.Guild;
 
@@ -50,4 +51,15 @@ public class AutoProcesses {
 			e1.printStackTrace();
 		}	
 	}
+	
+	public static void leaveEmptyChannels() {
+		List<Guild> guilds = me.darth.darthbot.main.Main.sm.getGuilds();
+		for (int x = 0 ; x < guilds.size() ; x++) {
+			Guild g = guilds.get(x);
+			if (g.getAudioManager().isConnected() && g.getAudioManager().getConnectedChannel().getMembers().size() == 1) {
+				g.getAudioManager().closeAudioConnection();
+			}
+		}
+	}
+	
 }

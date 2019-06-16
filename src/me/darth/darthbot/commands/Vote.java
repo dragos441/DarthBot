@@ -32,7 +32,6 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Vote extends ListenerAdapter {
@@ -375,7 +374,7 @@ public class Vote extends ListenerAdapter {
 				}
 				if (votes < 0) {
 					eb.setColor(Color.red);
-				} else if (votes >= 0 && votes < 3) {
+				} else if (votes == 0) {
 					eb.setColor(Color.yellow);
 				} else {
 					eb.setColor(Color.green);
@@ -384,7 +383,8 @@ public class Vote extends ListenerAdapter {
 				Message msg = e.getChannel().sendMessage(eb.build()).complete();
 				msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532922321797120")).queue();
 				msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532942437810177")).queue();
-				if (args.length <= 1) {
+				msg.addReaction("❗").queue();
+				if (args.length == 1) {
 					e.getMessage().delete().queue();
 				}
 			} catch (MalformedURLException e1) {
@@ -455,7 +455,7 @@ public class Vote extends ListenerAdapter {
 					eb.addField("Votes", ""+votes, false);
 					if (votes < 0) {
 						eb.setColor(Color.red);
-					} else if (votes >= 0 && votes < 5) {
+					} else if (votes == 0) {
 						eb.setColor(Color.orange); 
 					} else {
 						eb.setColor(Color.green);
@@ -463,75 +463,9 @@ public class Vote extends ListenerAdapter {
 					msg.editMessage(eb.build()).queue();
 					//listSort();
 					
-				} else if (!e.getUser().isBot()){
-					e.getChannel().sendMessage(e.getMember().getAsMention()+", you have already voted on this suggestion! To change your vote, __remove your current reaction first__!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
-					e.getTextChannel().removeReactionById(e.getMessageId(), e.getReaction().getReactionEmote().getEmote(), e.getMember().getUser()).queue();
-				}
-			}
-		} catch (NullPointerException | IndexOutOfBoundsException e2) {}
-	}
-	
-	@Override
-	public void onMessageReactionRemove(MessageReactionRemoveEvent e) {
-		Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
-		try {
-			if (e.getReactionEmote().getId().equals("574532922321797120") || e.getReactionEmote().getId().equals("574532942437810177")) {
-				String cardID = msg.getEmbeds().get(0).getFooter().getText();
-				Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
-				if (trello.getCard(cardID).isClosed() && e.getChannel().getMessageById(e.getMessageId()).complete().getContentRaw().split(" ").length == 1) {
-					msg.delete().queue();
-				}
-				int votes = getVotes(cardID);
-				if (votes == -99999) {
-					return;
-				}
-				if (e.getReactionEmote().getId().equals("574532922321797120")) {
-					votes=votes-1;
 				} else {
-					votes=votes+1;
+					//e.getChannel().sendMessage(e.getMember().getAsMention()+", you have already voted on this suggestion!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
 				}
-				if (!canVote(cardID, e.getMember().getUser().getIdLong())) {
-					Card c = trello.getCard(cardID);
-					c.setDesc(c.getDesc().replace(","+e.getUser().getId(), ""));
-					c.update();
-				}
-				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-				try {
-				    HttpPut request = new HttpPut("https://api.trello.com/1/card/"+cardID+"/customField/5cd078d3e7aeba2e3365ad81/item"
-				    		+ "?key=36c6ca5833a315746f43a1d6eee885b4&token=dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847");
-				    StringEntity params = new StringEntity("{ \"value\": { \"number\": \""+votes+"\" } }");
-				    request.addHeader("content-type", "application/json");
-				    request.setEntity(params);
-				    httpClient.execute(request);
-				    //System.out.print(request.toString());
-				    
-				// handle response here...
-				} catch (Exception ex) {
-				    ex.printStackTrace();
-				} finally {
-				    try {
-						httpClient.close();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
-				//e.getChannel().sendMessage(e.getMember().getAsMention()+", successfully added vote!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
-				EmbedBuilder eb = new EmbedBuilder(msg.getEmbeds().get(0));
-				eb.getFields().clear();
-				eb.addField("Votes", ""+votes, false);
-				if (votes < 0) {
-					eb.setColor(Color.red);
-				} else if (votes >= 0 && votes < 5) {
-					eb.setColor(Color.orange); 
-				} else {
-					eb.setColor(Color.green);
-				}
-				msg.editMessage(eb.build()).queue();
-				//listSort();
-				
-			} else {
-				//e.getChannel().sendMessage(e.getMember().getAsMention()+", you have already voted on this suggestion!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
 			}
 		} catch (NullPointerException | IndexOutOfBoundsException e2) {}
 	}

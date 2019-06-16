@@ -66,7 +66,7 @@ public class Kick extends ListenerAdapter {
 			      }
 			      
 			   
-			      String reason = e.getMessage().getContentRaw().replace(args[0], "").replace(args[1], "");
+			      String reason = e.getMessage().getContentRaw().replace(args[0]+" ", "").replace(target.getAsMention()+" ", "");
 			      if (reason.replace(" ", "").isEmpty()) {
 			    	  reason = "No Reason Provided";
 			      }

@@ -48,7 +48,6 @@ public class Ban extends ListenerAdapter {
 			        	e.getChannel().sendMessage(eb).queue();
 			        	return;
 			        }
-			        
 			        List<net.dv8tion.jda.core.entities.Guild.Ban> banlist = e.getGuild().getBanList().complete();
 			        String tounban = e.getMessage().getContentRaw().replace(args[0]+" ", "");
 		        	for (int x = 0 ; x < banlist.size() ; x++) {
