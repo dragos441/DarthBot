@@ -18,6 +18,9 @@ public class Give extends ListenerAdapter{
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!give") || args[0].equalsIgnoreCase("!donate") || args[0].equalsIgnoreCase("!transfer") || args[0].equalsIgnoreCase("!pay")) {
 			
+			e.getChannel().sendMessage("The `!give` command has been temporarily disabled due to ongoing internal issues! Sorry for the inconvinence!\n*You can use the `!rob` command a substitute!*").queue();
+			return;
+			/*
 			if (args.length < 3) {
 				e.getChannel().sendMessage("Invalid Syntax: `"+args[0]+" <User> <Amount>`").queue();
 				return;
@@ -69,8 +72,8 @@ public class Give extends ListenerAdapter{
 				e.getChannel().sendMessage("Successfully given "+m.getAsMention()+" `$"+amount+"`!").queue();
 				EmbedBuilder eb = new EmbedBuilder().setAuthor("Money Given", null, e.getGuild().getIconUrl()).setDescription(e.getMember().getAsMention()+" has "
 						+ "given "+m.getAsMention()+" `$"+amount+"`").setColor(Color.green).setFooter(e.getGuild()+"", null);
-				me.darth.darthbot.main.Main.sm.getTextChannelById("569883444126023680").sendMessage(eb.build()).queue();
-			} catch (SQLException e1) {e1.printStackTrace();}
+				me.darth.darthbot.main.Main.sm.getTextChannelById("590155719790166082").sendMessage(eb.build()).queue();
+			} catch (SQLException e1) {e1.printStackTrace();}*/
 			
 		}
 	}

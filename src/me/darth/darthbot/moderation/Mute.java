@@ -44,7 +44,7 @@ public class Mute extends ListenerAdapter {
 			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup Moderation <role>)`").queue();
 			        	return;
 			        }
-			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {
+			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID)) && !e.getMember().getRoles().contains(e.getGuild().getRoleById("589796348711403520"))) {
 			        	MessageEmbed eb = new EmbedBuilder().setDescription("⛔ "+e.getMember().getAsMention()+", you must have the "+e.getGuild().getRoleById(ModRoleID).getAsMention()
 			        			+ " role to use that command!").setColor(Color.red).build();
 			        	e.getChannel().sendMessage(eb).queue();
@@ -83,7 +83,7 @@ public class Mute extends ListenerAdapter {
 			   e1.printStackTrace();
 			}
 		}
-		if (args[0].equalsIgnoreCase("!mute")) {
+		if (args[0].equalsIgnoreCase("!mute") || args[0].equalsIgnoreCase("!tempmute")) {
 			if (args.length < 2) {
 				e.getChannel().sendMessage("Invalid Syntax: `!mute <User> (Time) <Reason>`").queue();
 				return;
@@ -113,7 +113,7 @@ public class Mute extends ListenerAdapter {
 			        	e.getChannel().sendMessage("You must setup the staff role before using the moderation system! `(!setup Moderation <role>)`").queue();
 			        	return;
 			        }
-			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID))) {
+			        if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(ModRoleID)) && !e.getMember().getRoles().contains(e.getGuild().getRoleById("589796348711403520"))) {
 			        	MessageEmbed eb = new EmbedBuilder().setDescription("⛔ "+e.getMember().getAsMention()+", you must have the "+e.getGuild().getRoleById(ModRoleID).getAsMention()
 			        			+ " role to use that command!").setColor(Color.red).build();
 			        	e.getChannel().sendMessage(eb).queue();
@@ -157,7 +157,7 @@ public class Mute extends ListenerAdapter {
 					
 			      }
 			      String reason = null;
-			      if (args.length < 4) {
+			      if (args.length < 4 && !args[0].equalsIgnoreCase("!tempmute")) {
 			    	  temp=false;
 			      }
 			      if (temp) {
@@ -165,7 +165,7 @@ public class Mute extends ListenerAdapter {
 			      } else {
 			    	  e.getMessage().getContentRaw().replace(args[0]+" ", "").replace(target.getAsMention()+" ", "");
 			      }
-			      if (reason.replace(" ", "").isEmpty()) {
+			      if (reason == null || reason.replace(" ", "").isEmpty()) {
 			    	  reason = "No Reason Provided";
 			      }
 		        	EmbedBuilder send = new EmbedBuilder().setAuthor("You have been muted!", null, e.getGuild().getIconUrl()).setDescription("You have been "

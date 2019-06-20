@@ -43,7 +43,7 @@ public class Suggest extends ListenerAdapter {
 			int counter = 1;
 			while(!map.isEmpty() && counter <= 5) {
 				float acc = map.firstKey();
-				if (acc > 30) {
+				if (acc > 10) {
 					dupes.addField("Accuracy: "+acc+"%", map.firstEntry().getValue(), false);
 				}
 				map.remove(map.firstKey());

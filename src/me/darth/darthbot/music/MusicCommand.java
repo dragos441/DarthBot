@@ -139,7 +139,7 @@ public class MusicCommand extends ListenerAdapter {
 					return;
 				}
 			}
-			if (e.getMessage().getContentRaw().contains("?list=")) {
+			if (e.getMessage().getContentRaw().contains("?list=") || e.getMessage().getContentRaw().contains("&list=")) {
 				e.getChannel().sendMessage(":no_entry: Adding playlists is currently unavailable!").queue();
 				return;
 			}

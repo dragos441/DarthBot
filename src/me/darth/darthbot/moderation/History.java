@@ -104,7 +104,7 @@ public class History extends ListenerAdapter {
 				    		  eb.addField("Temporarily Banned on "+ft+" (Active: "+active+")", "**Reason:** `"+reason+"` **by "+punisher+"**\n**Expires:** "+exp.getTime(), false);
 				    	  } else if (type.equals("TEMPMUTE")) {
 				    		  Calendar exp = Calendar.getInstance();
-				    		  exp.setTimeInMillis(Long.parseLong(data[4]));
+				    		  exp.setTimeInMillis(Long.parseLong(data[5]));
 				    		  boolean active = true;
 				    		  if (new Date().getTime() > exp.getTimeInMillis()) {
 				    			  active=false;

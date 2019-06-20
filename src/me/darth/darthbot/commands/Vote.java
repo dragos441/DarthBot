@@ -382,7 +382,19 @@ public class Vote extends ListenerAdapter {
 			
 				Message msg = e.getChannel().sendMessage(eb.build()).complete();
 				msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532922321797120")).queue();
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532942437810177")).queue();
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				msg.addReaction("❗").queue();
 				if (args.length == 1) {
 					e.getMessage().delete().queue();
@@ -405,8 +417,18 @@ public class Vote extends ListenerAdapter {
 	
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent e) {
+		if (e.getChannel().getId().equals("575440909018202136") && e.getReaction().getReactionEmote().getName().equals("❗")) {
+			if (e.getMember().getRoles().contains(e.getGuild().getRoleById("590261682430017566"))) {
+				
+			} else {
+				e.getTextChannel().removeReactionById(e.getMessageId(), "❗", e.getUser()).queue();
+			}
+		}
 		Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
 		try {
+			if (e.getReactionEmote().getEmote().getName().equals("❗")) {
+				e.getTextChannel().removeReactionById(e.getMessageId(), e.getReaction().getReactionEmote().getEmote(), e.getMember().getUser()).queue();
+			}
 			if (e.getReactionEmote().getId().equals("574532922321797120") || e.getReactionEmote().getId().equals("574532942437810177")) {
 				String cardID = msg.getEmbeds().get(0).getFooter().getText();
 				Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());

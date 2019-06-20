@@ -27,8 +27,8 @@ public class Main {
 	//public static JDA jda = null;
 	public static ShardManager sm = null;
 	public static int updatedmin = -1;
-	//private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
-	private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
+	private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
+	//private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
 	
 	
 	
@@ -144,23 +144,26 @@ public class Main {
 		try {
 			if (sm.getGuildById("568849490425937940").isMember(m.getUser())) {
 				eb.setFooter(m.getUser().getName()+" is a Member of the DarthBot Discord!", "https://i.imgur.com/OhUmIFC.png");
-				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("575729770164256768"))) {
-					eb.setFooter(m.getUser().getName()+" is a Creator of Great Ideas on the DarthBot Discord!", "https://i.imgur.com/G83T1Kh.png");
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("590261682430017566"))) {
+					eb.setFooter(m.getUser().getName()+" is a Bot Innovator on the DarthBot Discord!", "https://i.imgur.com/c8NuUYh.png");
+				}	
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("582164371455606784"))) {
+					eb.setFooter(m.getUser().getName()+" Supports the Development of DarthBot!", "https://is5-ssl.mzstatic.com/image/thumb/Purple123/v4/56/00/8a/56008a35-b11c-d31d-da7d-05ecba9bb69b/AppIcon-0-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-7.png/246x0w.jpg");
 				}
-				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("575729381452939274"))) {
-					eb.setFooter(m.getUser().getName()+" is a Master of Hunting Bugs on the DarthBot Discord!", "https://i.imgur.com/G6NedwO.png");
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("589800268795871243"))) {
+					eb.setFooter(m.getUser().getName()+" is a Community Supporter on the DarthBot Discord!", "https://i.imgur.com/nc5vmM1.png");
 				}
-				
-				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("575729381452939274"))
-				&& sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("575729381452939274"))) {
-					eb.setFooter(m.getUser().getName()+" is a Master Bug Hunter and an Ideas Connoisseur on the DarthBot Discord!", "https://i.imgur.com/lesRIbp.png");
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("589550817649098773"))) {
+					eb.setFooter(m.getUser().getName()+" is the Feedback Manager of DarthBot!", "https://i.imgur.com/P0Fkt4t.png");
 				}
-				
-				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("569464005416976394"))) {
-					eb.setFooter(m.getUser().getName()+" is a Server Moderator on the DarthBot Discord!", "https://i.imgur.com/P0Fkt4t.png");
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("589550729593880590"))) {
+					eb.setFooter(m.getUser().getName()+" is the Community Support Team Manager!", "https://i.imgur.com/P0Fkt4t.png");
+				}
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("589550625537392643"))) {
+					eb.setFooter(m.getUser().getName()+" is the Economy Manager of DarthBot!", "https://i.imgur.com/P0Fkt4t.png");
 				}
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("569463842552152094"))) {
-					eb.setFooter(m.getUser().getName()+" is the Creator of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
+					eb.setFooter(m.getUser().getName()+" is the Creator and Developer of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
 				}
 			}
 		} catch (NullPointerException e1) {}

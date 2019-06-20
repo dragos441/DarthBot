@@ -56,7 +56,7 @@ public class SetBal extends ListenerAdapter {
 			        	MessageEmbed success = new EmbedBuilder().setAuthor("Balance Set", null, e.getGuild().getIconUrl()).setColor(Color.red)
 			        			.setDescription(e.getMember().getAsMention()+" set "+target.getAsMention()+"'s balance to `$"+bux+"`").setFooter(e.getGuild().toString(), null).build();
 			        	e.getChannel().sendMessage(new EmbedBuilder().setDescription(":white_check_mark: Successfully updated "+target.getAsMention()+"'s balance to `$"+bux+"`").build()).queue();
-			        	me.darth.darthbot.main.Main.sm.getTextChannelById("569883444126023680").sendMessage(success).queue();
+			        	me.darth.darthbot.main.Main.sm.getTextChannelById("590155925407531008").sendMessage(success).queue();
 			        }
 			      }
 			      rs.close();

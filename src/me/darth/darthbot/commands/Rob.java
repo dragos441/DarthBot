@@ -6,8 +6,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -18,13 +21,6 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Rob extends ListenerAdapter {
-	
-	static long randNum(long min, long max) {
-		double randomDouble = Math.random();
-		randomDouble = randomDouble * max + 1;
-		long randomInt = (long) randomDouble;
-		return randomInt;
-	}
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
@@ -59,9 +55,7 @@ public class Rob extends ListenerAdapter {
 					
 					if (e.getAuthor().getIdLong() == rs.getLong("UserID")) {
 						robstring = rs.getString("Inventory");
-						if (rs.getInt("Robbed") != new Date().getHours()) {
-							con.prepareStatement("UPDATE profiles SET Robbed = "+new Date().getHours()+" WHERE UserID = "+e.getAuthor().getId()).execute();
-						} else {
+						if (rs.getInt("Robbed") == new Date().getHours()) {
 							e.getChannel().sendMessage(":no_entry: You may only rob people once an hour!").queue();
 							return;
 						}
@@ -94,7 +88,7 @@ public class Rob extends ListenerAdapter {
 					if (target.getUser().getIdLong() == rs.getLong("UserID")) {
 						victimstring = rs.getString("Inventory");
 						if (rs.getLong("DBux") == -1337) {
-							e.getChannel().sendMessage(":no_entry: You can't rob that user!");
+							e.getChannel().sendMessage(":no_entry: You can't rob that user!").queue();
 							return;
 						}
 						if (rs.getLong("DBux") < 100) {
@@ -140,12 +134,12 @@ public class Rob extends ListenerAdapter {
 						long bux = caught.getLong("DBux");
 						long min = bux / 100;
 						long max = min * 20;
-						long rand = randNum(min, max);
+						long rand = ThreadLocalRandom.current().nextLong(max);
 						robbery.addField("🚓 You were caught!", "The Police caught you robbing "+target.getEffectiveName()+", and you hand over **$"+new DecimalFormat("#,###").format(rand)+"**!", false);
 						robbery.setColor(Color.blue);
 						long newbux = bux - rand;
 						msg.editMessage(robbery.build()).queue();
-						con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+target.getUser().getId()).execute();
+						con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+e.getAuthor().getId()).execute();
 						con.close();
 						return;
 					}
@@ -157,13 +151,17 @@ public class Rob extends ListenerAdapter {
 						long bux = victim.getLong("DBux");
 						long min = bux / 100;
 						long max = min * 5;
-						rand = randNum(min, max);
+						rand = ThreadLocalRandom.current().nextLong(max);
 						long newbux = victim.getLong("DBux") - rand;
 						robbery.addField(target.getEffectiveName()+" surrenders", "And hands over **$"+new DecimalFormat("#,###").format(rand)+"**. You drop your weapon and run!", false);
 						robbery.setColor(Color.green);
 						msg.editMessage(robbery.build()).queue();
 						con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+target.getUser().getId()).execute();
-					
+						EmbedBuilder log = new EmbedBuilder().setAuthor(e.getMember().getEffectiveName()+" robbed "+target.getEffectiveName(), null, e.getAuthor().getEffectiveAvatarUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
+	    				log.setDescription(e.getMember().getAsMention()+" robbed "+target.getEffectiveName()+" for a total of **$"+rand+"**").setColor(Color.green)
+	    				.addField(e.getMember().getEffectiveName()+" New Balance", "$**"+newbux+"**", true)
+	    				.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl());
+	    				me.darth.darthbot.main.Main.sm.getTextChannelById("590158748736159744").sendMessage(log.build()).queue();
 					}
 					ResultSet robber = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getId());
 					while (robber.next()) {
@@ -189,6 +187,7 @@ public class Rob extends ListenerAdapter {
 						msg.editMessage(robbery.build()).queue();
 					}
 				}
+				con.prepareStatement("UPDATE profiles SET Robbed = "+new Date().getHours()+" WHERE UserID = "+e.getAuthor().getId()).execute();
 				rs.close();
 			    con.close();
 			

@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +21,7 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent;
+import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Casino extends ListenerAdapter {
@@ -47,6 +50,10 @@ public class Casino extends ListenerAdapter {
 				return;
 			} catch (NumberFormatException e2) {
 				e.getChannel().sendMessage("Invalid Syntax: `!hl <amount>`").queue();
+				return;
+			}
+			if (tobet > 50000) {
+				e.getChannel().sendMessage("A temporary limit of **$50,000** has been applied to all casino commands!").queue();
 				return;
 			}
 			try {
@@ -149,6 +156,10 @@ public class Casino extends ListenerAdapter {
 				c.add(Calendar.SECOND, 10);
 				betcooldown.put(e.getMember(), c.getTimeInMillis());
 			}
+			if (tobet > 50000) {
+				e.getChannel().sendMessage("A temporary limit of **$50,000** has been applied to all casino commands!").queue();
+				return;
+			}
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 				ResultSet canBet = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "
     					+e.getAuthor().getIdLong());
@@ -205,19 +216,25 @@ public class Casino extends ListenerAdapter {
     			if (usernum > botnum) {
     				eb.setColor(Color.green);
     				long win = Long.parseLong(args[1]) * 2;
-    				long newbux = bux + win;
+    				long newbux = bux + win - tobet;
     				if (bux != -1337) {
     					eb.addField("You Win!", ":confetti_ball: Prize: $**"+win+"** :confetti_ball:\n**New Balance:** "+newbux, false);
     					con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
     				} else{
     					eb.addField("You Win!", ":confetti_ball: Prize: $**"+win+"** :confetti_ball:", false);
     				}
+    				EmbedBuilder log = new EmbedBuilder().setAuthor(e.getMember().getEffectiveName()+" used !bet", null, e.getAuthor().getEffectiveAvatarUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
+    				log.setDescription(e.getMember().getAsMention()+" placed a bet of **$"+tobet+"** and won **$"+win+"**").setColor(Color.green)
+    				.addField(e.getMember().getEffectiveName()+" New Balance", "$**"+newbux+"**", true)
+    				.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl());
+    				try {
+    					me.darth.darthbot.main.Main.sm.getTextChannelById("590156048002711552").sendMessage(log.build()).queue();
+    				} catch (InsufficientPermissionException e1) {}
     			} else if (botnum > usernum){
     				eb.setColor(Color.red);
     				long newbux = bux - tobet;
     				if (bux != -1337) {
     					eb.addField("You Lose!", "You Lose: $"+tobet+"\n**New Balance:** "+newbux, false);
-    					con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
     				} else {
     					eb.addField("You Lose!", "You Lose: $"+tobet, false);
     				}
@@ -290,6 +307,11 @@ public class Casino extends ListenerAdapter {
 					eb.addField("Successfully Cashed Out $"+cashout, "New Balance: $"+newbux, false);
 					eb.setColor(Color.green);
 					e.getChannel().getMessageById(e.getMessageId()).complete().editMessage(eb.build()).queue();
+					EmbedBuilder log = new EmbedBuilder().setAuthor(e.getMember().getEffectiveName()+" used !higherlower", null, e.getUser().getEffectiveAvatarUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
+    				log.setDescription(e.getMember().getAsMention()+" cashed out **$"+cashout+"**").setColor(Color.green)
+    				.addField(e.getMember().getEffectiveName()+" New Balance", "$**"+newbux+"**", true)
+    				.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl());
+    				me.darth.darthbot.main.Main.sm.getTextChannelById("590158585602768896").sendMessage(log.build()).queue();
 					con.close();
 					return;
 					
@@ -366,6 +388,11 @@ public class Casino extends ListenerAdapter {
 					eb.addField("Successfully Cashed Out $"+cashout, "New Balance: $"+newbux, false);
 					eb.setColor(Color.green);
 					e.getChannel().getMessageById(e.getMessageId()).complete().editMessage(eb.build()).queue();
+					EmbedBuilder log = new EmbedBuilder().setAuthor(e.getMember().getEffectiveName()+" used !higherlower", null, e.getUser().getEffectiveAvatarUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
+    				log.setDescription(e.getMember().getAsMention()+" cashed out **$"+cashout+"**").setColor(Color.green)
+    				.addField(e.getMember().getEffectiveName()+" New Balance", "$**"+newbux+"**", true)
+    				.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl());
+    				me.darth.darthbot.main.Main.sm.getTextChannelById("590158585602768896").sendMessage(eb.build()).queue();
 					con.close();
 					return;
 					
