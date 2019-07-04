@@ -27,8 +27,8 @@ public class Main {
 	//public static JDA jda = null;
 	public static ShardManager sm = null;
 	public static int updatedmin = -1;
-	private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
-	//private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
+	//private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
+	private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
 	
 	
 	
@@ -45,7 +45,7 @@ public class Main {
 		builder.addEventListeners(new Commands());
 		builder.addEventListeners(new ProfileGen());
 		builder.addEventListeners(new ViewProfile());
-		builder.addEventListeners(new Casino());
+		builder.addEventListeners(new HigherLower());
 		builder.addEventListeners(new logMessages());
 		builder.addEventListeners(new RandomEarn());
 		builder.addEventListeners(new SetBal());
@@ -73,7 +73,7 @@ public class Main {
 		builder.addEventListeners(new SAC());
 		builder.addEventListeners(new submit());
 		builder.addEventListeners(new apply());
-		builder.addEventListeners(new ServerSetup());
+		builder.addEventListeners(new Setup());
 		builder.addEventListeners(new Lock());
 		builder.addEventListeners(new LevelRoles());
 		builder.addEventListeners(new Leaderboards());
@@ -83,8 +83,14 @@ public class Main {
 		builder.addEventListeners(new Avatar());
 		builder.addEventListeners(new Inventories());
 		builder.addEventListeners(new Rob());
+		builder.addEventListeners(new Slots());
 		sm = builder.build();
-		sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
+		me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
+		if (key.contains("NTc")) {
+			sm.setPresence(OnlineStatus.DO_NOT_DISTURB, Game.playing("[BETA] !commands"));
+		} else {
+			sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
+		}
 		Thread.sleep(5000);
 		while (true) {
 			try {
@@ -94,19 +100,22 @@ public class Main {
 						me.darth.darthbot.main.AutoProcesses.removePunishments();
 						sm.getVoiceChannelById("585917931586584586").getManager().setName("Supporting "+new DecimalFormat("#,###").format(sm.getGuilds().size())+" Servers").queue();
 						sm.getVoiceChannelById("585918083168731146").getManager().setName("Serving "+new DecimalFormat("#,###").format(sm.getUsers().size())+" Users").queue();
+						if (min % 5 == 0 || updatedmin == -1) {
+							me.darth.darthbot.main.Leaderboards.GlobalLeaderboard();
+							me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
+							me.darth.darthbot.main.Leaderboards.Retali8Leaderboard();
+						}
 						if (min == 0) {
 							me.darth.darthbot.commands.Vote.listSort();
 							me.darth.darthbot.main.AutoProcesses.purgeMessages();
 							me.darth.darthbot.main.AutoProcesses.leaveEmptyChannels();
 							sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
 						}
-						if (min % 5 == 0 || updatedmin == -1) {
-							me.darth.darthbot.main.Leaderboards.GlobalLeaderboard();
-							me.darth.darthbot.main.Leaderboards.Retali8Leaderboard();
-						}
 						updatedmin = min;
 					}
 					Thread.sleep(5000);
+				} else {
+					break;
 				}
 			} catch (NullPointerException | IllegalStateException e1) {
 				e1.printStackTrace();
@@ -145,25 +154,31 @@ public class Main {
 			if (sm.getGuildById("568849490425937940").isMember(m.getUser())) {
 				eb.setFooter(m.getUser().getName()+" is a Member of the DarthBot Discord!", "https://i.imgur.com/OhUmIFC.png");
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("590261682430017566"))) {
-					eb.setFooter(m.getUser().getName()+" is a Bot Innovator on the DarthBot Discord!", "https://i.imgur.com/c8NuUYh.png");
+					eb.setFooter(m.getEffectiveName()+" is a Bot Innovator on the DarthBot Discord!", "https://i.imgur.com/c8NuUYh.png");
 				}	
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("587318643633684491"))) {
+					eb.setFooter(m.getEffectiveName()+" Nitro Boosts the DarthBot Discord!", "http://pimg.p30download.com/APK_IMG/n/com.nitro.boost.and.cleaner/icon/icon_4_small.png");
+				}
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("582164371455606784"))) {
-					eb.setFooter(m.getUser().getName()+" Supports the Development of DarthBot!", "https://is5-ssl.mzstatic.com/image/thumb/Purple123/v4/56/00/8a/56008a35-b11c-d31d-da7d-05ecba9bb69b/AppIcon-0-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-7.png/246x0w.jpg");
+					eb.setFooter(m.getEffectiveName()+" Supports the Development of DarthBot!", "https://is5-ssl.mzstatic.com/image/thumb/Purple123/v4/56/00/8a/56008a35-b11c-d31d-da7d-05ecba9bb69b/AppIcon-0-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-7.png/246x0w.jpg");
 				}
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("589800268795871243"))) {
-					eb.setFooter(m.getUser().getName()+" is a Community Supporter on the DarthBot Discord!", "https://i.imgur.com/nc5vmM1.png");
+					eb.setFooter(m.getEffectiveName()+" is a Community Supporter on the DarthBot Discord!", "https://i.imgur.com/nc5vmM1.png");
+				}
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("592813831164657684"))) {
+					eb.setFooter(m.getEffectiveName()+" is the Event Coordinator on the DarthBot Discord!", "https://i.imgur.com/wN5JF1r.png");
 				}
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("589550817649098773"))) {
-					eb.setFooter(m.getUser().getName()+" is the Feedback Manager of DarthBot!", "https://i.imgur.com/P0Fkt4t.png");
+					eb.setFooter(m.getEffectiveName()+" is the Feedback Manager of DarthBot!", "https://i.imgur.com/P0Fkt4t.png");
 				}
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("589550729593880590"))) {
-					eb.setFooter(m.getUser().getName()+" is the Community Support Team Manager!", "https://i.imgur.com/P0Fkt4t.png");
+					eb.setFooter(m.getEffectiveName()+" is the Community Support Team Manager!", "https://i.imgur.com/P0Fkt4t.png");
 				}
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("589550625537392643"))) {
-					eb.setFooter(m.getUser().getName()+" is the Economy Manager of DarthBot!", "https://i.imgur.com/P0Fkt4t.png");
+					eb.setFooter(m.getEffectiveName()+" is the Economy Manager of DarthBot!", "https://i.imgur.com/P0Fkt4t.png");
 				}
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("569463842552152094"))) {
-					eb.setFooter(m.getUser().getName()+" is the Creator and Developer of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
+					eb.setFooter(m.getEffectiveName()+" is the Creator and Developer of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
 				}
 			}
 		} catch (NullPointerException e1) {}

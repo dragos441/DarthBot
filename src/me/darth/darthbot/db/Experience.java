@@ -16,7 +16,7 @@ public class Experience extends ListenerAdapter {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		if (e.getMessage().getAuthor().isFake()) {
+		if (e.getMessage().getAuthor().isFake() || e.getAuthor().isBot()) {
 			return;
 		}
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
@@ -35,16 +35,17 @@ public class Experience extends ListenerAdapter {
 				long xp = msgs.getLong("xp");
 				int level = msgs.getInt("Level");
 				if (UserID == e.getMember().getUser().getIdLong() && GuildID == e.getGuild().getIdLong() && e.getMessage().toString().toCharArray()[0] != '!') {
+					long newxp = new Random().nextInt((12 - 8) + 1) + 12;
+					long reqxp = (level + 1) * 100;
+					if (xp >= reqxp) {
+					    int prevlevel = level;
+					    level++;
+						xp = xp - reqxp;
+				    	con.prepareStatement("UPDATE GuildProfiles SET Level = "+level+" WHERE UserID = "+e.getMember().getUser().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong()).execute();
+						e.getChannel().sendMessage("Congrats "+e.getMember().getAsMention()+", you advanced from **Level "+prevlevel+"** :arrow_right: **Level "+level+"**!").complete().delete().queueAfter(2, TimeUnit.MINUTES);
+					}
 					if (new Date().getMinutes() != lastearned) {
 				    	  lastearned = new Date().getMinutes();
-				    	  long newxp = new Random().nextInt((12 - 8) + 1) + 12;
-				    	  long reqxp = (level + 1) * 100;
-				    	  if (xp >= reqxp) {
-				    		  int prevlevel = level;
-				    		  level++;
-				    		  xp = xp - reqxp;
-				    		  e.getChannel().sendMessage("Congrats "+e.getMember().getAsMention()+", you advanced from **Level "+prevlevel+"** :arrow_right: **Level "+level+"**!").complete().delete().queueAfter(2, TimeUnit.MINUTES);
-				    	  }
 				    	  xp = xp + newxp;
 				    	  con.prepareStatement("UPDATE GuildProfiles SET xp = "+xp+", xpGained = "+lastearned+", Level = "+level+" WHERE UserID = "+e.getMember().getUser().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong()).execute();
 				    	  ResultSet rewards = con.createStatement().executeQuery("SELECT * FROM RoleRewards WHERE GuildID = "+e.getGuild().getId()+" AND Level = "+level);
@@ -52,7 +53,7 @@ public class Experience extends ListenerAdapter {
 				    		  e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(rewards.getLong("RoleID"))).queue();
 				    		  
 				    	  }
-				      }
+				     }
 				}
 		     }
 		      

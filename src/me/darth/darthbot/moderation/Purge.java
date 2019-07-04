@@ -68,7 +68,9 @@ public class Purge extends ListenerAdapter {
 							x=x-1;
 						}
 					}
-			      e.getChannel().deleteMessages(todelete).queue();
+			      try {
+			    	  e.getChannel().deleteMessages(todelete).queue();
+			      } catch (IllegalArgumentException e1) {}
 			      num=num-1;
 			      e.getChannel().sendMessage(":white_check_mark: Successfully purged `"+num+"` messages!").complete().delete().queueAfter(5, TimeUnit.SECONDS);
 			      EmbedBuilder eb = new EmbedBuilder().setAuthor("Messages Purged", null, e.getMember().getUser().getEffectiveAvatarUrl()).setDescription("User "+e.getMember().getAsMention()+" "

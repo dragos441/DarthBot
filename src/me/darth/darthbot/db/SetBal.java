@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
@@ -54,7 +56,7 @@ public class SetBal extends ListenerAdapter {
 			        if (UserID == e.getMember().getUser().getIdLong()) {
 			        	con.prepareStatement("UPDATE profiles SET DBux = "+bux+" WHERE UserID = "+target.getUser().getIdLong()).execute();
 			        	MessageEmbed success = new EmbedBuilder().setAuthor("Balance Set", null, e.getGuild().getIconUrl()).setColor(Color.red)
-			        			.setDescription(e.getMember().getAsMention()+" set "+target.getAsMention()+"'s balance to `$"+bux+"`").setFooter(e.getGuild().toString(), null).build();
+			        			.setDescription(e.getMember().getAsMention()+" set "+target.getAsMention()+"'s balance to `$"+bux+"`").setFooter(e.getGuild().toString(), e.getGuild().getIconUrl()).setTimestamp(Instant.from(ZonedDateTime.now())).build();
 			        	e.getChannel().sendMessage(new EmbedBuilder().setDescription(":white_check_mark: Successfully updated "+target.getAsMention()+"'s balance to `$"+bux+"`").build()).queue();
 			        	me.darth.darthbot.main.Main.sm.getTextChannelById("590155925407531008").sendMessage(success).queue();
 			        }

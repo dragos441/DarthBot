@@ -86,6 +86,8 @@ public class ReportBug extends ListenerAdapter {
 		chnl.sendMessage(eb.build()).queue();
 		if (!bug) {
 			me.darth.darthbot.main.Main.sm.getTextChannelById("575440909018202136").sendMessage(shortUrl).queue();
+		} else {
+			me.darth.darthbot.main.Main.sm.getTextChannelById("590252086189621258").sendMessage(shortUrl).queue();
 		}
 	}
 	
@@ -108,11 +110,15 @@ public class ReportBug extends ListenerAdapter {
 				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!reportbug Bug - Description`").queue();
 				return;
 			}
+			if (e.getMessage().getContentRaw().contains("\n")) {
+				e.getChannel().sendMessage(":no_entry: Please don't include line-breaks in your report!\n(eg\nthese\nthings)").queue();
+				return;
+			}
 			EmbedBuilder dupes = new EmbedBuilder().setAuthor("Possible Duplicates Found", null, e.getGuild().getIconUrl());
 			dupes.setDescription("Please check that the below cards aren't a duplicate of what you're submitting. If none of them are, **react with a :white_check_mark:"
 					+ "to your message above to submit it!**");
 			TreeMap<Integer, String> map = me.darth.darthbot.commands.SearchTrello.searchTrello(args);
-			while(!map.isEmpty()) {
+			while(map != null && !map.isEmpty()) {
 				float acc = map.firstKey();
 				if (acc > 50) {
 					dupes.addField("Accuracy: "+acc+"%", map.firstEntry().getValue(), false);

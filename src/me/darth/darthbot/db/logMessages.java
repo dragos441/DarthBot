@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+
+import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -38,9 +40,10 @@ public class logMessages extends ListenerAdapter {
 				
 			}
 		} catch (ArrayIndexOutOfBoundsException e1) {return;}
-		if (args[0].equalsIgnoreCase("!findmsg") || args[0].equalsIgnoreCase("!quote")) {
-			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/retali8", "root", "57d9c35a8160b5644e032d8a10d37324")) {
-			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM messageLog");
+		ShardManager sm = me.darth.darthbot.main.Main.sm;
+		if (args[0].equalsIgnoreCase("!findmsg") && sm.getGuildById("568849490425937940").getMember(e.getAuthor()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("569463842552152094"))) {
+			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM messageLog WHERE MessageID = "+args[1]);
 			      boolean found = false;
 			      EmbedBuilder qeb = new EmbedBuilder();
 			      while (rs.next())

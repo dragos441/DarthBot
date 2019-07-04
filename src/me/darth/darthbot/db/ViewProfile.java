@@ -85,6 +85,7 @@ public class ViewProfile extends ListenerAdapter {
 				    	  Collections.reverse(roles);
 				    	  if (!roles.isEmpty()) {
 				    		  eb.addField("Server Rank", roles.get(0), true);
+				    		  eb.setColor(m.getRoles().get(0).getColorRaw());
 				    	  } else {
 				    		  eb.addField("Server Rank", "Member", true);
 				    	  }

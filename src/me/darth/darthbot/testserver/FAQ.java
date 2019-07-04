@@ -32,7 +32,7 @@ public class FAQ extends ListenerAdapter {
 		}
 		
 		if (e.getChannel().equals(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("574250427462320168")) && !e.getAuthor().isBot()
-				&& e.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!r") && e.getMember().getRoles().contains(e.getGuild().getRoleById("569464005416976394"))) {
+				&& e.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!r")) {
 			String[] args = e.getMessage().getContentRaw().split(" ");
 			MessageEmbed msg = e.getChannel().getMessageById(args[1]).complete().getEmbeds().get(0);
 			Member sender = e.getGuild().getMemberById(msg.getFooter().getText());

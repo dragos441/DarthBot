@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 
@@ -33,7 +34,7 @@ public class WelcomeMessages extends ListenerAdapter {
 		}
 		if (c != null) {
 			c.sendMessage(new EmbedBuilder().setAuthor("Member Joined", null, e.getMember().getUser().getEffectiveAvatarUrl()).setColor(Color.green)
-				.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setDescription(e.getMember().getAsMention()+" has joined the server! We now have  `"+e.getGuild().getMembers().size()+"` "
+				.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setDescription(e.getMember().getAsMention()+" has joined the server! We now have  `"+new DecimalFormat("#,###").format(e.getGuild().getMembers().size())+"` "
 						+ "members!").setTimestamp(Instant.from(ZonedDateTime.now())).build()).queue();
 		}
 		
@@ -56,7 +57,7 @@ public class WelcomeMessages extends ListenerAdapter {
 		}
 		if (c != null) {
 			c.sendMessage(new EmbedBuilder().setAuthor("Member Left", null, e.getMember().getUser().getEffectiveAvatarUrl()).setColor(Color.red)
-				.setDescription(e.getMember().getAsMention()+" left the server! We now have `"+e.getGuild().getMembers().size()+"` "
+				.setDescription(e.getMember().getAsMention()+" left the server! We now have `"+new DecimalFormat("#,###").format(e.getGuild().getMembers().size())+"` "
 						+ "members!").setTimestamp(Instant.from(ZonedDateTime.now())).build()).queue();
 		}
 		

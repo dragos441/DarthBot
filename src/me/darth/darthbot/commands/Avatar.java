@@ -2,6 +2,8 @@ package me.darth.darthbot.commands;
 
 import java.awt.Color;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
@@ -15,6 +17,7 @@ public class Avatar extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
+		
 		if (args[0].equalsIgnoreCase("!avatar") || args[0].equalsIgnoreCase("!profilepic") || args[0].equalsIgnoreCase("!pfp")) {
 			Member target = null;
 			if (args.length < 2) {

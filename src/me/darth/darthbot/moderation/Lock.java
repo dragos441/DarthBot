@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -37,6 +38,10 @@ public class Lock extends ListenerAdapter {
 			        	MessageEmbed eb = new EmbedBuilder().setDescription("⛔ "+e.getMember().getAsMention()+", you must have the "+e.getGuild().getRoleById(ModRoleID).getAsMention()
 			        			+ " role to use that command!").setColor(Color.red).build();
 			        	e.getChannel().sendMessage(eb).queue();
+			        	return;
+			        }
+			        if (!e.getChannel().getPermissionOverride(e.getGuild().getPublicRole()).getAllowed().contains(Permission.MESSAGE_WRITE)) {
+			        	e.getChannel().sendMessage(":no_entry: This channel is already locked!").complete().delete().queueAfter(5, TimeUnit.SECONDS);
 			        	return;
 			        }
 			        String reason = "No Reason Provided";
@@ -88,6 +93,10 @@ public class Lock extends ListenerAdapter {
 			        	e.getChannel().sendMessage(eb).queue();
 			        	return;
 			        }
+			        if (e.getChannel().getPermissionOverride(e.getGuild().getPublicRole()).getAllowed().contains(Permission.MESSAGE_WRITE)) {
+			        	e.getChannel().sendMessage(":no_entry: This channel is already unlocked!").complete().delete().queueAfter(5, TimeUnit.SECONDS);
+			        	return;
+			        }
 			        e.getChannel().getPermissionOverride(e.getGuild().getPublicRole()).getManager().grant(Permission.MESSAGE_WRITE).queue();
 			        try {
 						Thread.sleep(100);
@@ -96,7 +105,7 @@ public class Lock extends ListenerAdapter {
 						e1.printStackTrace();
 					}
 			        String reason = "No Reason Provided";
-        			EmbedBuilder eb = new EmbedBuilder().setAuthor("Channel Locked", null, e.getGuild().getIconUrl()).setDescription("This channel has been unlocked")
+        			EmbedBuilder eb = new EmbedBuilder().setAuthor("Channel Unlocked", null, e.getGuild().getIconUrl()).setDescription("This channel has been unlocked")
         					.addField("Unlocked By", e.getMember().getAsMention(), false).setColor(Color.green);
         			e.getChannel().sendMessage(eb.build()).queue();
 			      }

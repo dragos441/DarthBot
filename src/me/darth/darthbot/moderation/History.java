@@ -57,65 +57,46 @@ public class History extends ListenerAdapter {
 				return;
 			}
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
-			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM ModHistory WHERE PunishedID = "+target.getUser().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong());
+			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM ModHistory WHERE PunishedID = "+target.getUser().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong()+" ORDER BY `TimeStamp` DESC");
 			      EmbedBuilder eb = new EmbedBuilder().setColor(Color.red);
-			      Map<Integer, String> map = new HashMap<>();
 			      int counter = 0;
 			      while (rs.next()) {
-			    	  String type = rs.getString("Type");
-			    	  String punisher = "<@"+rs.getLong("PunisherID")+">";
-			    	  String reason = rs.getString("Reason");
-			    	  long expiry = rs.getLong("Expires");
-			    	  Calendar cal = Calendar.getInstance();
-			    	  cal.setTimeInMillis(rs.getLong("Timestamp"));
-			    	  map.put(9, map.get(8));
-			    	  map.put(8, map.get(7));
-			    	  map.put(7, map.get(6));
-			    	  map.put(6, map.get(5));
-			    	  map.put(5, map.get(4));
-			    	  map.put(4, map.get(3));
-			    	  map.put(3, map.get(2));
-			    	  map.put(2, map.get(1));
-			    	  map.put(1, map.get(0));
-			    	  map.put(0, type+","+cal.getTimeInMillis()+","+reason+","+punisher+","+expiry);
+			    	  if (counter < 10) {
+				    	  try {
+					    	  String type = rs.getString("Type");
+					    	  Calendar cal = Calendar.getInstance();
+					    	  cal.setTimeInMillis(rs.getLong("TimeStamp"));
+					    	  String reason = rs.getString("Reason");
+					    	  String punisher = e.getGuild().getMemberById(rs.getLong("PunisherID")).getEffectiveName();
+					    	  String ft = cal.getTime().getDate()+"/"+(cal.getTime().getMonth() < 10 ? "0" : "") + cal.getTime().getMonth()+"/"+Math.subtractExact(cal.getTime().getYear(), 100)+" @ "+cal.getTime().getHours()+":"+(cal.getTime().getMinutes() < 10 ? "0" : "") + cal.getTime().getMinutes();
+					    	  if (type.equals("BAN")) {
+					    		  eb.addField("Banned on "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
+					    	  } else if (type.equals("KICK")) {
+					    		  eb.addField("Kicked on "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
+					    	  } else if (type.equals("TEMPBAN")) {
+					    		  Calendar exp = Calendar.getInstance();
+					    		  exp.setTimeInMillis(rs.getLong("Expires"));
+					    		  boolean active = true;
+					    		  if (new Date().getTime() > exp.getTimeInMillis()) {
+					    			  active=false;
+					    		  }
+					    		  eb.addField("Temporarily Banned on "+ft+" (Active: "+active+")", "**Reason:** `"+reason+"` **by "+punisher+"**\n**Expires:** "+exp.getTime(), false);
+					    	  } else if (type.equals("TEMPMUTE")) {
+					    		  Calendar exp = Calendar.getInstance();
+					    		  exp.setTimeInMillis(rs.getLong("Expires"));
+					    		  boolean active = true;
+					    		  if (new Date().getTime() > exp.getTimeInMillis()) {
+					    			  active=false;
+					    		  }
+					    		  eb.addField("Temporarily Muted on "+ft+" (Active: "+active+")", "**Reason:** `"+reason+"` **by "+punisher+"**\n**Expires:** "+exp.getTime(), false);
+					    	  } else if (type.equals("WARN")) {
+					    		  eb.addField("Warned on "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
+					    	  } else {
+					    		  eb.addField(type+" on "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
+					    	  }
+				    	  } catch (NullPointerException e1) {}
+			    	  }
 			    	  counter++;
-			      }
-			      for (int x = 0 ; x < 9 ; x++) {
-			    	  try {
-				    	  String[] data = map.get(x).split(",");
-				    	  String type = data[0];
-				    	  long time = Long.parseLong(data[1]);
-				    	  Calendar cal = Calendar.getInstance();
-				    	  cal.setTimeInMillis(time);
-				    	  String reason = data[2];
-				    	  String punisher = data[3];
-				    	  String ft = cal.getTime().getDate()+"/"+(cal.getTime().getMonth() < 10 ? "0" : "") + cal.getTime().getMonth()+"/"+Math.subtractExact(cal.getTime().getYear(), 100)+" @ "+cal.getTime().getHours()+":"+(cal.getTime().getMinutes() < 10 ? "0" : "") + cal.getTime().getMinutes();
-				    	  if (type.equals("BAN")) {
-				    		  eb.addField("Banned on "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
-				    	  } else if (type.equals("KICK")) {
-				    		  eb.addField("Kicked on "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
-				    	  } else if (type.equals("TEMPBAN")) {
-				    		  Calendar exp = Calendar.getInstance();
-				    		  exp.setTimeInMillis(Long.parseLong(data[4]));
-				    		  boolean active = true;
-				    		  if (new Date().getTime() > exp.getTimeInMillis()) {
-				    			  active=false;
-				    		  }
-				    		  eb.addField("Temporarily Banned on "+ft+" (Active: "+active+")", "**Reason:** `"+reason+"` **by "+punisher+"**\n**Expires:** "+exp.getTime(), false);
-				    	  } else if (type.equals("TEMPMUTE")) {
-				    		  Calendar exp = Calendar.getInstance();
-				    		  exp.setTimeInMillis(Long.parseLong(data[5]));
-				    		  boolean active = true;
-				    		  if (new Date().getTime() > exp.getTimeInMillis()) {
-				    			  active=false;
-				    		  }
-				    		  eb.addField("Temporarily Muted on "+ft+" (Active: "+active+")", "**Reason:** `"+reason+"` **by "+punisher+"**\n**Expires:** "+exp.getTime(), false);
-				    	  } else if (type.equals("WARN")) {
-				    		  eb.addField("Warned on "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
-				    	  } else {
-				    		  eb.addField(type+" on "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
-				    	  }
-			    	  } catch (NullPointerException e1) {}
 			      }
 			      eb.setAuthor(target.getEffectiveName()+"'s Punishment History ("+eb.getFields().size()+"/"+counter+")", null, target.getUser().getEffectiveAvatarUrl());
 			      if (eb.getFields().size() == 0) {

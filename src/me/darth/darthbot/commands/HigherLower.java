@@ -1,4 +1,4 @@
-package me.darth.darthbot.db;
+package me.darth.darthbot.commands;
 
 import java.awt.Color;
 import java.sql.Connection;
@@ -24,7 +24,7 @@ import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class Casino extends ListenerAdapter {
+public class HigherLower extends ListenerAdapter {
 	
 	public static Map<Member, Long> betcooldown = new HashMap<>();	
 	public static Map<Member, Long> highlowcooldown = new HashMap<>();	
@@ -32,15 +32,7 @@ public class Casino extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		
-		if (args[0].equalsIgnoreCase("!casino")) {
-			EmbedBuilder eb = new EmbedBuilder();
-			eb.setAuthor("Casino ~ Hub", null, e.getGuild().getIconUrl());
-			eb.setColor(Color.green);
-			eb.addField("Double or Nothing ~ !bet <money>", "Automatically roll 2 dice and attempt to score higher than the bot. Either win double, or nothing.", false);
-			eb.addField("Higher or Lower ~ !higherlower <money>", "Guess whether the next number will be higher or lower, and win 10% of your bet for each correct guess", false);
-			e.getChannel().sendMessage(eb.build()).queue();
-		}
+
 		if (args[0].equalsIgnoreCase("!hl") || args[0].equalsIgnoreCase("!higherlower") || args[0].equalsIgnoreCase("!highlow") || args[0].equalsIgnoreCase("!higherorlower")) {
 			long tobet = -1;
 			try {
@@ -53,7 +45,7 @@ public class Casino extends ListenerAdapter {
 				return;
 			}
 			if (tobet > 50000) {
-				e.getChannel().sendMessage("A temporary limit of **$50,000** has been applied to all casino commands!").queue();
+				e.getChannel().sendMessage("A temporary limit of **$50,000** has been applied to this casino game!").queue();
 				return;
 			}
 			try {
@@ -124,131 +116,7 @@ public class Casino extends ListenerAdapter {
 			
 		}
 		
-		if (args[0].equalsIgnoreCase("!bet")) {
-			long tobet = -1;
-			try {
-				tobet = Long.parseLong(args[1]);
-			} catch (ArrayIndexOutOfBoundsException e1) {
-				e.getChannel().sendMessage("Invalid Syntax: `!bet <amount>`").queue();
-				return;
-			} catch (NumberFormatException e2) {
-				e.getChannel().sendMessage("Invalid Syntax: `!bet <amount>`").queue();
-				return;
-			}
-			try {
-				long time = betcooldown.get(e.getMember());
-				if (time > System.currentTimeMillis() && !e.getMember().getRoles().contains(e.getGuild().getRoleById("557702978455339009"))) {
-					Date date = new Date(time);
-					long s = (date.getTime() - System.currentTimeMillis()) / 1000;
-					e.getChannel().sendMessage("Please wait **"+s+"** seconds before using `!bet` again!").queue();
-					return;
-				} else {
-					Calendar c = Calendar.getInstance();
-					c.add(Calendar.SECOND, 10);
-					betcooldown.put(e.getMember(), c.getTimeInMillis());
-				}
-			} catch (NullPointerException e1) {
-				Calendar c = Calendar.getInstance();
-				c.add(Calendar.SECOND, 10);
-				betcooldown.put(e.getMember(), c.getTimeInMillis());
-			} catch (IllegalStateException e2) {
-				Calendar c = Calendar.getInstance();
-				c.add(Calendar.SECOND, 10);
-				betcooldown.put(e.getMember(), c.getTimeInMillis());
-			}
-			if (tobet > 50000) {
-				e.getChannel().sendMessage("A temporary limit of **$50,000** has been applied to all casino commands!").queue();
-				return;
-			}
-			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
-				ResultSet canBet = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "
-    					+e.getAuthor().getIdLong());
-				long bux = -1;
-    			while (canBet.next()) {
-    				bux = canBet.getLong("DBux");
-    				if (tobet > bux && bux != -1337) {
-    					if (bux > 0) {
-    						e.getChannel().sendMessage("You don't have $"+tobet+" to bet! You can only bet a maximum of $"+bux).queue();
-    					} else {
-    						e.getChannel().sendMessage("You don't have any money to bet!").queue();
-    					}
-    					betcooldown.put(e.getMember(), System.currentTimeMillis());
-    					return;
-    				}
-    				if (tobet < 10) {
-    					e.getChannel().sendMessage("You must bet $10 or more!").queue();
-    					betcooldown.put(e.getMember(), System.currentTimeMillis());
-    					return;
-    				}
-    				if (bux != -1337) {
-    					long newbux = bux - tobet;
-    					con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
-    				}
-     			}
-    			canBet.close();
-    			EmbedBuilder eb = new EmbedBuilder();
-    			eb.setColor(Color.yellow);
-    			eb.setAuthor("Casino ~ Double or Nothing", null, e.getAuthor().getEffectiveAvatarUrl());
-    			eb.setFooter("To Win: Roll higher than the bot!", null);
-    			eb.setDescription("**Betting `$"+tobet+"`**");
-    			eb.addField("Your Roll", "*Rolling Dice...*", false);
-    			eb.addField("Bot's Roll", "*Waiting...*", false);
-    			Message msg = e.getChannel().sendMessage(eb.build()).complete();
-    			eb.clearFields();
-    			int botnum = new Random().nextInt(12);
-    			int usernum = new Random().nextInt(12);	
-    			usernum++;
-    			botnum++;
-    			try {
-	    			if (e.getMember().getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("582164371455606784")) && botnum > 1) {
-	    				botnum = botnum - 1;
-	    			}
-    			} catch (NullPointerException e1) {}
-    			eb.addField("Your Roll", "`"+usernum+"`", false);
-    			eb.addField("Bot's Roll", "*Rolling...*", false);
-    			msg.editMessage(eb.build()).queueAfter(1, TimeUnit.SECONDS);
-    			/*if (bux > 10000 && botnum != 12) {
-    				botnum=botnum+1;
-    			}*/
-    			eb.clearFields();
-    			eb.addField("Your Roll", "`"+usernum+"`", false);
-    			eb.addField("Bot's Roll", "`"+botnum+"`", false);
-    			if (usernum > botnum) {
-    				eb.setColor(Color.green);
-    				long win = Long.parseLong(args[1]) * 2;
-    				long newbux = bux + win - tobet;
-    				if (bux != -1337) {
-    					eb.addField("You Win!", ":confetti_ball: Prize: $**"+win+"** :confetti_ball:\n**New Balance:** "+newbux, false);
-    					con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
-    				} else{
-    					eb.addField("You Win!", ":confetti_ball: Prize: $**"+win+"** :confetti_ball:", false);
-    				}
-    				EmbedBuilder log = new EmbedBuilder().setAuthor(e.getMember().getEffectiveName()+" used !bet", null, e.getAuthor().getEffectiveAvatarUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
-    				log.setDescription(e.getMember().getAsMention()+" placed a bet of **$"+tobet+"** and won **$"+win+"**").setColor(Color.green)
-    				.addField(e.getMember().getEffectiveName()+" New Balance", "$**"+newbux+"**", true)
-    				.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl());
-    				try {
-    					me.darth.darthbot.main.Main.sm.getTextChannelById("590156048002711552").sendMessage(log.build()).queue();
-    				} catch (InsufficientPermissionException e1) {}
-    			} else if (botnum > usernum){
-    				eb.setColor(Color.red);
-    				long newbux = bux - tobet;
-    				if (bux != -1337) {
-    					eb.addField("You Lose!", "You Lose: $"+tobet+"\n**New Balance:** "+newbux, false);
-    				} else {
-    					eb.addField("You Lose!", "You Lose: $"+tobet, false);
-    				}
-    			} else {
-    				eb.addField("Draw!", "You drew with the bot!", false);
-    				long newbux = bux;
-    				con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
-    			}
-    			msg.editMessage(eb.build()).queueAfter(2, TimeUnit.SECONDS);
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
-			
-		}
+		
 		
 	}
 	@Override
@@ -310,7 +178,7 @@ public class Casino extends ListenerAdapter {
 					EmbedBuilder log = new EmbedBuilder().setAuthor(e.getMember().getEffectiveName()+" used !higherlower", null, e.getUser().getEffectiveAvatarUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
     				log.setDescription(e.getMember().getAsMention()+" cashed out **$"+cashout+"**").setColor(Color.green)
     				.addField(e.getMember().getEffectiveName()+" New Balance", "$**"+newbux+"**", true)
-    				.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl());
+    				.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
     				me.darth.darthbot.main.Main.sm.getTextChannelById("590158585602768896").sendMessage(log.build()).queue();
 					con.close();
 					return;
@@ -391,8 +259,8 @@ public class Casino extends ListenerAdapter {
 					EmbedBuilder log = new EmbedBuilder().setAuthor(e.getMember().getEffectiveName()+" used !higherlower", null, e.getUser().getEffectiveAvatarUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
     				log.setDescription(e.getMember().getAsMention()+" cashed out **$"+cashout+"**").setColor(Color.green)
     				.addField(e.getMember().getEffectiveName()+" New Balance", "$**"+newbux+"**", true)
-    				.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl());
-    				me.darth.darthbot.main.Main.sm.getTextChannelById("590158585602768896").sendMessage(eb.build()).queue();
+    				.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
+    				me.darth.darthbot.main.Main.sm.getTextChannelById("590158585602768896").sendMessage(log.build()).queue();
 					con.close();
 					return;
 					

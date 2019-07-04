@@ -77,6 +77,9 @@ public class Whois extends ListenerAdapter {
 			List<Permission> permsRaw = target.getPermissions();
 			
 			List<String> perms = new ArrayList<String>();
+			if (!target.getRoles().isEmpty()) {
+				eb.setColor(target.getRoles().get(0).getColorRaw());
+			}
 			int n = permsRaw.size();
 			while (n > 0) {
 				n = n - 1;

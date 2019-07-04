@@ -12,13 +12,20 @@ public class ChangeLog extends ListenerAdapter {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!changelog") && me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser())
-				.getRoles().contains(e.getGuild().getRoleById("569463842552152094"))
-			|| args[0].equalsIgnoreCase("!cl") && e.getMember().getRoles().contains(e.getGuild().getRoleById("569463842552152094"))) {
+				.getRoles().contains(e.getGuild().getRoleById("569463842552152094"))) {
 			e.getGuild().getRoleById("571066563055321098").getManager().setMentionable(true).queue();
 			me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("569466661644795910").sendMessage(e.getMessage().getContentDisplay().replace(args[0]+" ", "")+"\n<@&571066563055321098> *(<#569465554079842306> to get Update Notifications!)*").queue();
 			e.getGuild().getRoleById("571066563055321098").getManager().setMentionable(false).queueAfter(1, TimeUnit.SECONDS);
 			e.getMessage().delete().queue();
 		}
+		if (args[0].equalsIgnoreCase("!ea") && me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser())
+				.getRoles().contains(e.getGuild().getRoleById("592813831164657684"))) {
+			e.getGuild().getRoleById("592816963261038646").getManager().setMentionable(true).queue();
+			me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("570342307870539838").sendMessage("\n^ <@&592816963261038646>^ *(<#569465554079842306> to get Update Notifications!)*").queue();
+			e.getGuild().getRoleById("592816963261038646").getManager().setMentionable(false).queueAfter(1, TimeUnit.SECONDS);
+			e.getMessage().delete().queue();
+		}
+
 	}
 
 }

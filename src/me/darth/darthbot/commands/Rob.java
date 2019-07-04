@@ -96,13 +96,13 @@ public class Rob extends ListenerAdapter {
 							return;
 						}
 						if (victimstring != null && !victimstring.replace(" ", "").isEmpty()) {
-							if (victimstring.contains(",6")) {
+							if (victimstring.contains(",8")) {
 								robchance = 20;
 								foundDefense = 6;
 							} else if (victimstring.contains(",7")) {
 								robchance = 30;
 								foundDefense = 7;
-							} else if (victimstring.contains(",8")) {
+							} else if (victimstring.contains(",6")) {
 								robchance = 50;
 								foundDefense = 8;
 							}
@@ -135,7 +135,7 @@ public class Rob extends ListenerAdapter {
 						long min = bux / 100;
 						long max = min * 20;
 						long rand = ThreadLocalRandom.current().nextLong(max);
-						robbery.addField("🚓 You were caught!", "The Police caught you robbing "+target.getEffectiveName()+", and you hand over **$"+new DecimalFormat("#,###").format(rand)+"**!", false);
+						robbery.addField("🚓 You were caught!", "The Police caught you robbing "+target.getEffectiveName()+", and you bribe them **$"+new DecimalFormat("#,###").format(rand)+"** to stay out of Jail!", false);
 						robbery.setColor(Color.blue);
 						long newbux = bux - rand;
 						msg.editMessage(robbery.build()).queue();
@@ -160,7 +160,7 @@ public class Rob extends ListenerAdapter {
 						EmbedBuilder log = new EmbedBuilder().setAuthor(e.getMember().getEffectiveName()+" robbed "+target.getEffectiveName(), null, e.getAuthor().getEffectiveAvatarUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
 	    				log.setDescription(e.getMember().getAsMention()+" robbed "+target.getEffectiveName()+" for a total of **$"+rand+"**").setColor(Color.green)
 	    				.addField(e.getMember().getEffectiveName()+" New Balance", "$**"+newbux+"**", true)
-	    				.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl());
+	    				.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
 	    				me.darth.darthbot.main.Main.sm.getTextChannelById("590158748736159744").sendMessage(log.build()).queue();
 					}
 					ResultSet robber = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getId());

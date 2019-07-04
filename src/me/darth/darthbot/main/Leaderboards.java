@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
@@ -25,19 +26,94 @@ public class Leaderboards extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!leaderboard")) {
-			if (lastUpdated == null) {
-				e.getChannel().sendMessage(":timer: The Leaderboard is updated every 5 minutes, please wait a few minutes and try this command again!").queue();
+		if (args[0].equalsIgnoreCase("!leaderboard") || args[0].equalsIgnoreCase("!lb") || args[0].equalsIgnoreCase("!chatleaderboard") || args[0].equalsIgnoreCase("!cl")
+				|| args[0].equalsIgnoreCase("!moneyleaderboard") || args[0].equalsIgnoreCase("!ml")) {
+			try {
+				if (args[0].equalsIgnoreCase("!cl") || args[0].equalsIgnoreCase("!chatleaderboard") || args[1].equalsIgnoreCase("chat")) {
+					MessageEmbed me = ChatLeaderboard(e.getGuild());
+					EmbedBuilder eb = new EmbedBuilder(me).setFooter("Snapshot of Chat Leaderboard - Accurate as of", null)
+							.setTimestamp(Instant.from(ZonedDateTime.now()));
+					if (e.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+						eb.addField("*Looking to make an automatically updating leaderboard?*", "*Use `!setup ChatLeaderboard`*", false);
+					}
+					e.getChannel().sendMessage(eb.build()).queue();
+				} else if (args[0].equalsIgnoreCase("!moneyleaderboard") || args[0].equalsIgnoreCase("!ml") || args[1].equalsIgnoreCase("money")) {
+					GlobalLeaderboard();
+					e.getChannel().sendMessage(lastUpdated).queue();
+					
+				} else {
+					e.getChannel().sendMessage(":no_entry: You must choose whether you view the `CHAT` or `MONEY` leaderboard\n`!leaderboard CHAT`\n`!leaderboard MONEY`").queue();
+					return;
+				}
+			} catch (ArrayIndexOutOfBoundsException e1) {
+				e.getChannel().sendMessage(":no_entry: You must choose whether you view the `CHAT` or `MONEY` leaderboard!\n`!leaderboard CHAT`\n`!leaderboard MONEY`").queue();
 				return;
 			}
-			e.getChannel().sendMessage(lastUpdated).queue();
 		}
 		
 	}
 
+		
+	
+	public static MessageEmbed ChatLeaderboard(Guild g) {
+		EmbedBuilder eb = new EmbedBuilder().setAuthor("Chat Leaderboard", null, g.getIconUrl()).setColor(Color.green).setTimestamp(Instant.from(ZonedDateTime.now()));
+		try {
+			eb.setThumbnail(g.getIconUrl());
+		} catch (NullPointerException e1) {}
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+		      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildProfiles WHERE GuildID = "+g.getId()+" ORDER BY `Level` DESC, `xp` DESC");
+		      int counter = 1;
+		      while (counter <= 15 && rs.next()) {
+		    	  if (me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMemberById(rs.getLong("UserID")) != null) {
+			    	  String m = null;
+			    	  int level = rs.getInt("Level");
+			    	  boolean fU = true;
+			    	  try {
+			    		  m=g.getMemberById(rs.getLong("UserID")).getAsMention();
+			    	  } catch (NullPointerException e1) {
+			    		  fU=false;
+			    	  }
+			    	  
+			    	  String visual = "";
+			    	  int levelup = (level + 1) * 100;
+			    	  int xp = rs.getInt("xp");
+			    	  int xpcount = 0;
+			    	  for (int x = 1 ; x <= 5 ; x++) {
+			    		  xpcount = xpcount + ((levelup / 10) * 2);
+			    		  if (xp >= xpcount) {
+			    			  visual=visual+":white_small_square:";
+			    		  } else {
+			    			  visual=visual+":black_small_square:";
+			    		  }
+			    	  }
+			    	  
+			    	  if (fU) {
+				    	  m=g.getMemberById(rs.getLong("UserID")).getAsMention();
+				    	  if (counter == 1) {
+				    		  eb.addField("🥇 1st Place 🥇", "👑**"+m+"** at Level `"+level+"`"+visual, false);
+				    	  } else if (counter == 2) {
+				    		  eb.addField("🥈 2nd Place 🥈", "**"+m+"** at Level `"+level+"`"+visual, false);
+				    	  } else if (counter == 3) {
+				    		  eb.addField("🥉 3rd Place 🥉", "**"+m+"** at Level `"+level+"`"+visual, false);
+				    	  } else {
+				    		  eb.addField(counter+"th Place", "**"+m+"** at Level `"+level+"`"+visual, false);
+				    	  }
+				    	  counter++;
+			    	  }
+		    	  }
+		      }
+		      rs.close();
+		      con.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		return eb.build();
+		
+	}
+	
 	public static void Retali8Leaderboard() {
 		Guild g = me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940");
-		EmbedBuilder eb = new EmbedBuilder().setAuthor("Retali8 Leaderboard", null, g.getIconUrl()).setColor(Color.blue).setThumbnail(g.getIconUrl())
+		EmbedBuilder eb = new EmbedBuilder().setAuthor("Retali8 Leaderboard", null, g.getIconUrl()).setColor(Color.green).setThumbnail(g.getIconUrl())
 				.setTimestamp(Instant.from(ZonedDateTime.now())).setFooter("Last Updated", null);
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 		      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM profiles ORDER BY `DBux` DESC");

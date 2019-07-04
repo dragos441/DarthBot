@@ -30,6 +30,7 @@ import com.julienvey.trello.impl.http.ApacheHttpClient;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageReaction;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -253,7 +254,7 @@ public class Vote extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		if (!e.getGuild().getId().equals("568849490425937940")) {
+		if (!e.getGuild().getId().equals("568849490425937940") && !e.getGuild().getId().equals("545700502747349022")) {
 			return;
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
@@ -345,57 +346,97 @@ public class Vote extends ListenerAdapter {
 				JSONArray arr = obj.getJSONArray("customFieldItems");
 				String name = obj.getString("name").toString();
 				String desc = null;
-				Member sm = e.getGuild().getMemberById(obj.getString("desc").toString().split("\n")[6].replace("> Submitter ID: `", "").replace("`", ""));
-				desc = obj.getString("desc").toString().split("\n")[1];
-				String value = null;
-				for (int x = 0 ; x < arr.length() ; x++) {
-					value = arr.getJSONObject(x).get("value").toString();
-				}
-				int votes = -1;
 				try {
-					votes = Integer.parseInt(value.replace("{", "").replace("}", "").replace("\"", "").replace(":", "").replace("number", ""));
-				} catch (NullPointerException e1) {
-					votes = 0;
-				}
-				EmbedBuilder eb = new EmbedBuilder().addField("Votes", ""+votes, true).setFooter(cardID, null).setDescription(desc);
-				if (name.toString().length() < 256) {
-					eb.setTitle(name, link);
-				} else {
-					String shortname = "";
-					for (int x = 0 ; x < 256 ; x++) {
-						shortname=shortname+name.toCharArray()[x];
+					Member sm = e.getGuild().getMemberById(obj.getString("desc").toString().split("\n")[6].replace("> Submitter ID: `", "").replace("`", ""));
+					desc = obj.getString("desc").toString().split("\n")[1];
+					String value = null;
+					for (int x = 0 ; x < arr.length() ; x++) {
+						value = arr.getJSONObject(x).get("value").toString();
 					}
-					eb.setTitle(shortname, link);
+					int votes = -1;
+					try {
+						votes = Integer.parseInt(value.replace("{", "").replace("}", "").replace("\"", "").replace(":", "").replace("number", ""));
+					} catch (NullPointerException e1) {
+						votes = 0;
+					}
+					EmbedBuilder eb = new EmbedBuilder().addField("Votes", ""+votes, true).setFooter(cardID, null).setDescription(desc);
+					if (name.toString().length() < 256) {
+						eb.setTitle(name, link);
+					} else {
+						String shortname = "";
+						for (int x = 0 ; x < 256 ; x++) {
+							shortname=shortname+name.toCharArray()[x];
+						}
+						eb.setTitle(shortname, link);
+					}
+					if (sm == null) {
+						eb.setAuthor(obj.getString("desc").toString().split("\n")[5].replace("> ", "").replace("`", "").replace("`", ""), link, me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getIconUrl());
+					} else {
+						eb.setAuthor("Submitted by "+sm.getUser().getName()+"#"+sm.getUser().getDiscriminator(), link, sm.getUser().getEffectiveAvatarUrl());
+					}
+					if (votes < 0) {
+						eb.setColor(Color.red);
+					} else if (votes == 0) {
+						eb.setColor(Color.yellow);
+					} else {
+						eb.setColor(Color.green);
+					}
+				
+					Message msg = e.getChannel().sendMessage(eb.build()).complete();
+					msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532922321797120")).queue();
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532942437810177")).queue();
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					msg.addReaction("❗").queue();
+				} catch (NumberFormatException e1) {
+					
+					Member sm = e.getGuild().getMemberById(obj.getString("desc").toString().split("\n")[6].replace("> Reporter ID: `", "").replace("`", ""));
+					desc = obj.getString("desc").toString().split("\n")[1];
+					String value = null;
+					for (int x = 0 ; x < arr.length() ; x++) {
+						value = arr.getJSONObject(x).get("value").toString();
+					}
+					EmbedBuilder eb = new EmbedBuilder().setFooter(cardID, null).setDescription(desc).setColor(Color.orange);
+					if (name.toString().length() < 256) {
+						eb.setTitle(name, link);
+					} else {
+						String shortname = "";
+						for (int x = 0 ; x < 256 ; x++) {
+							shortname=shortname+name.toCharArray()[x];
+						}
+						eb.setTitle(shortname, link);
+					}
+					if (sm == null) {
+						eb.setAuthor(obj.getString("desc").toString().split("\n")[5].replace("> ", "").replace("`", "").replace("`", ""), link, me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getIconUrl());
+					} else {
+						eb.setAuthor("Submitted by "+sm.getUser().getName()+"#"+sm.getUser().getDiscriminator(), link, sm.getUser().getEffectiveAvatarUrl());
+					}
+					Message msg = e.getChannel().sendMessage(eb.build()).complete();
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e3) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e3) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					msg.addReaction("❗").queue();
+					
 				}
-				if (sm == null) {
-					eb.setAuthor(obj.getString("desc").toString().split("\n")[5].replace("> ", "").replace("`", "").replace("`", ""), link, me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getIconUrl());
-				} else {
-					eb.setAuthor("Submitted by "+sm.getUser().getName()+"#"+sm.getUser().getDiscriminator(), link, sm.getUser().getEffectiveAvatarUrl());
-				}
-				if (votes < 0) {
-					eb.setColor(Color.red);
-				} else if (votes == 0) {
-					eb.setColor(Color.yellow);
-				} else {
-					eb.setColor(Color.green);
-				}
-			
-				Message msg = e.getChannel().sendMessage(eb.build()).complete();
-				msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532922321797120")).queue();
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532942437810177")).queue();
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				msg.addReaction("❗").queue();
 				if (args.length == 1) {
 					e.getMessage().delete().queue();
 				}
@@ -417,14 +458,58 @@ public class Vote extends ListenerAdapter {
 	
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent e) {
-		if (e.getChannel().getId().equals("575440909018202136") && e.getReaction().getReactionEmote().getName().equals("❗")) {
-			if (e.getMember().getRoles().contains(e.getGuild().getRoleById("590261682430017566"))) {
-				
-			} else {
-				e.getTextChannel().removeReactionById(e.getMessageId(), "❗", e.getUser()).queue();
-			}
+		if (!e.getUser().isBot() && e.getChannel().getId().equals("591749394517458944") && e.getReaction().getReactionEmote().getName().equals("⛔")) {
+			e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
 		}
 		Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
+		try {
+			if (e.getReaction().getReactionEmote().getName().equals("❗") && msg.getEmbeds().get(0).getUrl().contains("trello.com")) {
+				if (e.getMember().getRoles().contains(e.getGuild().getRoleById("590190112688832522"))) {
+					List<Message> messages = e.getGuild().getTextChannelById("591749394517458944").getHistory().retrievePast(50).complete();
+					boolean found = false;
+					for (int x = 0 ; x < messages.size() ; x++) {
+						if (!messages.get(x).getEmbeds().isEmpty() 
+						&& messages.get(x).getEmbeds().get(0).getFooter().getText().equals(msg.getEmbeds().get(0).getFooter().getText())) {
+							found = true;
+						}
+					}
+					
+					if (!found) {
+						Message reported = e.getGuild().getTextChannelById("591749394517458944").sendMessage("<@&589550817649098773> - This feedback was reported by **"+e.getUser().getName()
+								+"#"+e.getUser().getDiscriminator()+"** in the channel <#"+e.getChannel().getId()+">").embed(msg.getEmbeds().get(0)).complete();
+						reported.addReaction("❕").queue();
+						reported.addReaction("⛔").queue();
+					}
+					
+					msg.addReaction("❕").queue();
+					
+				} else if (!e.getUser().isBot()) {
+					e.getTextChannel().removeReactionById(e.getMessageId(), "❗", e.getUser()).queue();
+				}
+			}
+			if (e.getReaction().getReactionEmote().getName().equals("❕") && msg.getEmbeds().get(0).getUrl().contains("trello.com")
+				&& e.getMember().getRoles().contains(e.getGuild().getRoleById("589550817649098773"))) {
+				e.getGuild().getTextChannelById("592011838930288650").sendMessage(msg.getEmbeds().get(0)).queue();
+				String cardID = msg.getEmbeds().get(0).getFooter().getText();
+				Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
+				Card c = trello.getCard(cardID);
+				c.setClosed(true);
+				c.update();
+				msg.delete().queue();
+				List<Message> messages = e.getGuild().getTextChannelById("575440909018202136").getHistory().retrievePast(50).complete();
+				messages.addAll(e.getGuild().getTextChannelById("590252086189621258").getHistory().retrievePast(50).complete());
+				for (int x = 0 ; x < messages.size() ; x++) {
+					if (!messages.get(x).getEmbeds().isEmpty() 
+					&& messages.get(x).getEmbeds().get(0).getFooter().getText().equals(msg.getEmbeds().get(0).getFooter().getText())) {
+						messages.get(x).delete().queue();
+					}
+				}
+				
+				
+			} else if (!e.getUser().isBot()) {
+				e.getTextChannel().removeReactionById(e.getMessageId(), "❕", e.getUser()).queue();
+			}
+		} catch (NullPointerException e1) {}
 		try {
 			if (e.getReactionEmote().getEmote().getName().equals("❗")) {
 				e.getTextChannel().removeReactionById(e.getMessageId(), e.getReaction().getReactionEmote().getEmote(), e.getMember().getUser()).queue();

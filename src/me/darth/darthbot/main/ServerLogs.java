@@ -41,6 +41,7 @@ import net.dv8tion.jda.core.events.role.update.RoleUpdateColorEvent;
 import net.dv8tion.jda.core.events.role.update.RoleUpdateMentionableEvent;
 import net.dv8tion.jda.core.events.role.update.RoleUpdateNameEvent;
 import net.dv8tion.jda.core.events.role.update.RoleUpdatePermissionsEvent;
+import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class ServerLogs extends ListenerAdapter {
@@ -757,7 +758,9 @@ public class ServerLogs extends ListenerAdapter {
 				long GuildID = g.getLong("GuildID");
 				if (GuildID == e.getGuild().getIdLong() && g.getLong("LogChannel") != 0) {
 					long logchannel = g.getLong("LogChannel");
-					e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
+					try {
+						e.getGuild().getTextChannelById(logchannel).sendMessage(eb.build()).queue();
+					} catch (InsufficientPermissionException e1) {}
 				}
 			}
 		} catch (SQLException e1) {

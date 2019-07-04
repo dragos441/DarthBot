@@ -104,7 +104,7 @@ public class Inventories extends ListenerAdapter {
 			EmbedBuilder eb = new EmbedBuilder().setAuthor("Store", null, e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setColor(Color.yellow)
 					.setDescription("> **Buy items using `!buy <ID>` or `!buy <Name>`**\n"
 							+ "> **Max Inventory Size** is **10 items**!\n"
-							+ "> **Robbery Defense Items** have a **1/10** chance of wearing dropped after each time you're robbed!\n"
+							+ "> **Robbery Defense Items** have a **1/10** chance of being dropped after each time you're robbed!\n"
 							+ "> **Your most powerful item** is **always used**!");
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 				ResultSet rs = con.createStatement().executeQuery("SELECT * FROM StoreItems");

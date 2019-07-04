@@ -3,22 +3,25 @@ package me.darth.darthbot.commands;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Category;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class ServerSetup extends ListenerAdapter {
+public class Setup extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!enable") || args[0].equalsIgnoreCase("!disable") || args[0].equalsIgnoreCase("!setup")) {
+		if (args[0].equalsIgnoreCase("!enable") || args[0].equalsIgnoreCase("!disable") || args[0].equalsIgnoreCase("!setup") || args[0].equalsIgnoreCase("!configure")) {
 			if (!e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
 				e.getChannel().sendMessage(":no_entry: You must have the **Administrator** permission to manage the bot!").queue();
 				return;
@@ -31,10 +34,32 @@ public class ServerSetup extends ListenerAdapter {
 							+ "`!enable Moderation <Role>` Setup the role that can use Punishment Commands (Ban, Mute, Kick etc)\n"
 							+ "`!enable PublicRooms <Category>` Setup the Category that will have automatic public rooms\n"
 							+ "`!enable Experience` Enabled the Level/Experience Feature `Enabled by default`\n"
+							+ "`!enable ChatLeaderboard` Generates a Leaderboard that automatically updates every 5 minutes of the most active members"
 							+ "`!levelrewards` Add level rewards for when users reach specific chat levels!", false);
 					eb.addField("Disabling Features", "__!disable <Feature>__\n*Example: `!disable JoinLog`*", false);
 					e.getChannel().sendMessage(eb.build()).queue();
 					return;
+				}
+				if (args[1].equalsIgnoreCase("ChatLeaderboard")) {
+					if (!args[0].equalsIgnoreCase("!disable")) {
+						ResultSet rs = con.createStatement().executeQuery("SELECT * FROM ChatLeaderboards WHERE GuildID = "+e.getGuild().getId());
+						while (rs.next()) {
+							eb.setDescription(":no_entry: You already have a Chat Leaderboard on this server! To remove it, type `!disable ChatLeaderboard`!").setColor(Color.red);
+							e.getChannel().sendMessage(eb.build()).queue();
+							return;
+						}
+						Message msg = e.getChannel().sendMessage(me.darth.darthbot.main.Leaderboards.ChatLeaderboard(e.getGuild())).complete();
+						con.prepareStatement("INSERT INTO ChatLeaderboards (GuildID, ChannelID, MessageID) values ("+e.getGuild().getId()+", "+e.getChannel().getId()+", "+msg.getId()+")").execute();
+						eb.setDescription(":white_check_mark: Successfully created a Chat Leaderboard! `It will update every 5 minutes automatically`");
+						e.getChannel().sendMessage(eb.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
+						e.getMessage().delete().queue();
+					} else {
+						con.prepareStatement("DELETE FROM ChatLeaderboards WHERE GuildID = "+e.getGuild().getId()).execute();
+						eb.setDescription("Disabled Chat Leaderboard!").setColor(Color.red);
+						e.getChannel().sendMessage(eb.build()).queue();
+					}
+					
+					
 				}
 				if (args[1].equalsIgnoreCase("Experience")) {
 					if (!args[0].equalsIgnoreCase("!disable")) {
@@ -152,7 +177,7 @@ public class ServerSetup extends ListenerAdapter {
 				}
 				con.close();
 			} catch (SQLException e1) {
-				
+				e1.printStackTrace();
 			}
 		}
 		
