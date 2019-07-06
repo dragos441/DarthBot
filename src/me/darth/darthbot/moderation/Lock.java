@@ -40,10 +40,12 @@ public class Lock extends ListenerAdapter {
 			        	e.getChannel().sendMessage(eb).queue();
 			        	return;
 			        }
-			        if (!e.getChannel().getPermissionOverride(e.getGuild().getPublicRole()).getAllowed().contains(Permission.MESSAGE_WRITE)) {
-			        	e.getChannel().sendMessage(":no_entry: This channel is already locked!").complete().delete().queueAfter(5, TimeUnit.SECONDS);
-			        	return;
-			        }
+			        try {
+				        if (!e.getChannel().getPermissionOverride(e.getGuild().getPublicRole()).getAllowed().contains(Permission.MESSAGE_WRITE)) {
+				        	e.getChannel().sendMessage(":no_entry: This channel is already locked!").complete().delete().queueAfter(5, TimeUnit.SECONDS);
+				        	return;
+				        }
+			        } catch (NullPointerException e1) {}
 			        String reason = "No Reason Provided";
 			        if (args.length >= 2) {
 			        	reason = e.getMessage().getContentRaw().replace(args[0]+" ", "");
@@ -93,10 +95,12 @@ public class Lock extends ListenerAdapter {
 			        	e.getChannel().sendMessage(eb).queue();
 			        	return;
 			        }
-			        if (e.getChannel().getPermissionOverride(e.getGuild().getPublicRole()).getAllowed().contains(Permission.MESSAGE_WRITE)) {
-			        	e.getChannel().sendMessage(":no_entry: This channel is already unlocked!").complete().delete().queueAfter(5, TimeUnit.SECONDS);
-			        	return;
-			        }
+			        try {
+				        if (e.getChannel().getPermissionOverride(e.getGuild().getPublicRole()).getAllowed().contains(Permission.MESSAGE_WRITE)) {
+				        	e.getChannel().sendMessage(":no_entry: This channel is already unlocked!").complete().delete().queueAfter(5, TimeUnit.SECONDS);
+				        	return;
+				        }
+			        } catch (NullPointerException e1) {}
 			        e.getChannel().getPermissionOverride(e.getGuild().getPublicRole()).getManager().grant(Permission.MESSAGE_WRITE).queue();
 			        try {
 						Thread.sleep(100);

@@ -135,7 +135,7 @@ public class Rob extends ListenerAdapter {
 						long min = bux / 100;
 						long max = min * 20;
 						long rand = ThreadLocalRandom.current().nextLong(max);
-						robbery.addField("🚓 You were caught!", "The Police caught you robbing "+target.getEffectiveName()+", and you bribe them **$"+new DecimalFormat("#,###").format(rand)+"** to stay out of Jail!", false);
+						robbery.addField("🚓 You were caught!", "The Police caught you robbing "+target.getEffectiveName()+", and you bribe the officers **$"+new DecimalFormat("#,###").format(rand)+"** to stay out of jail!", false);
 						robbery.setColor(Color.blue);
 						long newbux = bux - rand;
 						msg.editMessage(robbery.build()).queue();
