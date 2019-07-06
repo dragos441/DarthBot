@@ -9,7 +9,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 public class Commands extends ListenerAdapter {
 
 	@Override
-	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+	public void onGuildMessageReceived(GuildMessageReceivedEvent e) { //
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!commands") || args[0].equalsIgnoreCase("!help") || args[0].equalsIgnoreCase("!command") || args[0].equalsIgnoreCase("!cmd") || args[0].equalsIgnoreCase("!cmds")) {
 			String def = "`!setup` - View commands to configure DarthBot\n`!commands` - View command categories\n`!commands Economy` - View economy commands\n"
