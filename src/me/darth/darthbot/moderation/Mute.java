@@ -181,16 +181,20 @@ public class Mute extends ListenerAdapter {
 						cal.add(Calendar.YEAR, lengthd);
 						charstring = "years";
 					}
-					
+					EmbedBuilder log = new EmbedBuilder().setAuthor("Member Muted", null, m.getUser().getEffectiveAvatarUrl()).setDescription("User "+m.getAsMention()+" "
+	  			    		+ "has been muted").addField("Muted by", e.getMember().getAsMention(), true).addField("Reason", reason, false).setTimestamp(Instant.from(ZonedDateTime.now()))
+	  			    		.setFooter("User ID"+m.getUser().getId(), null).setColor(Color.red);
 					if (lengthc != 'n' && lengthd > 0) {
 						if (reason.replace(" ", "").equals("")) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.green).setDescription(
 									":white_check_mark: Successfully muted "+m.getAsMention()+" for "+lengthd+" "+charstring+"!").build()).queue();
 							send.setDescription("You have been muted in **"+e.getGuild().getName()+"** for **"+lengthd+" "+charstring+"**!");
+							log.addField("Length", lengthc+lengthd+"", false);
 							reason="No Reason Provided";
 						} else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.green).setDescription(
 									":white_check_mark: Successfully muted "+m.getAsMention()+" for "+lengthd+" "+charstring+" due to `"+reason+"`").build()).queue();
+							log.addField("Length", lengthc+lengthd+"", false);
 							send.setDescription("You have been muted in **"+e.getGuild().getName()+"** for **"+lengthd+" "+charstring+"** due to `"+reason+"`");
 						}
 						con.prepareStatement("INSERT INTO ModHistory (Timestamp, GuildID, PunishedID, PunisherID, Type, Reason, Expires, Active)  values "
@@ -213,6 +217,9 @@ public class Mute extends ListenerAdapter {
 					}
 					e.getGuild().getController().addSingleRoleToMember(m, mutedrole).queue();
 					e.getGuild().getController().setMute(m, true).queue();
+					if (canUse.getLong("LogChannel") != 0L) {
+						e.getGuild().getTextChannelById(canUse.getLong("LogChannel")).sendMessage(log.build()).queue();
+					}
 					m.getUser().openPrivateChannel().queue((channel) ->
 			        {
 			            channel.sendMessage(send.build()).queue();

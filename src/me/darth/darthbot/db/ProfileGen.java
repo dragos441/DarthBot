@@ -5,11 +5,40 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class ProfileGen extends ListenerAdapter {
+	
+	@Override
+	public void onGuildMemberJoin(GuildMemberJoinEvent e) {
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+			
+			ResultSet rs = con.prepareStatement("SELECT * FROM GuildProfiles WHERE UserID = "+e.getUser().getId()+" AND GuildID = "+e.getGuild().getIdLong()).executeQuery();
+			ResultSet rewards = con.prepareStatement("SELECT * FROM RoleRewards WHERE GuildID = "+e.getGuild().getId()).executeQuery();
+			while (rs.next()) {
+				List<Role> roles = new ArrayList<Role>();
+				int level = rs.getInt("Level");
+				while (rewards.next()) {
+					if (rewards.getInt("Level") <= level) {
+						roles.add(e.getGuild().getRoleById(rewards.getLong("RoleID")));
+					}
+				}
+				if (!roles.isEmpty()) {
+					e.getGuild().getController().addRolesToMember(e.getMember(), roles).queue();
+				}
+			}
+			
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	}
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {

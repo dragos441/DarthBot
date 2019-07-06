@@ -24,6 +24,16 @@ public class LevelRoles extends ListenerAdapter {
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!levelrewards") || args[0].equalsIgnoreCase("!lr")) {
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+				EmbedBuilder commands = new EmbedBuilder().setAuthor("Level Rewards", null, e.getGuild().getIconUrl())
+						.setDescription("`!lr add <Level> <Role>` Adds a role reward to a level"
+								+ "\n`!lr remove <Level>` Removes a role reward from a level"
+								+ "\n`!lr list` Lists all the current role rewards for levels"
+								+ "\n`!lr help` Displays this list of commands").setColor(Color.blue)
+						.setFooter("[TIP] Set a role reward for Level 0 for it to be automatically assigned to all users!", null);
+				if (args.length <= 1 || args[1].equalsIgnoreCase("help")) {
+					e.getChannel().sendMessage(commands.build()).queue();
+					return;
+				}
 				if (args[1].equalsIgnoreCase("list")) {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM RoleRewards WHERE GuildID = "+e.getGuild().getIdLong()+" ORDER BY Level ASC");
 					EmbedBuilder eb = new EmbedBuilder().setAuthor("Level Role Rewards - Rewards List", null, e.getGuild().getIconUrl()).setColor(Color.blue);
@@ -40,16 +50,6 @@ public class LevelRoles extends ListenerAdapter {
 				}
 				if (!e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
 					e.getChannel().sendMessage(":no_entry: You must have the **Administrator** permission to manage the bot!").queue();
-					return;
-				}
-				EmbedBuilder commands = new EmbedBuilder().setAuthor("Level Rewards", null, e.getGuild().getIconUrl())
-						.setDescription("`!lr add <Level> <Role>` Adds a role reward to a level"
-								+ "\n`!lr remove <Level>` Removes a role reward from a level"
-								+ "\n`!lr list` Lists all the current role rewards for levels"
-								+ "\n`!lr help` Displays this list of commands").setColor(Color.blue)
-						.setFooter("[TIP] Set a role reward for Level 0 for it to be automatically assigned to all users!", null);
-				if (args.length <= 1 || args[1].equalsIgnoreCase("help")) {
-					e.getChannel().sendMessage(commands.build()).queue();
 					return;
 				}
 				if (args[1].equalsIgnoreCase("remove")) {

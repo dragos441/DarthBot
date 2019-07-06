@@ -84,6 +84,8 @@ public class Main {
 		builder.addEventListeners(new Inventories());
 		builder.addEventListeners(new Rob());
 		builder.addEventListeners(new Slots());
+		builder.addEventListeners(new PingTEST());
+		builder.addEventListeners(new Ball8());
 		sm = builder.build();
 		me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
 		if (key.contains("NTc")) {
@@ -178,7 +180,10 @@ public class Main {
 					eb.setFooter(m.getEffectiveName()+" is the Economy Manager of DarthBot!", "https://i.imgur.com/P0Fkt4t.png");
 				}
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("569463842552152094"))) {
-					eb.setFooter(m.getEffectiveName()+" is the Creator and Developer of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
+					eb.setFooter(m.getEffectiveName()+" is a Developer of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
+				}
+				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getUser().getId().equals("159770472567799808")) {
+					eb.setFooter(m.getEffectiveName()+" is the Creator of DarthBot!", "https://i.imgur.com/kb2zLnn.png");
 				}
 			}
 		} catch (NullPointerException e1) {}
