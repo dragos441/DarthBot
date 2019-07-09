@@ -20,6 +20,12 @@ public class Ball8 extends ListenerAdapter {
                 eb.setAuthor("Magic 8 Ball", null, "https://www.incandescentwaxmelts.com/wp-content/uploads/2017/07/8-BALL-SCENTSY-WARMER-2.png").setColor(660066);
                 eb.setDescription("Consulting the oracles.....");
                 Message msg = e.getChannel().sendMessage(eb.build()).complete();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
                 Random rand = new Random();
                 int n = rand.nextInt(20);
                 n += 1;
@@ -106,7 +112,7 @@ public class Ball8 extends ListenerAdapter {
             }
             else {
                 EmbedBuilder eb = new EmbedBuilder();
-                eb.setAuthor("Ball8", null, e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setColor(660066);
+                eb.setAuthor("Magic 8 Ball", null, "https://www.incandescentwaxmelts.com/wp-content/uploads/2017/07/8-BALL-SCENTSY-WARMER-2.png").setColor(660066);
                 eb.setDescription("An answer requires a question.");
                 Message msg = e.getChannel().sendMessage(eb.build()).complete();
            
