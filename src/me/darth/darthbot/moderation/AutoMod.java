@@ -55,7 +55,7 @@ public class AutoMod extends ListenerAdapter {
 					String[] filter = rs.getString("Filter").split(",");
 					fstring = rs.getString("Filter");
 					for (int x = 1 ; x < filter.length ; x++) {
-						if (e.getMessage().getContentRaw().toLowerCase().replace(" ", "").contains(filter[x].toLowerCase().replace(" ", ""))) {
+						if (e.getMessage().getContentRaw().toLowerCase().contains(filter[x].toLowerCase())) {
 							e.getMessage().delete().queue();
 							e.getChannel().sendMessage(e.getMember().getAsMention()+", some of your message contained content blocked by the Chat Filter!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
 						}
