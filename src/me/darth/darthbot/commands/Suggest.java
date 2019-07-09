@@ -1,5 +1,6 @@
 package me.darth.darthbot.commands;
 
+import java.awt.Color;
 import java.util.TreeMap;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -36,7 +37,7 @@ public class Suggest extends ListenerAdapter {
 				e.getChannel().sendMessage(":no_entry: Please don't include line-breaks in your suggestion!\n(eg\nthese\nthings)").queue();
 				return;
 			}
-			EmbedBuilder dupes = new EmbedBuilder().setAuthor("Possible Duplicates Found", null, e.getGuild().getIconUrl());
+			EmbedBuilder dupes = new EmbedBuilder().setAuthor("Possible Duplicates Found", null, e.getGuild().getIconUrl()).setColor(Color.yellow);
 			dupes.setDescription("Please check that the below cards aren't a duplicate of what you're submitting. If none of them are, **react with a :white_check_mark:"
 					+ "to your message above to submit it!**");
 			TreeMap<Integer, String> map = me.darth.darthbot.commands.SearchTrello.searchTrello(args);
@@ -58,6 +59,8 @@ public class Suggest extends ListenerAdapter {
 			
 		}
 	}
+	
+	
 	
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent e) {

@@ -50,7 +50,7 @@ public class Main {
 		builder.addEventListeners(new RandomEarn());
 		builder.addEventListeners(new SetBal());
 		builder.addEventListeners(new ReactRole());
-		builder.addEventListeners(new ChangeLog());
+		builder.addEventListeners(new DBCommands());
 		builder.addEventListeners(new Daily());
 		builder.addEventListeners(new GuildJoin());
 		builder.addEventListeners(new ServerLogs());
@@ -81,11 +81,12 @@ public class Main {
 		builder.addEventListeners(new Give());
 		builder.addEventListeners(new EditMsg());
 		builder.addEventListeners(new Avatar());
-		builder.addEventListeners(new Inventories());
+		builder.addEventListeners(new Store());
 		builder.addEventListeners(new Rob());
 		builder.addEventListeners(new Slots());
 		builder.addEventListeners(new PingTEST());
 		builder.addEventListeners(new Ball8());
+		builder.addEventListeners(new AutoMod());
 		sm = builder.build();
 		me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
 		if (key.contains("NTc")) {

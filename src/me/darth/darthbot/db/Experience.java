@@ -41,7 +41,7 @@ public class Experience extends ListenerAdapter {
 					    int prevlevel = level;
 					    level++;
 						xp = xp - reqxp;
-				    	con.prepareStatement("UPDATE GuildProfiles SET Level = "+level+" WHERE UserID = "+e.getMember().getUser().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong()).execute();
+				    	con.prepareStatement("UPDATE GuildProfiles SET Level = "+level+", xp = 0 WHERE UserID = "+e.getMember().getUser().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong()).execute();
 						e.getChannel().sendMessage("Congrats "+e.getMember().getAsMention()+", you advanced from **Level "+prevlevel+"** :arrow_right: **Level "+level+"**!").complete().delete().queueAfter(2, TimeUnit.MINUTES);
 					}
 					if (new Date().getMinutes() != lastearned) {

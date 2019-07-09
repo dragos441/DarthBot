@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class ChangeLog extends ListenerAdapter {
+public class DBCommands extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
@@ -24,6 +24,15 @@ public class ChangeLog extends ListenerAdapter {
 			me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("570342307870539838").sendMessage("\n^ <@&592816963261038646>^ *(<#569465554079842306> to get Update Notifications!)*").queue();
 			e.getGuild().getRoleById("592816963261038646").getManager().setMentionable(false).queueAfter(1, TimeUnit.SECONDS);
 			e.getMessage().delete().queue();
+		}
+		if (args[0].equalsIgnoreCase("!innovator") && e.getMember().getRoles().contains(e.getGuild().getRoleById("569464005416976394"))) {
+			if (e.getMessage().getMentionedMembers().isEmpty()) {
+				e.getChannel().sendMessage(":no_entry: You must mention a user that will recieve the innovator role!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
+			} else {
+				e.getGuild().getController().addSingleRoleToMember(e.getMessage().getMentionedMembers().get(0), e.getGuild().getRoleById("590190112688832522")).queue();
+				e.getChannel().sendMessage(":confetti_ball: "+e.getMessage().getMentionedMembers().get(0).getAsMention()+" has earned the **Innovators** role for "
+						+ "suggesting a popular idea or reporting a bug! Congrats!").queue();
+			}
 		}
 
 	}

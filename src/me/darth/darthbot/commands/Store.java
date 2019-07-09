@@ -18,7 +18,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 
-public class Inventories extends ListenerAdapter {
+public class Store extends ListenerAdapter {
 	
 	public static int publicIds = 8;
 	

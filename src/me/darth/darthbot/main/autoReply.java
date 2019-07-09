@@ -69,7 +69,7 @@ public class autoReply extends ListenerAdapter {
 			if (!e.getMessage().getMentionedMembers().isEmpty() && e.getMessage().getMentionedMembers().contains(e.getGuild().getMemberById("159770472567799808"))
 				|| msg.contains("darth")) {
 				if (!e.getMember().getRoles().contains(e.getGuild().getRoleById("589797120207486988")) && !e.getChannel().getId().equals("574246600570830853")) {
-					e.getChannel().sendMessage("Hey "+e.getMember().getAsMention()+", make sure to ask questions in <#574246600570830853> so others can benefit from the response!").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+					e.getChannel().sendMessage("All questions regarding the bot should be asked in <#574246600570830853> so others can benefit from the response!").complete().delete().queueAfter(30, TimeUnit.SECONDS);
 				}
 			}
 		}
