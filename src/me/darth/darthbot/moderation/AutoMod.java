@@ -24,16 +24,23 @@ public class AutoMod extends ListenerAdapter {
 			if (e.getAuthor().isFake() || e.getAuthor().isBot()) {
 				return;
 			}
+			String fstring = null;
+			String[] args = e.getMessage().getContentRaw().split(" ");
 			ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (rs.next()) {
 				if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(rs.getLong("Moderator"))) && rs.getString("Filter") != null && !rs.getString("Filter").equals("")) {
-					String[] filter = rs.getString("Filter").split(",");
-					for (int x = 1 ; x < filter.length ; x++) {
-						if (e.getMessage().getContentRaw().toLowerCase().replace(" ", "").contains(filter[x].toLowerCase().replace(" ", ""))) {
-							e.getMessage().delete().queue();
-							e.getChannel().sendMessage(e.getMember().getAsMention()+", some of your message contained content blocked by the Chat Filter!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
+					for (int x = 0 ; x < args.length ; x++) {
+						String[] filter = rs.getString("Filter").split(",");
+						fstring = rs.getString("Filter");
+						for (int y = 1 ; y < filter.length ; y++) {
+							if (args[x].equalsIgnoreCase(filter[y])) {
+								e.getMessage().delete().queue();
+								e.getChannel().sendMessage(e.getMember().getAsMention()+", some of your message contained content blocked by the Chat Filter!\n`DEBUG W:"+filter[y]+"`").complete().delete().queueAfter(15, TimeUnit.SECONDS);
+							}
 						}
 					}
+					String[] filter = rs.getString("Filter").split(",");
+					fstring = rs.getString("Filter");
 					
 				}
 			}
@@ -49,24 +56,26 @@ public class AutoMod extends ListenerAdapter {
 			
 			//chatcheck
 			String fstring = null;
+			String[] args = e.getMessage().getContentRaw().split(" ");
 			ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 			while (rs.next()) {
 				if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(rs.getLong("Moderator"))) && rs.getString("Filter") != null && !rs.getString("Filter").equals("")) {
-					String[] filter = rs.getString("Filter").split(",");
-					fstring = rs.getString("Filter");
-					for (int y = 1 ; y < filter.length ; y++) {
-						String[] args = e.getMessage().getContentRaw().split(" ");
-						for (int x = 1 ; x < args.length ; x++) {
+					for (int x = 0 ; x < args.length ; x++) {
+						String[] filter = rs.getString("Filter").split(",");
+						fstring = rs.getString("Filter");
+						for (int y = 1 ; y < filter.length ; y++) {
 							if (args[x].equalsIgnoreCase(filter[y])) {
-								e.getChannel().sendMessage(e.getMember().getAsMention()+", some of your message contained content blocked by the Chat Filter!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
+								e.getMessage().delete().queue();
+								e.getChannel().sendMessage(e.getMember().getAsMention()+", some of your message contained content blocked by the Chat Filter!\n`DEBUG W:"+filter[y]+"`").complete().delete().queueAfter(15, TimeUnit.SECONDS);
 							}
 						}
 					}
+					String[] filter = rs.getString("Filter").split(",");
+					fstring = rs.getString("Filter");
 					
 				}
 			}
 			
-			String[] args = e.getMessage().getContentRaw().split(" ");
 			if (args[0].equalsIgnoreCase("!automod") || args[0].equalsIgnoreCase("!am")) {
 				if (!e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
 					e.getChannel().sendMessage(":no_entry: You must have the **Administrator** permission to setup **Auto Moderation**!").queue();
