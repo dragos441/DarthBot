@@ -23,22 +23,24 @@ public class SearchTrello extends ListenerAdapter {
 			ArrayList<Integer> added = new ArrayList<Integer>();
 			List<Card> cards = trello.getBoardCards("EndaJ5Op");
 			for (int x = 0 ; x < cards.size() && added.size() <= 10 ; x++) {
-				int accuracy = 0;
-				Card c = cards.get(x);
-				for (int i = 1 ; i < args.length ; i++) {
-					if (c.getName().toLowerCase().contains(args[i].toLowerCase())) {
-						accuracy=accuracy+1;
-						
+				try {
+					int accuracy = 0;
+					Card c = cards.get(x);
+					for (int i = 1 ; i < args.length ; i++) {
+						if (c.getName().toLowerCase().contains(args[i].toLowerCase())) {
+							accuracy=accuracy+1;
+							
+						}
 					}
-				}
-				accuracy=accuracy * 100 / (args.length - 1);
-				if (accuracy > 0) {
-					while (added.contains(accuracy)) {
-						accuracy=accuracy-1;
+					accuracy=accuracy * 100 / (args.length - 1);
+					if (accuracy > 0) {
+						while (added.contains(accuracy)) {
+							accuracy=accuracy-1;
+						}
+						added.add(accuracy);
+						map.put(accuracy, "**"+c.getName()+"** ("+c.getShortUrl()+")");
 					}
-					added.add(accuracy);
-					map.put(accuracy, "**"+c.getName()+"** ("+c.getShortUrl()+")");
-				}
+				} catch (ArithmeticException e1) {}
 			}
 		} catch (TrelloHttpException e1) {}
 		return map;

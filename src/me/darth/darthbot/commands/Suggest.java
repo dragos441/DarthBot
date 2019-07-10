@@ -26,21 +26,11 @@ public class Suggest extends ListenerAdapter {
 				}
 				return;
 			}
-			TreeMap<Integer, String> map = null;
-			if (e.getMessage().getContentRaw().contains("|")) {
-				map = me.darth.darthbot.commands.SearchTrello.searchTrello(e.getMessage().getContentRaw().split("|")[1].split(" "));
-			} else {
-				map = me.darth.darthbot.commands.SearchTrello.searchTrello(args);
-				if (e.getMessage().getContentRaw().length() > 100) {
-					e.getChannel().sendMessage(":no_entry: Your title is too long! Make sure to split it from the description using the `|` symbol!\n`!suggest Title | Description`").queue();
-					return;
-				}
-			}
 			try {
 				String test = args[1];
 				test=test+"";
 			} catch (ArrayIndexOutOfBoundsException e1) {
-				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!suggest Idea **|** Description`").queue();
+				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!suggest Idea - Description`").queue();
 				return;
 			}
 			if (e.getMessage().getContentRaw().contains("\n")) {
@@ -50,6 +40,7 @@ public class Suggest extends ListenerAdapter {
 			EmbedBuilder dupes = new EmbedBuilder().setAuthor("Possible Duplicates Found", null, e.getGuild().getIconUrl()).setColor(Color.yellow);
 			dupes.setDescription("Please check that the below cards aren't a duplicate of what you're submitting. If none of them are, **react with a :white_check_mark:"
 					+ "to your message above to submit it!**");
+			TreeMap<Integer, String> map = me.darth.darthbot.commands.SearchTrello.searchTrello(args);
 			int counter = 1;
 			while(!map.isEmpty() && counter <= 5) {
 				float acc = map.firstKey();

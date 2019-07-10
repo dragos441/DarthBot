@@ -54,10 +54,12 @@ public class AutoMod extends ListenerAdapter {
 				if (!e.getMember().getRoles().contains(e.getGuild().getRoleById(rs.getLong("Moderator"))) && rs.getString("Filter") != null && !rs.getString("Filter").equals("")) {
 					String[] filter = rs.getString("Filter").split(",");
 					fstring = rs.getString("Filter");
-					for (int x = 1 ; x < filter.length ; x++) {
-						if (e.getMessage().getContentRaw().toLowerCase().contains(filter[x].toLowerCase())) {
-							e.getMessage().delete().queue();
-							e.getChannel().sendMessage(e.getMember().getAsMention()+", some of your message contained content blocked by the Chat Filter!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
+					for (int y = 1 ; y < filter.length ; y++) {
+						String[] args = e.getMessage().getContentRaw().split(" ");
+						for (int x = 1 ; x < args.length ; x++) {
+							if (args[x].equalsIgnoreCase(filter[y])) {
+								e.getChannel().sendMessage(e.getMember().getAsMention()+", some of your message contained content blocked by the Chat Filter!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
+							}
 						}
 					}
 					
