@@ -26,6 +26,10 @@ public class Rob extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!rob") || args[0].equalsIgnoreCase("!steal")) {
+			if (!me.darth.darthbot.main.Main.economyEnabled) {
+				e.getChannel().sendMessage(":no_entry: This section of the economy system is temporarily disabled due to an ongoing issue! Check the Official `!darthbot` Server for Updates!").queue();
+				return;
+			}
 			if (args.length < 2) {
 				e.getChannel().sendMessage(":no_entry: Incorrect Syntax `!rob <User>`").queue();
 				return;
@@ -60,7 +64,7 @@ public class Rob extends ListenerAdapter {
 							return;
 						}
 						if (robstring == null || robstring.isEmpty()) {
-							e.getChannel().sendMessage(":no_entry: You do not have a weapon to rob the user with! Purchase one at the `!store`!").queue();
+							e.getChannel().sendMessage(":no_entry: You do not have a weapon to rob the user with! Purchase one at the `!shop`!").queue();
 							return;
 						}
 						
@@ -80,7 +84,7 @@ public class Rob extends ListenerAdapter {
 							robchance = 10;
 							foundWeapon = 1;
 						} else {
-							e.getChannel().sendMessage(":no_entry: You do not have a weapon to rob the user with! Purchase one at the `!store`!").queue();
+							e.getChannel().sendMessage(":no_entry: You do not have a weapon to rob the user with! Purchase one at the `!shop`!").queue();
 							return;
 						}
 					}
@@ -97,14 +101,14 @@ public class Rob extends ListenerAdapter {
 						}
 						if (victimstring != null && !victimstring.replace(" ", "").isEmpty()) {
 							if (victimstring.contains(",8")) {
-								robchance = 20;
-								foundDefense = 6;
-							} else if (victimstring.contains(",7")) {
-								robchance = 30;
-								foundDefense = 7;
-							} else if (victimstring.contains(",6")) {
 								robchance = 50;
 								foundDefense = 8;
+							} else if (victimstring.contains(",7")) {
+								robchance = 40;
+								foundDefense = 7;
+							} else if (victimstring.contains(",6")) {
+								robchance = 30;
+								foundDefense = 6;
 							}
 						}
 					}

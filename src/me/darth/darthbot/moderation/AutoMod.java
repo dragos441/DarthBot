@@ -35,7 +35,7 @@ public class AutoMod extends ListenerAdapter {
 						for (int y = 1 ; y < filter.length ; y++) {
 							if (args[x].equalsIgnoreCase(filter[y])) {
 								e.getMessage().delete().queue();
-								e.getChannel().sendMessage(e.getMember().getAsMention()+", some of your message contained content blocked by the Chat Filter!\n`DEBUG W:"+filter[y]+"`").complete().delete().queueAfter(15, TimeUnit.SECONDS);
+								e.getChannel().sendMessage(e.getMember().getAsMention()+", some of your message contained content blocked by the Chat Filter!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
 							}
 						}
 					}
@@ -66,7 +66,7 @@ public class AutoMod extends ListenerAdapter {
 						for (int y = 1 ; y < filter.length ; y++) {
 							if (args[x].equalsIgnoreCase(filter[y])) {
 								e.getMessage().delete().queue();
-								e.getChannel().sendMessage(e.getMember().getAsMention()+", some of your message contained content blocked by the Chat Filter!\n`DEBUG W:"+filter[y]+"`").complete().delete().queueAfter(15, TimeUnit.SECONDS);
+								e.getChannel().sendMessage(e.getMember().getAsMention()+", some of your message contained content blocked by the Chat Filter!").complete().delete().queueAfter(15, TimeUnit.SECONDS);
 							}
 						}
 					}
@@ -136,12 +136,12 @@ public class AutoMod extends ListenerAdapter {
 						ResultSet fr = con.createStatement().executeQuery("SELECT * FROM GuildInfo WHERE GuildID = "+e.getGuild().getId());
 						while (fr.next()) {
 							String str = fr.getString("Filter");
-							if (str != null && !str.equals("") && !str.isEmpty() && str.toLowerCase().contains(","+term.toLowerCase())) {
+							if (str != null && !str.equals("") && !str.isEmpty() && str.contains(","+term)) {
 								String newstr = str.replace(","+term, "");
 								con.prepareStatement("UPDATE GuildInfo SET Filter = '"+newstr+"' WHERE GuildID = "+e.getGuild().getId()).execute();
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.red).setDescription(":white_check_mark: Successfully removed `"+term+"` from the filter!").build()).queue();
 							} else {
-								e.getChannel().sendMessage(":no_entry: That term is not filtered!").queue();
+								e.getChannel().sendMessage(":no_entry: That term is not filtered! *(Case Sensitive!)*").queue();
 							}
 							
 							

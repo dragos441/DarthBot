@@ -203,6 +203,7 @@ public class Ban extends ListenerAdapter {
 			        	e.getGuild().getController().ban(target, 0,  "[By "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+"] "+reason).reason("[By "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+"] "+reason).queue();
 			        } catch (HierarchyException e1) {
 			        	e.getChannel().sendMessage(":no_entry: I can't punish that user!").queue();
+			        	return;
 			        }
 		  			String type = "BAN";
 		  			if (temp) {

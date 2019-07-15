@@ -24,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.julienvey.trello.Trello;
+import com.julienvey.trello.domain.Board;
 import com.julienvey.trello.domain.Card;
 import com.julienvey.trello.impl.TrelloImpl;
 import com.julienvey.trello.impl.http.ApacheHttpClient;

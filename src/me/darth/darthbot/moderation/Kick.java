@@ -26,7 +26,7 @@ public class Kick extends ListenerAdapter {
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!kick")) {
-			if (args.length < 3) {
+			if (args.length < 2) {
 				e.getChannel().sendMessage("Invalid Syntax: `!kick <User> <Reason>`").queue();
 				return;
 			}
@@ -66,8 +66,8 @@ public class Kick extends ListenerAdapter {
 			      }
 			      
 			   
-			      String reason = e.getMessage().getContentRaw().replace(args[0]+" ", "").replace(target.getAsMention()+" ", "");
-			      if (reason.replace(" ", "").isEmpty()) {
+			      String reason = e.getMessage().getContentRaw().replace(args[0]+" "+args[1], "");
+			      if (reason.replace(" ", "").equals("")) {
 			    	  reason = "No Reason Provided";
 			      }
 			      final String finalreason = reason;

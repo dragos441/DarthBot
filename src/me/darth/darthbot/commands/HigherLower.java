@@ -44,10 +44,6 @@ public class HigherLower extends ListenerAdapter {
 				e.getChannel().sendMessage("Invalid Syntax: `!hl <amount>`").queue();
 				return;
 			}
-			if (tobet > 50000) {
-				e.getChannel().sendMessage("A temporary limit of **$50,000** has been applied to this casino game!").queue();
-				return;
-			}
 			try {
 				long time = highlowcooldown.get(e.getMember());
 				if (time > System.currentTimeMillis() && !e.getMember().getRoles().contains(e.getGuild().getRoleById("557702978455339009"))) {

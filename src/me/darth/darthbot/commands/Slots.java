@@ -18,20 +18,16 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 public class Slots extends ListenerAdapter {
 
 	public String getSlot() {
-		int rand = new Random().nextInt(7) + 1;
+		int rand = new Random().nextInt(5) + 1;
 		if (rand == 1) {
 			return ":cherries:";
 		} else if (rand == 2) {
 			return ":apple:";
 		}  else if (rand == 3) {
-			return ":grapes:";
-		}  else if (rand == 4) {
 			return ":lemon:";
-		}  else if (rand == 5) {
+		}  else if (rand == 4) {
 			return ":pineapple:";
-		}  else if (rand == 6) {
-			return ":tangerine:";
-		}  else if (rand == 7) {
+		}  else if (rand == 5) {
 			return ":watermelon:";
 		} 
 		
@@ -43,6 +39,9 @@ public class Slots extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
+		if (args[0].equalsIgnoreCase("!emojis") && e.getAuthor().getId().equals("159770472567799808")) {
+			e.getChannel().sendMessage(e.getGuild().getEmotes().toString()).queue();
+		}
 		if (args[0].equalsIgnoreCase("!slots") || args[0].equalsIgnoreCase("!slot") || args[0].equalsIgnoreCase("!bet")) {
 			
 			if (args.length < 2) {
@@ -62,11 +61,6 @@ public class Slots extends ListenerAdapter {
 				return;
 			}
 			
-			if (tobet > 75000) {
-				e.getChannel().sendMessage(":no_entry: This command is temporarily capped at **$75,000** due to its recent release!").queue();
-				return;
-			}
-			
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			    ResultSet rs = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getIdLong());
 			    while (rs.next()) {
@@ -76,7 +70,7 @@ public class Slots extends ListenerAdapter {
 			    	}
 					EmbedBuilder eb = new EmbedBuilder().setAuthor("🍒 Fruit Machine 🍋", null, e.getAuthor().getEffectiveAvatarUrl()).setColor(Color.yellow)
 							.setDescription("Betting: `$"+new DecimalFormat("#,###").format(tobet)+"`");
-					String slotgif = me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("591698520101093389").getAsMention();
+					String slotgif = me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("599953101050609664").getAsMention();
 					
 					String[] slot = (getSlot()+","+slotgif+","+slotgif).split(",");
 					eb.addField("🎰 Slots 🎰",slot[0]+" "+slot[1]+" "+slot[2], false);

@@ -84,7 +84,7 @@ public class Whois extends ListenerAdapter {
 			while (n > 0) {
 				n = n - 1;
 				Permission p = permsRaw.get(n);
-				if (!p.equals(Permission.CREATE_INSTANT_INVITE) && !p.equals(Permission.MESSAGE_ADD_REACTION) && 
+				if (!p.equals(Permission.MESSAGE_ADD_REACTION) && 
 					!p.equals(Permission.MESSAGE_ATTACH_FILES) && !p.equals(Permission.MESSAGE_EMBED_LINKS) && 
 					!p.equals(Permission.MESSAGE_EXT_EMOJI) && !p.equals(Permission.MESSAGE_HISTORY) && 
 					!p.equals(Permission.MESSAGE_READ) && !p.equals(Permission.MESSAGE_TTS) && !p.equals(Permission.MESSAGE_WRITE) && 
