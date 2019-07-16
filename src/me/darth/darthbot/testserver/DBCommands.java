@@ -1,6 +1,12 @@
 package me.darth.darthbot.testserver;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import org.trello4j.Trello;
+import org.trello4j.TrelloImpl;
+import org.trello4j.model.Card;
 
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -34,7 +40,6 @@ public class DBCommands extends ListenerAdapter {
 						+ "suggesting a popular idea or reporting a bug! Congrats!").queue();
 			}
 		}
-
 	}
 
 }

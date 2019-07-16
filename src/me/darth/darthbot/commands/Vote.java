@@ -22,12 +22,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.trello4j.Trello;
+import org.trello4j.TrelloException;
+import org.trello4j.TrelloImpl;
+import org.trello4j.model.Card;
 
-import com.julienvey.trello.Trello;
-import com.julienvey.trello.domain.Board;
-import com.julienvey.trello.domain.Card;
-import com.julienvey.trello.impl.TrelloImpl;
-import com.julienvey.trello.impl.http.ApacheHttpClient;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -178,8 +177,8 @@ public class Vote extends ListenerAdapter {
 	
 	@SuppressWarnings("deprecation")
 	public static void listSort() {
-		Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
-		List<Card> cards = trello.getListCards("5cbc6c5a24c96885903fde3e");
+		Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847");
+		List<Card> cards = trello.getCardsByBoard("5cbc6c2d584c75132d2d08cb");
 		//System.out.print("c: "+cards.size());
 		TreeMap<Integer, String> map = new TreeMap<>(Collections.reverseOrder());
 		ArrayList<Integer> added = new ArrayList<>();
@@ -346,6 +345,7 @@ public class Vote extends ListenerAdapter {
 				JSONObject obj = new JSONObject(content.toString());
 				JSONArray arr = obj.getJSONArray("customFieldItems");
 				String name = obj.getString("name").toString();
+				String id = obj.getString("id").toString();
 				String desc = null;
 				try {
 					Member sm = e.getGuild().getMemberById(obj.getString("desc").toString().split("\n")[6].replace("> Submitter ID: `", "").replace("`", ""));
@@ -360,7 +360,7 @@ public class Vote extends ListenerAdapter {
 					} catch (NullPointerException e1) {
 						votes = 0;
 					}
-					EmbedBuilder eb = new EmbedBuilder().addField("Votes", ""+votes, true).setFooter(cardID, null).setDescription(desc);
+					EmbedBuilder eb = new EmbedBuilder().addField("Votes", ""+votes, true).setFooter(id, null).setDescription(desc);
 					if (name.toString().length() < 256) {
 						eb.setTitle(name, link);
 					} else {
@@ -492,10 +492,29 @@ public class Vote extends ListenerAdapter {
 				&& e.getMember().getRoles().contains(e.getGuild().getRoleById("589550817649098773"))) {
 				e.getGuild().getTextChannelById("592011838930288650").sendMessage(msg.getEmbeds().get(0)).queue();
 				String cardID = msg.getEmbeds().get(0).getFooter().getText();
-				Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
+				Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847");
 				Card c = trello.getCard(cardID);
 				c.setClosed(true);
-				c.update();
+			
+				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+				try {
+				    HttpPut request = new HttpPut("https://api.trello.com/1/cards/"+cardID+"?closed=true&key=36c6ca5833a315746f43a1d6eee885b4&token=dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847");
+				    request.addHeader("content-type", "application/json");
+				    httpClient.execute(request);
+				    //System.out.print(request.toString());
+				// handle response here...
+				} catch (Exception ex) {
+				    ex.printStackTrace();
+				} finally {
+				    try {
+						httpClient.close();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			
+				
 				msg.delete().queue();
 				List<Message> messages = e.getGuild().getTextChannelById("575440909018202136").getHistory().retrievePast(50).complete();
 				messages.addAll(e.getGuild().getTextChannelById("590252086189621258").getHistory().retrievePast(50).complete());
@@ -517,7 +536,13 @@ public class Vote extends ListenerAdapter {
 			}
 			if (e.getReactionEmote().getId().equals("574532922321797120") || e.getReactionEmote().getId().equals("574532942437810177")) {
 				String cardID = msg.getEmbeds().get(0).getFooter().getText();
-				Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847", new ApacheHttpClient());
+				Trello trello = new TrelloImpl("36c6ca5833a315746f43a1d6eee885b4", "dda51a3550614cf455f617c42d615a28c7b67bb4c96b225fa4ef82a08d7b7847");
+				try {
+					Card c = trello.getCard(cardID);
+				} catch (TrelloException e1) {
+					msg.delete().queue();
+					return;
+				}
 				if (trello.getCard(cardID).isClosed() && e.getChannel().getMessageById(e.getMessageId()).complete().getContentRaw().split(" ").length == 1) {
 					msg.delete().queue();
 				}

@@ -63,7 +63,7 @@ public class RandomEarn extends ListenerAdapter {
 				target = e.getMessage().getMentionedMembers().get(0);
 			}
 			eb.setColor(Color.green);
-			eb.setDescription(":money_with_wings:"+target.getAsMention()+" just found **$"+money+"** from chatting!\n"+multimsg);
+			eb.setDescription(":money_with_wings:"+target.getAsMention()+" just found **$"+money+"**`DBux` from chatting!\n"+multimsg);
 			eb.setFooter("Use !profile to view your balance!", null);
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getIdLong());
