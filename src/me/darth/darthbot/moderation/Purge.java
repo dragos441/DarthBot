@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -49,30 +50,35 @@ public class Purge extends ListenerAdapter {
 					}
 			      }
 			      int num = 0;
-			      
 			      try {
 			    	  num = Integer.parseInt(args[1]);
 			      } catch (NumberFormatException e1) {
 			    	  e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!purge <number>`").queue();
 			      }
-			      if (num == 99 || num == 100) {
-			    	  num=num-1;
-			      } else if (num > 100) {
+			      if (num > 100) {
 			    	  e.getChannel().sendMessage(":no_entry: You may only purge up to **100** messages at a time!").queue();
 			      }
-			      num=num+1;
 			      List<Message> todelete = e.getChannel().getHistory().retrievePast(num).complete();
+			      Calendar time = Calendar.getInstance();
+			      time.add(Calendar.DAY_OF_MONTH, -13);
 			      for (int x = 0 ; x < todelete.size() ; x++) {
-						if (todelete.get(x).isPinned()) {
+						if (todelete.get(x).isPinned() || todelete.get(x).getCreationTime().toEpochSecond() < Math.floorDiv(time.getTimeInMillis(), 1000)) {
 							todelete.remove(x);
 							x=x-1;
 						}
 					}
 			      try {
-			    	  e.getChannel().deleteMessages(todelete).queue();
+			    	  e.getMessage().delete().queue();
+			    	  if (!todelete.isEmpty()) {
+			    		  e.getChannel().deleteMessages(todelete).queue();
+			      		}
 			      } catch (IllegalArgumentException e1) {e1.printStackTrace();}
-			      num=num-1;
-			      e.getChannel().sendMessage(":white_check_mark: Successfully purged `"+num+"` messages!").complete().delete().queueAfter(5, TimeUnit.SECONDS);
+			      if (num == todelete.size()) {
+			    	  e.getChannel().sendMessage(":white_check_mark: Successfully purged `"+todelete.size()+"` messages!").complete().delete().queueAfter(5, TimeUnit.SECONDS);
+			      } else {
+			    	  int removed = num - todelete.size();
+			    	  e.getChannel().sendMessage(":white_check_mark: Successfully purged `"+todelete.size()+"` messages! *(`"+removed+"` message(s) were unable to be removed due to being pinned or over 2 weeks old)*").complete().delete().queueAfter(10, TimeUnit.SECONDS);
+			      }
 			      EmbedBuilder eb = new EmbedBuilder().setAuthor("Messages Purged", null, e.getMember().getUser().getEffectiveAvatarUrl()).setDescription("User "+e.getMember().getAsMention()+" "
 	  			    		+ "has purged `"+num+"` messages in "+e.getChannel().getAsMention()+".").setTimestamp(Instant.from(ZonedDateTime.now()))
 	  			    		.setFooter("User ID"+e.getMember().getUser().getId(), null).setColor(Color.red);

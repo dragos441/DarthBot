@@ -37,7 +37,7 @@ public class CustomStores extends ListenerAdapter {
 					while (rs.next()) {
 						counter++;
 					}
-					if (counter >= 15) {
+					if (counter >= 10) {
 						e.getChannel().sendMessage(":no_entry: Your store is full! Remove some items from your store using `!customstore remove <Item ID>`!").queue();
 						return;
 					}
@@ -125,7 +125,7 @@ public class CustomStores extends ListenerAdapter {
 				}
 				e.getChannel().sendMessage(eb.build()).queue();
 			} catch (SQLException e1) {
-				
+				e1.printStackTrace();
 			}
 			
 		}

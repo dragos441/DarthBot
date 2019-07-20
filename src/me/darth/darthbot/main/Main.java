@@ -8,6 +8,7 @@ import me.darth.darthbot.commands.*;
 import me.darth.darthbot.db.*;
 import me.darth.darthbot.moderation.*;
 import me.darth.darthbot.music.*;
+import me.darth.darthbot.natter.Project_Natter;
 import me.darth.darthbot.testserver.*;
 import me.darth.darthbot.retalibot.*;
 import me.darth.darthbot.retalibot.submit;
@@ -27,8 +28,8 @@ public class Main {
 	//public static JDA jda = null;
 	public static ShardManager sm = null;
 	public static int updatedmin = -1;
-	private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
-	//private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
+	//private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
+	private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
 	
 	public static final boolean economyEnabled = true;
 	
@@ -89,6 +90,7 @@ public class Main {
 		builder.addEventListeners(new Ball8());
 		builder.addEventListeners(new AutoMod());
 		builder.addEventListeners(new CustomStores());
+		builder.addEventListeners(new Project_Natter());
 		sm = builder.build();
 		me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
 		if (key.contains("NTc")) {

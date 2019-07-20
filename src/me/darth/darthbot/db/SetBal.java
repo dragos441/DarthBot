@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -20,6 +21,28 @@ public class SetBal extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
+		if (args[0].equalsIgnoreCase("!addall")) {
+			if (!me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("569463842552152094"))
+					&& !me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("589550625537392643"))) {
+				return;
+			}
+			long bux = 0;
+			try {
+				bux = Long.parseLong(args[1]);
+			} catch (NumberFormatException | ArrayIndexOutOfBoundsException e1) {
+				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!addall <money>`").queue();
+				return;
+			}
+			Message msg = e.getChannel().sendMessage(":stopwatch: Adding `$"+bux+"` to every user...").complete();
+			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+				
+			      con.prepareStatement("UPDATE profiles SET DBux = DBux + "+bux).execute();
+				  msg.editMessage(":white_check_mark: Successfully added `$"+bux+"` to all users!").queue();
+			      con.close();
+			} catch (SQLException e1) {
+			    e.getChannel().sendMessage("<@159770472567799808> Error! ```"+e1+"```").queue();
+			}
+		}
 		if (args[0].equalsIgnoreCase("!setbalance") || args[0].equalsIgnoreCase("!setbal")) {
 			if (!me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("569463842552152094"))
 					&& !me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("589550625537392643"))) {
@@ -29,11 +52,8 @@ public class SetBal extends ListenerAdapter {
 			long bux = 0;
 			try {
 				bux = Long.parseLong(args[2]);
-			} catch (NumberFormatException e1) {
-				e.getChannel().sendMessage("Invalid Syntax: `!setbal <user> <money>`").queue();
-				return;
-			} catch (ArrayIndexOutOfBoundsException e2) {
-				e.getChannel().sendMessage("Invalid Syntax: `!setbal <user> <money>`").queue();
+			} catch (NumberFormatException | ArrayIndexOutOfBoundsException e1) {
+				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!setbal <user> <money>`").queue();
 				return;
 			}
 			if (!e.getMessage().getMentionedMembers().isEmpty()) {

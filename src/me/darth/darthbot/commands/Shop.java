@@ -51,6 +51,10 @@ public class Shop extends ListenerAdapter {
 							e.getChannel().sendMessage(":no_entry: Your Inventory is Full!").queue();
 							return;
 						}
+						if (rs.getLong("SellerID") == e.getAuthor().getIdLong()) {
+							e.getChannel().sendMessage(":no_entry: This is your item!").queue();
+							return;
+						}
 						long newbux = profile.getLong("DBux") - rs.getLong("Price");
 						if (newbux < 0 && profile.getLong("DBux") != -1337) {
 							e.getChannel().sendMessage(":no_entry: You don't have enough to purchase this item!").queue();
@@ -90,7 +94,7 @@ public class Shop extends ListenerAdapter {
 						        });
 							}
 						}
-						e.getChannel().sendMessage(rs.getInt("ID")+" - "+rs.getString("Name")+" - "+rs.getLong("Price")).queue();
+						//e.getChannel().sendMessage(rs.getInt("ID")+" - "+rs.getString("Name")+" - "+rs.getLong("Price")).queue();
 						e.getChannel().sendMessage("Successfully purchased **"+rs.getString("Name")+"**!").queue();
 						EmbedBuilder eb = new EmbedBuilder().setAuthor("Item Purchased", null, e.getAuthor().getEffectiveAvatarUrl())
 							.setDescription(e.getMember().getAsMention()+" purchased **"+rs.getString("Name")+"** from "+seller.getAsMention()+" for `$"+rs.getLong("Price")+"`!")
