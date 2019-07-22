@@ -114,10 +114,17 @@ public class ReportBug extends ListenerAdapter {
 				e.getChannel().sendMessage(":no_entry: Please don't include line-breaks in your report!\n(eg\nthese\nthings)").queue();
 				return;
 			}
+			String title = e.getMessage().getContentRaw();
+			if (e.getMessage().getContentRaw().contains("|")) {
+				title = e.getMessage().getContentRaw().split("\\|")[0];
+			} else if (title.length() > 50) {
+				e.getChannel().sendMessage(":no_entry: Your suggestion title is too long! Make sure to split the title and description using the `|` symbol!\n*Eg: `!suggest This is the title | This is the description`*").queue();
+				return;
+			}
 			EmbedBuilder dupes = new EmbedBuilder().setAuthor("Possible Duplicates Found", null, e.getGuild().getIconUrl()).setColor(Color.red);
 			dupes.setDescription("Please check that the below cards aren't a duplicate of what you're submitting. If none of them are, **react with a :white_check_mark:"
 					+ "to your message above to submit it!**");
-			TreeMap<Integer, String> map = me.darth.darthbot.commands.SearchTrello.searchTrello(args);
+			TreeMap<Integer, String> map = me.darth.darthbot.commands.SearchTrello.searchTrello(title.split(" "));
 			while(map != null && !map.isEmpty()) {
 				float acc = map.firstKey();
 				if (acc > 50) {

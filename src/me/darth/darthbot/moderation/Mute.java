@@ -3,6 +3,7 @@ package me.darth.darthbot.moderation;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -51,6 +52,10 @@ public class Mute extends ListenerAdapter {
 		EmbedBuilder eb = new EmbedBuilder().setAuthor("Mute Guide", null, e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setDescription("**Command Usage**\n"
 				+ "`!mute @User (Optional Duration) (Reason)`\n*() = Optional Argument*").addField("Permanent Mute", "`!mute @User (Reason)`", false).addField("Temporary Mute", "`!mute @User 1m test`\n**1m** = 1 minute\n"
 						+ "**2h** = 2 hours\n**3d** = 3 days\n**4w** = 4 weeks\n**5y** = 5 years", false).setColor(Color.red);
+		if (args[0].equalsIgnoreCase("!mutefix") && e.getAuthor().getId().equals("159770472567799808")) {
+			me.darth.darthbot.main.AutoProcesses.removePunishments();
+			
+		}
 		if (args[0].equalsIgnoreCase("!unmute")) {
 			if (args.length < 2) {
 				e.getChannel().sendMessage("Invalid Syntax: `!unmute <User>`").queue();
@@ -197,9 +202,11 @@ public class Mute extends ListenerAdapter {
 							log.addField("Length", lengthc+lengthd+"", false);
 							send.setDescription("You have been muted in **"+e.getGuild().getName()+"** for **"+lengthd+" "+charstring+"** due to `"+reason+"`");
 						}
-						con.prepareStatement("INSERT INTO ModHistory (Timestamp, GuildID, PunishedID, PunisherID, Type, Reason, Expires, Active)  values "
+						PreparedStatement ps = con.prepareStatement("INSERT INTO ModHistory (Timestamp, GuildID, PunishedID, PunisherID, Type, Reason, Expires, Active)  values "
 					      		+ "("+System.currentTimeMillis()+", "+e.getGuild().getIdLong()+", "+m.getUser().getIdLong()+", "+e.getAuthor().getIdLong()
-					      		+ ", 'TEMPMUTE', '"+reason+"', "+cal.getTimeInMillis()+", 1)").execute();
+					      		+ ", 'TEMPMUTE', ?, "+cal.getTimeInMillis()+", 1)");
+						ps.setString(1, reason);
+						ps.execute();
 					} else {
 						if (reason.replace(" ", "").equals("")) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.green).setDescription(
@@ -211,9 +218,11 @@ public class Mute extends ListenerAdapter {
 									":white_check_mark: Successfully permanently muted "+m.getAsMention()+" due to `"+reason+"`!").build()).queue();
 							send.setDescription("You have been permanently muted in **"+e.getGuild().getName()+"**! due to `"+reason+"`");
 						}
-						con.prepareStatement("INSERT INTO ModHistory (Timestamp, GuildID, PunishedID, PunisherID, Type, Reason, Expires, Active)  values "
+						PreparedStatement ps = con.prepareStatement("INSERT INTO ModHistory (Timestamp, GuildID, PunishedID, PunisherID, Type, Reason, Expires, Active)  values "
 					      		+ "("+System.currentTimeMillis()+", "+e.getGuild().getIdLong()+", "+m.getUser().getIdLong()+", "+e.getAuthor().getIdLong()
-					      		+ ", 'TEMPMUTE', '"+reason+"', 0, 0)").execute();
+					      		+ ", 'TEMPMUTE', ?, 0, 0)");
+						ps.setString(1, reason);
+						ps.execute();
 					}
 					e.getGuild().getController().addSingleRoleToMember(m, mutedrole).queue();
 					e.getGuild().getController().setMute(m, true).queue();

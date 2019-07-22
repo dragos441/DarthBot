@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -55,12 +57,23 @@ public class Rob extends ListenerAdapter {
 				int foundDefense = -1;
 				String robstring = null;
 				String victimstring = null;
+			    Calendar cal = Calendar.getInstance();
+			    cal.add(Calendar.HOUR, -1);
 				while (rs.next()) {
 					
 					if (e.getAuthor().getIdLong() == rs.getLong("UserID")) {
 						robstring = rs.getString("Inventory");
-						if (rs.getInt("Robbed") == new Date().getHours()) {
-							e.getChannel().sendMessage(":no_entry: You may only rob people once an hour!").queue();
+						Calendar claimed = Calendar.getInstance();
+			        	claimed.setTimeInMillis(rs.getLong("Robbed"));
+			        	long mins = ChronoUnit.MINUTES.between(cal.toInstant(), claimed.toInstant()) - 1;
+			        	int hours = 0;
+			        	while (mins >= 60) {
+			        		hours++;
+			        		mins = mins - 60;
+			        	}
+						if (rs.getLong("Robbed") >= cal.getTimeInMillis()) {
+							e.getChannel().sendMessage(":no_entry: You may only rob people once an hour! You can rob another user in **"+hours+"** hours "
+									+ "and **"+mins+"** minutes!").queue();
 							return;
 						}
 						if (robstring == null || robstring.isEmpty()) {
@@ -191,7 +204,7 @@ public class Rob extends ListenerAdapter {
 						msg.editMessage(robbery.build()).queue();
 					}
 				}
-				con.prepareStatement("UPDATE profiles SET Robbed = "+new Date().getHours()+" WHERE UserID = "+e.getAuthor().getId()).execute();
+				con.prepareStatement("UPDATE profiles SET Robbed = "+Calendar.getInstance().getTimeInMillis()+" WHERE UserID = "+e.getAuthor().getId()).execute();
 				rs.close();
 			    con.close();
 			

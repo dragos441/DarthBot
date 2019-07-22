@@ -3,6 +3,7 @@ package me.darth.darthbot.moderation;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -209,9 +210,11 @@ public class Ban extends ListenerAdapter {
 		  			if (temp) {
 		  				type = "TEMPBAN";
 		  			}
-	  				con.prepareStatement("INSERT INTO ModHistory (Timestamp, GuildID, PunishedID, PunisherID, Type, Reason, Expires, Active)  values "
+	  				PreparedStatement ps = con.prepareStatement("INSERT INTO ModHistory (Timestamp, GuildID, PunishedID, PunisherID, Type, Reason, Expires, Active)  values "
 				      		+ "("+System.currentTimeMillis()+", "+e.getGuild().getIdLong()+", "+target.getUser().getIdLong()+", "+e.getAuthor().getIdLong()
-				      		+ ", '"+type+"', '"+reason+"', "+expires+", 1)").execute();
+				      		+ ", '"+type+"', , "+expires+", 1)");
+	  				ps.setString(1, reason);
+	  				ps.execute();
 		          	e.getChannel().sendMessage(eb.build()).queue();
 		          	if (temp) {
 		  			    eb = new EmbedBuilder().setAuthor("Member Banned", null, target.getUser().getEffectiveAvatarUrl()).setDescription("User "+target.getAsMention()+" "

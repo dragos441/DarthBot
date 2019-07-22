@@ -29,6 +29,8 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Quiz extends ListenerAdapter {
 
+	boolean enabled = false;
+	
 	HashMap<Long, String> ansmap = new HashMap<Long, String>();
 	HashMap<Long, Long> msgmap = new HashMap<Long, Long>();
 	HashMap<Long, Boolean> isactive = new HashMap<Long, Boolean>();
@@ -71,6 +73,10 @@ public class Quiz extends ListenerAdapter {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!quiz")) {
+			if (!enabled) {
+				e.getChannel().sendMessage(":no_entry: This command is temporarily globally disabled due to internal issues. Sorry for the inconvenience!").queue();
+				return;
+			}
 			if (isactive.get(e.getGuild().getIdLong()) != null && isactive.get(e.getGuild().getIdLong()) && new Date().getTime() - timestarted.get(e.getGuild().getIdLong()) > 60000) {
 				isactive.remove(e.getGuild().getIdLong());
 				timestarted.remove(e.getGuild().getIdLong());

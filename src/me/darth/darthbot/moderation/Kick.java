@@ -3,6 +3,7 @@ package me.darth.darthbot.moderation;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -96,9 +97,11 @@ public class Kick extends ListenerAdapter {
 			        }
 			    	 EmbedBuilder eb = new EmbedBuilder().setDescription("⛔ "+e.getMember().getAsMention()+", you have kicked **"+target.getUser().getName()
 		  						+"#"+target.getUser().getDiscriminator()+"** due to `"+reason+"`").setColor(Color.green);
-	  				con.prepareStatement("INSERT INTO ModHistory (Timestamp, GuildID, PunishedID, PunisherID, Type, Reason)  values "
+	  				PreparedStatement ps = con.prepareStatement("INSERT INTO ModHistory (Timestamp, GuildID, PunishedID, PunisherID, Type, Reason)  values "
 				      		+ "("+System.currentTimeMillis()+", "+e.getGuild().getIdLong()+", "+target.getUser().getIdLong()+", "+e.getAuthor().getIdLong()
-				      		+ ", 'KICK', '"+reason+"')").execute();
+				      		+ ", 'KICK', ?)");
+	  				ps.setString(1, reason);
+	  				ps.execute();
 		
 		          	e.getChannel().sendMessage(eb.build()).queue();
 	  			    eb = new EmbedBuilder().setAuthor("Member Kicked", null, target.getUser().getEffectiveAvatarUrl()).setDescription("User "+target.getAsMention()+" "

@@ -3,6 +3,7 @@ package me.darth.darthbot.moderation;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -121,7 +122,9 @@ public class AutoMod extends ListenerAdapter {
 								} else {
 									newstr = str+","+term;
 								}
-								con.prepareStatement("UPDATE GuildInfo SET Filter = '"+newstr+"' WHERE GuildID = "+e.getGuild().getId()).execute();
+								PreparedStatement ps = con.prepareStatement("UPDATE GuildInfo SET Filter = ? WHERE GuildID = "+e.getGuild().getId());
+								ps.setString(1, newstr);
+								ps.execute();
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.green).setDescription(":white_check_mark: Successfully added `"+term+"` to the filter!").build()).queue();
 							}
 							
@@ -138,7 +141,9 @@ public class AutoMod extends ListenerAdapter {
 							String str = fr.getString("Filter");
 							if (str != null && !str.equals("") && !str.isEmpty() && str.contains(","+term)) {
 								String newstr = str.replace(","+term, "");
-								con.prepareStatement("UPDATE GuildInfo SET Filter = '"+newstr+"' WHERE GuildID = "+e.getGuild().getId()).execute();
+								PreparedStatement ps = con.prepareStatement("UPDATE GuildInfo SET Filter = ? WHERE GuildID = "+e.getGuild().getId());
+								ps.setString(1, newstr);
+								ps.execute();
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.red).setDescription(":white_check_mark: Successfully removed `"+term+"` from the filter!").build()).queue();
 							} else {
 								e.getChannel().sendMessage(":no_entry: That term is not filtered! *(Case Sensitive!)*").queue();

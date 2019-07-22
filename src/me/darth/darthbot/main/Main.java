@@ -90,7 +90,7 @@ public class Main {
 		builder.addEventListeners(new Ball8());
 		builder.addEventListeners(new AutoMod());
 		builder.addEventListeners(new CustomStores());
-		builder.addEventListeners(new Project_Natter());
+		//builder.addEventListeners(new Project_Natter());
 		sm = builder.build();
 		me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
 		if (key.contains("NTc")) {
@@ -112,7 +112,7 @@ public class Main {
 							me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
 							me.darth.darthbot.main.Leaderboards.Retali8Leaderboard();
 						}
-						if (min == 0) {
+						if (min == 0 || updatedmin == -1) {
 							//me.darth.darthbot.commands.Vote.listSort();
 							me.darth.darthbot.main.AutoProcesses.purgeMessages();
 							me.darth.darthbot.main.AutoProcesses.leaveEmptyChannels();
@@ -194,4 +194,5 @@ public class Main {
 		} catch (NullPointerException e1) {}
 		return eb;
 	}
+	
 }

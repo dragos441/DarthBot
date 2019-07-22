@@ -3,6 +3,7 @@ package me.darth.darthbot.db;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class ProfileGen extends ListenerAdapter {
+	
+	
 	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent e) {
@@ -107,7 +110,9 @@ public class ProfileGen extends ListenerAdapter {
 		        if (UserID == e.getAuthor().getIdLong()) {
 		        	found = true;
 		        	if (!rs.getString("Name").equalsIgnoreCase(e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator())) {
-		        		con.prepareStatement("UPDATE profiles SET Name = '"+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+"' WHERE UserID = "+e.getAuthor().getIdLong()).execute();
+		        		PreparedStatement ps = con.prepareStatement("UPDATE profiles SET Name = ? WHERE UserID = "+e.getAuthor().getIdLong());
+		        		ps.setString(1, e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator());
+		        		ps.execute();
 		        	}
 		        }
 		      }

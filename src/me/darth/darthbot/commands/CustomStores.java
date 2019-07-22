@@ -3,6 +3,7 @@ package me.darth.darthbot.commands;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -65,7 +66,11 @@ public class CustomStores extends ListenerAdapter {
 						e.getChannel().sendMessage(":no_entry: Your item must cost something!").queue();
 						return;
 					}
-					con.prepareStatement("INSERT INTO StoreItems (SellerID, Name, Description, Price) values ("+e.getAuthor().getId()+", '"+name+"', '"+desc+"', "+price+")").execute();
+					PreparedStatement ps = con.prepareStatement("INSERT INTO StoreItems (SellerID, Name, Description, Price) values ("+e.getAuthor().getId()+", ?, ?, "+price+")");
+					ps.setString(1, name);
+					ps.setString(2, desc);
+					ps.execute();
+					
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.green).setDescription("Successfully added **"+name+"** to your store!").build()).queue();
 				} catch (SQLException e1) {e1.printStackTrace();}
 				

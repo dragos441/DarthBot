@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
@@ -19,20 +21,31 @@ public class Daily extends ListenerAdapter {
 		if (args[0].equalsIgnoreCase("!daily")) {
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getIdLong());
+			      Calendar cal = Calendar.getInstance();
+			      cal.add(Calendar.DAY_OF_MONTH, -1);
 			      while (rs.next())
 			      {
 			        long bux = rs.getLong("DBux");
-			        int daily = rs.getInt("DailyBonus");
-			        if (daily != new Date().getDate()) {
+			        long daily = rs.getLong("DailyBonus");
+			        if (daily < cal.getTimeInMillis()) {
 				        int rand = new Random().nextInt((100 - 80) + 1) + 80;
 				        long newbux = bux + rand;
 				        if (bux != -1337) {
 				        	con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
 				        }
-				        con.prepareStatement("UPDATE profiles SET DailyBonus = "+new Date().getDate()+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
+				        con.prepareStatement("UPDATE profiles SET DailyBonus = "+Calendar.getInstance().getTimeInMillis()+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
 				        e.getChannel().sendMessage("You claimed your daily reward of $**"+rand+"**").queue();
 			        } else {
-			        	e.getChannel().sendMessage("You have already claimed your daily reward for today! Try again tomorrow!").queue();
+			        	Calendar claimed = Calendar.getInstance();
+			        	claimed.setTimeInMillis(daily);
+			        	long mins = ChronoUnit.MINUTES.between(cal.toInstant(), claimed.toInstant()) - 1;
+			        	int hours = 0;
+			        	while (mins >= 60) {
+			        		hours++;
+			        		mins = mins - 60;
+			        	}
+			        	e.getChannel().sendMessage("You have already claimed your daily reward for today! "
+			        			+ "You can claim another one in **"+hours+"** hours and **"+mins+"** minutes!").queue();
 			        }
 			      }
 			      rs.close();

@@ -49,7 +49,7 @@ public class AutoProcesses {
 		    			  Guild g = me.darth.darthbot.main.Main.sm.getGuildById(guildID);
 		    			  g.getController().unban(punishedID+"").queue();
 		    		  }
-	    		  } catch (IllegalArgumentException | NullPointerException | IndexOutOfBoundsException e1) {e1.printStackTrace();}
+	    		  } catch (IllegalArgumentException | NullPointerException | IndexOutOfBoundsException e1) {}
 	    		  con.prepareStatement("UPDATE ModHistory SET Active = 0 WHERE GuildID = "+guildID+" AND PunishedID = "+punishedID+" AND Type = '"+type+"'").execute();
 		      }
 		      rs.close();

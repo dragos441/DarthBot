@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -72,13 +74,24 @@ public class Give extends ListenerAdapter{
 						e.getChannel().sendMessage(":no_entry: You don't have that much to give!").queue();
 						return;
 					}
-					int lastGiven = from.getInt("Given");
-					if (lastGiven == new Date().getHours()) {
-						e.getChannel().sendMessage(":no_entry: You've already sent money this hour!").queue();
+					long lastGiven = from.getLong("Given");
+					Calendar cal = Calendar.getInstance();
+					cal.add(Calendar.HOUR, -1);
+					if (lastGiven > cal.getTimeInMillis()) {
+						Calendar claimed = Calendar.getInstance();
+			        	claimed.setTimeInMillis(lastGiven);
+			        	long mins = ChronoUnit.MINUTES.between(cal.toInstant(), claimed.toInstant()) - 1;
+			        	int hours = 0;
+			        	while (mins >= 60) {
+			        		hours++;
+			        		mins = mins - 60;
+			        	}
+						e.getChannel().sendMessage(":no_entry: You've already sent money this hour! "
+								+ "You can give another user money in **"+hours+"** hours and **"+mins+"** minutes!").queue();
 						return;
 					} else {
 						long newtotal = from.getLong("DBux") - amount - tax;
-						con.prepareStatement("UPDATE profiles SET DBux = "+newtotal+", Given = "+new Date().getHours()+" WHERE UserID = "+e.getAuthor().getId()).execute();
+						con.prepareStatement("UPDATE profiles SET DBux = "+newtotal+", Given = "+Calendar.getInstance().getTimeInMillis()+" WHERE UserID = "+e.getAuthor().getId()).execute();
 					}
 				}
 				ResultSet to = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+m.getUser().getIdLong());
