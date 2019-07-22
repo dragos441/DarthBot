@@ -83,20 +83,26 @@ public class ViewProfile extends ListenerAdapter {
 								}
 				    	  }
 				    	  Collections.reverse(roles);
-				    	  if (!roles.isEmpty()) {
-				    		  eb.addField("Server Rank", roles.get(0), true);
+				    	  if (!e.getMember().getRoles().isEmpty()) {
 				    		  eb.setColor(m.getRoles().get(0).getColorRaw());
-				    	  } else {
-				    		  eb.addField("Server Rank", "Member", true);
 				    	  }
+				    	  int reqxp = (level + 1) * 100;
+					    	 eb.addField("Chat Level", "Level "+level+" *("+xp+"/"+reqxp+"*xp*)*", true);
 				    	  if (DBux == -1337) {
 				    		  eb.addField("DBux $$$", "$**"+Character.toString('\u221E')+"**", true);
 				    	  } else {
 				    		  String formattedbux = new DecimalFormat("#,###").format(DBux);
 				    		  eb.addField("DBux $$$", "**$"+formattedbux+"**", true);
 				    	  }
-				    	  int reqxp = (level + 1) * 100;
-				    	 eb.addField("Chat Level", "Level "+level+" *("+xp+"/"+reqxp+"*xp*)*", true);
+				    	  
+				    	  ResultSet clans = con.createStatement().executeQuery("SELECT * FROM Clans");
+				    	  String clan = "No Clan";
+				    	  while (clans.next()) {
+				    		  if (clans.getString("Members").contains(","+e.getAuthor().getId())) {
+				    			  clan = "**"+clans.getString("Name")+"**";
+				    		  }
+				    	  }
+				    	  eb.addField("Clan", "⚔"+clan+"⚔", true);
 				    	  ResultSet inv = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+target.getUser().getId());
 				    	  	while (inv.next()) {
 								String invstring = "";
@@ -113,7 +119,7 @@ public class ViewProfile extends ListenerAdapter {
 											}
 										}
 									}
-									eb.addField("Inventory", invstring, false);
+									eb.addField("Inventory", invstring, true);
 								}
 				    	  	}
 				    	  inv.close();
@@ -122,6 +128,7 @@ public class ViewProfile extends ListenerAdapter {
 				    	  st.executeUpdate();
 				      }
 			      }
+			      
 			      if (found) {
 			    	  e.getChannel().sendMessage(eb.build()).queue();
 			    	  return;

@@ -28,7 +28,7 @@ public class logMessages extends ListenerAdapter {
 					s1.setLong(3, e.getMessageIdLong());
 					s1.setLong(4, e.getAuthor().getIdLong());
 					s1.setLong(5, e.getChannel().getIdLong());
-					s1.setString(6, e.getMessage().getContentRaw());
+					s1.setString(6, e.getMessage().getContentDisplay());
 					s1.execute();
 	
 					

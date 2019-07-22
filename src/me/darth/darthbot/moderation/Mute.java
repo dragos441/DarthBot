@@ -194,12 +194,12 @@ public class Mute extends ListenerAdapter {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.green).setDescription(
 									":white_check_mark: Successfully muted "+m.getAsMention()+" for "+lengthd+" "+charstring+"!").build()).queue();
 							send.setDescription("You have been muted in **"+e.getGuild().getName()+"** for **"+lengthd+" "+charstring+"**!");
-							log.addField("Length", lengthc+lengthd+"", false);
+							log.addField("Length", lengthd+" "+charstring, false);
 							reason="No Reason Provided";
 						} else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.green).setDescription(
 									":white_check_mark: Successfully muted "+m.getAsMention()+" for "+lengthd+" "+charstring+" due to `"+reason+"`").build()).queue();
-							log.addField("Length", lengthc+lengthd+"", false);
+							log.addField("Length", lengthd+" "+charstring+"", false);
 							send.setDescription("You have been muted in **"+e.getGuild().getName()+"** for **"+lengthd+" "+charstring+"** due to `"+reason+"`");
 						}
 						PreparedStatement ps = con.prepareStatement("INSERT INTO ModHistory (Timestamp, GuildID, PunishedID, PunisherID, Type, Reason, Expires, Active)  values "

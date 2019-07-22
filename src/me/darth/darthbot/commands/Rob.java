@@ -142,7 +142,12 @@ public class Rob extends ListenerAdapter {
 				weapon.close();
 				robbery.addField("You approach "+target.getEffectiveName(), "And draw your **"+wname+"**...", false);
 				Message msg = e.getChannel().sendMessage(robbery.build()).complete();
-				Thread.sleep(1000);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				//e.getChannel().sendMessage("`DEBUG` "+robchance+" - "+randint+" odds").queue();
 				int policechance = new Random().nextInt(10) + 1;
 				if (policechance == 10) {
@@ -210,9 +215,6 @@ public class Rob extends ListenerAdapter {
 			
 			} catch (SQLException e1) {
 			    e1.printStackTrace();
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
 			}
 		}
 	}

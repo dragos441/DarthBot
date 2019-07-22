@@ -38,6 +38,13 @@ public class ProfileGen extends ListenerAdapter {
 				}
 			}
 			
+			ResultSet punished = con.prepareStatement("SELECT * FROM ModHistory WHERE PunishedID = "+e.getUser().getId()+" AND GuildID = "+e.getGuild().getId()+" AND Active = 1").executeQuery();
+			while (punished.next()) {
+				if (punished.getString("Type").equalsIgnoreCase("MUTE") || punished.getString("Type").equalsIgnoreCase("TEMPMUTE")) {
+					e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRolesByName("Muted", true).get(0)).queue();
+				}
+			}
+			
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}

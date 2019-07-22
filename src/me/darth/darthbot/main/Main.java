@@ -90,6 +90,7 @@ public class Main {
 		builder.addEventListeners(new Ball8());
 		builder.addEventListeners(new AutoMod());
 		builder.addEventListeners(new CustomStores());
+		builder.addEventListeners(new Clans());
 		//builder.addEventListeners(new Project_Natter());
 		sm = builder.build();
 		me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
