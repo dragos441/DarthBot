@@ -96,9 +96,9 @@ public class ViewProfile extends ListenerAdapter {
 				    	  }
 				    	  
 				    	  ResultSet clans = con.createStatement().executeQuery("SELECT * FROM Clans");
-				    	  String clan = "No Clan";
+				    	  String clan = "*No Clan*";
 				    	  while (clans.next()) {
-				    		  if (clans.getString("Members").contains(","+e.getAuthor().getId())) {
+				    		  if (clans.getString("Members").contains(","+target.getUser().getId())) {
 				    			  clan = "**"+clans.getString("Name")+"**";
 				    		  }
 				    	  }
