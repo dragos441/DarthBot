@@ -58,6 +58,7 @@ public class Purge extends ListenerAdapter {
 			      if (num > 100) {
 			    	  e.getChannel().sendMessage(":no_entry: You may only purge up to **100** messages at a time!").queue();
 			      }
+			      e.getMessage().delete().queue();
 			      List<Message> todelete = e.getChannel().getHistory().retrievePast(num).complete();
 			      Calendar time = Calendar.getInstance();
 			      time.add(Calendar.DAY_OF_MONTH, -13);
@@ -68,7 +69,6 @@ public class Purge extends ListenerAdapter {
 						}
 					}
 			      try {
-			    	  e.getMessage().delete().queue();
 			    	  if (!todelete.isEmpty()) {
 			    		  e.getChannel().deleteMessages(todelete).queue();
 			      		}

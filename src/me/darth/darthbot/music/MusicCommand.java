@@ -28,7 +28,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class MusicCommand extends ListenerAdapter {
 	
-	private final MusicManager manager = new MusicManager();
+	public static MusicManager manager = new MusicManager();
 	
 	@SuppressWarnings("deprecation")
 	public static String ytsearch(String search, TextChannel channel) {

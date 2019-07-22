@@ -115,7 +115,7 @@ public class Main {
 						if (min == 0 || updatedmin == -1) {
 							//me.darth.darthbot.commands.Vote.listSort();
 							me.darth.darthbot.main.AutoProcesses.purgeMessages();
-							me.darth.darthbot.main.AutoProcesses.leaveEmptyChannels();
+							me.darth.darthbot.main.AutoProcesses.leaveChannels(sm.getGuilds());
 							sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
 						}
 						updatedmin = min;
@@ -194,5 +194,7 @@ public class Main {
 		} catch (NullPointerException e1) {}
 		return eb;
 	}
+	
+	
 	
 }

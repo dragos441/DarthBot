@@ -150,7 +150,7 @@ public class Rob extends ListenerAdapter {
 					while (caught.next()) {
 						long bux = caught.getLong("DBux");
 						long min = bux / 100;
-						long max = min * 20;
+						long max = min * 25;
 						long rand = ThreadLocalRandom.current().nextLong(max);
 						robbery.addField("🚓 You were caught!", "The Police caught you robbing "+target.getEffectiveName()+", and you bribe the officers **$"+new DecimalFormat("#,###").format(rand)+"** to stay out of jail!", false);
 						robbery.setColor(Color.blue);

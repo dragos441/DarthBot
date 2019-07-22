@@ -68,7 +68,7 @@ public class History extends ListenerAdapter {
 					    	  cal.setTimeInMillis(rs.getLong("TimeStamp"));
 					    	  String reason = rs.getString("Reason");
 					    	  String punisher = e.getGuild().getMemberById(rs.getLong("PunisherID")).getEffectiveName();
-					    	  String ft = cal.getTime().getDate()+"/"+(cal.getTime().getMonth() < 10 ? "0" : "") + cal.getTime().getMonth()+"/"+Math.subtractExact(cal.getTime().getYear(), 100)+" @ "+cal.getTime().getHours()+":"+(cal.getTime().getMinutes() < 10 ? "0" : "") + cal.getTime().getMinutes();
+					    	  String ft = cal.getTime().getDate()+"/"+(cal.getTime().getMonth() < 10 ? "0" : "") + Math.addExact(cal.getTime().getMonth(), 1)+"/"+Math.subtractExact(cal.getTime().getYear(), 100)+" @ "+cal.getTime().getHours()+":"+(cal.getTime().getMinutes() < 10 ? "0" : "") + cal.getTime().getMinutes();
 					    	  if (type.equals("BAN")) {
 					    		  eb.addField("Banned on "+ft, "**Reason:** `"+reason+"` **by "+punisher+"**", false);
 					    	  } else if (type.equals("KICK")) {
