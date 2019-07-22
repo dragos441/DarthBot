@@ -160,6 +160,13 @@ public class Clans extends ListenerAdapter {
 					}
 					e.getChannel().sendMessage(":no_entry: You do not own a clan!").queue();
 				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("join")) {
+					ResultSet rs2 = con.createStatement().executeQuery("SELECT * FROM Clans");
+					while (rs2.next()) {
+						if (rs2.getString("Members").contains(","+e.getAuthor().getId())) {
+							e.getChannel().sendMessage(":no_entry: You are already in a Clan!").queue();
+							return;
+						}
+					}
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
 					while (rs.next()) {
 						try {
