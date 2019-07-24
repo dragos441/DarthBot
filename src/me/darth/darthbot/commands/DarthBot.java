@@ -14,7 +14,7 @@ public class DarthBot extends ListenerAdapter {
 		if (args[0].equalsIgnoreCase("!darthbot")) {
 			EmbedBuilder eb = new EmbedBuilder().setAuthor("DarthBot", "https://discord.gg/hVgXYyv", me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getIconUrl())
 					.setDescription("DarthBot is a heavily community-orientated bot, with regular and exciting updates! The bot is currently in a Beta Stage, to apply "
-							+ "to have DarthBot on your server, click the link above!").setColor(Color.yellow).setTitle("Join the Discord", "https://discord.gg/hVgXYyv");
+							+ "to have DarthBot on your server, click the link above!").setColor(Color.yellow).setTitle("Join the Discord", "https://discord.gg/nVpzgJG");
 			e.getChannel().sendMessage(eb.build()).queue();
 		}
 	}

@@ -168,7 +168,8 @@ public class HigherLower extends ListenerAdapter {
 					if (bux != -1337) {
 						con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
 					}
-					eb.addField("Successfully Cashed Out $"+cashout, "New Balance: $"+newbux, false);
+					long winnings = cashout - Integer.parseInt(oldeb.getDescription().split("\n")[0].replace("*Starting Bet: $*", ""));
+					eb.addField("Successfully Cashed Out $"+winnings, "New Balance: $"+newbux, false);
 					eb.setColor(Color.green);
 					e.getChannel().getMessageById(e.getMessageId()).complete().editMessage(eb.build()).queue();
 					EmbedBuilder log = new EmbedBuilder().setAuthor(e.getMember().getEffectiveName()+" used !higherlower", null, e.getUser().getEffectiveAvatarUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
@@ -249,7 +250,8 @@ public class HigherLower extends ListenerAdapter {
 					if (bux != -1337) {
 						con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+e.getMember().getUser().getIdLong()).execute();
 					}
-					eb.addField("Successfully Cashed Out $"+cashout, "New Balance: $"+newbux, false);
+					long winnings = cashout - Integer.parseInt(oldeb.getDescription().split("\n")[0].replace("*Starting Bet: $*", ""));
+					eb.addField("Successfully Cashed Out $"+winnings, "New Balance: $"+newbux, false);
 					eb.setColor(Color.green);
 					e.getChannel().getMessageById(e.getMessageId()).complete().editMessage(eb.build()).queue();
 					EmbedBuilder log = new EmbedBuilder().setAuthor(e.getMember().getEffectiveName()+" used !higherlower", null, e.getUser().getEffectiveAvatarUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));

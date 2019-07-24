@@ -30,7 +30,7 @@ public class Suggest extends ListenerAdapter {
 				String test = args[1];
 				test=test+"";
 			} catch (ArrayIndexOutOfBoundsException e1) {
-				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!suggest Idea - Description`").queue();
+				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!suggest Idea | Description`").queue();
 				return;
 			}
 			if (e.getMessage().getContentRaw().contains("\n")) {

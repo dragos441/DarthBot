@@ -403,11 +403,12 @@ public class Vote extends ListenerAdapter {
 					
 					Member sm = e.getGuild().getMemberById(obj.getString("desc").toString().split("\n")[6].replace("> Reporter ID: `", "").replace("`", ""));
 					desc = obj.getString("desc").toString().split("\n")[1];
+					String cardid = obj.getString("id").toString();
 					String value = null;
 					for (int x = 0 ; x < arr.length() ; x++) {
 						value = arr.getJSONObject(x).get("value").toString();
 					}
-					EmbedBuilder eb = new EmbedBuilder().setFooter(cardID, null).setDescription(desc).setColor(Color.orange);
+					EmbedBuilder eb = new EmbedBuilder().setFooter(cardid, null).setDescription(desc).setColor(Color.orange);
 					if (name.toString().length() < 256) {
 						eb.setTitle(name, link);
 					} else {

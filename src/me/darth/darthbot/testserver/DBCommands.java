@@ -27,7 +27,7 @@ public class DBCommands extends ListenerAdapter {
 		if (args[0].equalsIgnoreCase("!ea") && me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser())
 				.getRoles().contains(e.getGuild().getRoleById("592813831164657684"))) {
 			e.getGuild().getRoleById("592816963261038646").getManager().setMentionable(true).queue();
-			me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("570342307870539838").sendMessage("\n^ <@&592816963261038646>^ *(<#569465554079842306> to get Event Notifications!)*").queue();
+			me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("570342307870539838").sendMessage("\n^ <@&592816963261038646>^ *(<#602255519348162570> to get Event Notifications!)*").queue();
 			e.getGuild().getRoleById("592816963261038646").getManager().setMentionable(false).queueAfter(3, TimeUnit.SECONDS);
 			e.getMessage().delete().queue();
 		}

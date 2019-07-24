@@ -23,7 +23,7 @@ public class ReportBug extends ListenerAdapter {
 	
 	@SuppressWarnings("deprecation")
 	public static void makeCard(String[] args, Message msg, User author, TextChannel chnl, Boolean bug) {
-		String [] cardsplit = msg.getContentStripped().replace(args[0], "").split(" - ");
+		String [] cardsplit = msg.getContentStripped().replace(args[0], "").split("\\|");
 		String desc = null;
 		try {
 			desc = cardsplit[1];
@@ -107,7 +107,7 @@ public class ReportBug extends ListenerAdapter {
 				String test = args[1];
 				test=test+"";
 			} catch (ArrayIndexOutOfBoundsException e1) {
-				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!reportbug Bug - Description`").queue();
+				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!reportbug Bug | Description`").queue();
 				return;
 			}
 			if (e.getMessage().getContentRaw().contains("\n")) {

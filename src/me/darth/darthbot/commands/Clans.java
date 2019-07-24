@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 
@@ -15,11 +16,13 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Clans extends ListenerAdapter {
 	
-	final static int season = 1;
+	final static double season = 1.5;
 	
 	public static MessageEmbed viewClan(String clanID, User bot) {
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
@@ -27,7 +30,7 @@ public class Clans extends ListenerAdapter {
 			while (rs.next()) {
 				try {
 					if (rs.getString("Name").equalsIgnoreCase(clanID) || rs.getInt("ID") == Integer.parseInt(clanID)) {
-						EmbedBuilder eb = new EmbedBuilder().setAuthor("["+rs.getInt("ID")+"] "+rs.getString("Name")+"   ~   $"+rs.getLong("Bank")+" BANK", null, bot.getEffectiveAvatarUrl()).setColor(Color.red);
+						EmbedBuilder eb = new EmbedBuilder().setAuthor("["+rs.getInt("ID")+"] "+rs.getString("Name")+"   ~   $"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+" BANK", null, bot.getEffectiveAvatarUrl()).setColor(Color.red);
 						eb.setFooter("Clans ~ Season "+season+" | !clan help", null);
 						User founder = me.darth.darthbot.main.Main.sm.getUserById(rs.getLong("Founder"));
 						String members = "";
@@ -38,8 +41,23 @@ public class Clans extends ListenerAdapter {
 								members = members+"\n"+m.getAsMention();
 							} catch (IllegalArgumentException e1) {}
 						}
+						String officers = "";
+						if (rs.getString("Officers") != null && !rs.getString("Officers").isEmpty()) {
+							String[] officerssplit = rs.getString("Officers").split(",");
+							for (int x = 0 ; x < officerssplit.length ; x++) {
+								try {
+									User m = me.darth.darthbot.main.Main.sm.getUserById(officerssplit[x]);
+									officers = officers+"\n"+m.getAsMention();
+								} catch (IllegalArgumentException e1) {}
+							}
+						}
 						eb.addField("Founder", founder.getAsMention(), true);
 						eb.addField("Members "+Math.subtractExact(memberssplit.length, 1)+"/25", members, true);
+						if (officers.equals("")) {
+							eb.addField("Officers", "*No Officers*", true);
+						} else {
+							eb.addField("Officers", officers, true);
+						}
 						eb.addField("Join Status", rs.getString("Status"), true);
 						if (rs.getString("Description") != null) {
 							eb.setDescription(rs.getString("Description"));
@@ -61,19 +79,23 @@ public class Clans extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (args[0].equalsIgnoreCase("!clan") || args[0].equalsIgnoreCase("!clans")) {
+		if (args[0].equalsIgnoreCase("!clan") || args[0].equalsIgnoreCase("!clans") && args.length == 1 || args.length > 1 && args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("list")) {
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 				EmbedBuilder help = new EmbedBuilder().setAuthor("Clans Commands", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png")
 						.setColor(Color.blue);
 				help.setDescription("**General Commands**\n"
 						+ "`!clan create <Name>` Create a clan\n"
+						+ "`!clan join <Name/ID>` Joins a clan\n"
+						+ "`!clan leaves` Leaves a clan\n"
 						+ "`!clan deposit <Amount>` Deposit an amount to your Clan Bank\n"
-						+ "`!clan withdraw <Amount>` Withdraw an amount to your Clan Bank\n"
+						+ "`!clan withdraw <Amount>` Withdraw an amount to your Clan Bank `[OFFICER]`\n"
 						+ "`!clans` View all clans\n"
 						+ "\n**Management**\n"
 						+ "`!clan open` Opens the clan to the public\n"
-						+ "`!clan close` Closes the clan (invite only\n"
+						+ "`!clan close` Closes the clan (invite only)\n"
 						+ "`!clan invite <User>` Invites a user to the Clan\n"
+						+ "`!clan promote <User>` Promotes a member to Officer\n"
+						+ "`!clan demote <User>` Demotes a member from Officer\n"
 						+ "`!clan kick <User>` Kicks a user from the Clan");
 				if (args[0].equalsIgnoreCase("!clan") && args.length == 1) {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
@@ -87,6 +109,68 @@ public class Clans extends ListenerAdapter {
 					}
 					e.getChannel().sendMessage(":no_entry: You're not currently in a clan. To join one, use `!clans join <Clan>`!").queue();
 					return;
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("promote")) {
+					
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
+					while (rs.next()) {
+						Member m = null;
+						if (!e.getMessage().getMentionedMembers().isEmpty()) {
+							m = e.getMessage().getMentionedMembers().get(0);
+						} else {
+							m = me.darth.darthbot.main.Main.findUser(e.getMessage().getContentRaw().replace(args[0]+" "+args[1]+" ", ""), e.getGuild());
+						}
+						if (m == null) {
+							e.getChannel().sendMessage(":no_entry: Member not found!").queue();
+							return;
+						} else {
+							if (!rs.getString("Members").contains(","+m.getUser().getId())) {
+								e.getChannel().sendMessage(":no_entry: That user is not a member of your Clan!").queue();
+								return;
+							}
+							String officers = rs.getString("Officers");
+							if (officers != null && officers.contains(","+m.getUser().getId())) {
+								e.getChannel().sendMessage(":no_entry: That user is already an Officer of the Clan!").queue();
+							} else {
+								if (officers == null) {
+									officers=","+m.getUser().getId();
+								} else {
+									officers=officers+","+m.getUser().getId();
+								}
+								con.prepareStatement("UPDATE Clans SET Officers = '"+officers+"' WHERE ID = "+rs.getInt("ID")).execute();
+								e.getChannel().sendMessage(":white_check_mark: Successfully promoted member to Officer!").queue();
+								return;
+							}
+						}
+					}
+					e.getChannel().sendMessage(":no_entry: You do not own a clan!").queue();
+					
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("demote")) {
+					
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
+					while (rs.next()) {
+						Member m = null;
+						if (!e.getMessage().getMentionedMembers().isEmpty()) {
+							m = e.getMessage().getMentionedMembers().get(0);
+						} else {
+							m = me.darth.darthbot.main.Main.findUser(e.getMessage().getContentRaw().replace(args[0]+" "+args[1]+" ", ""), e.getGuild());
+						}
+						if (m == null) {
+							e.getChannel().sendMessage(":no_entry: Member not found!").queue();
+							return;
+						} else {
+							String officers = rs.getString("Officers");
+							if (!officers.contains(","+m.getUser().getId())) {
+								e.getChannel().sendMessage(":no_entry: That user is not an Officer of the Clan!").queue();
+							} else {
+								officers = officers.replace(","+m.getUser().getId(), "");
+								con.prepareStatement("UPDATE Clans SET Officers = '"+officers+"' WHERE ID = "+rs.getInt("ID")).execute();
+								e.getChannel().sendMessage(":white_check_mark: Successfully demoted member from Officer!").queue();
+								return;
+							}
+						}
+					}
+					e.getChannel().sendMessage(":no_entry: You do not own a clan!").queue();
+					
 				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("invite")) {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
 					while (rs.next()) {
@@ -102,7 +186,7 @@ public class Clans extends ListenerAdapter {
 						} else {
 							final Member target = m;
 							String invites = rs.getString("Invites");
-							if (invites.contains(","+m.getUser().getId())) {
+							if (invites != null && invites.contains(","+m.getUser().getId())) {
 								e.getChannel().sendMessage(":no_entry: This user is already invited!").queue();
 								return;
 							}
@@ -132,7 +216,7 @@ public class Clans extends ListenerAdapter {
 					}
 					e.getChannel().sendMessage(":no_entry: You do not own a Clan!").queue();
 				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("kick")) {
-					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
 					
 					while (rs.next()) {
 						if (rs.getString("Members").contains(","+e.getAuthor().getId())) {
@@ -223,6 +307,12 @@ public class Clans extends ListenerAdapter {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
 					while (rs.next()) {
 						if (rs.getString("Members").contains(","+e.getAuthor().getId())) {
+							if (rs.getString("Officers") == null || !rs.getString("Officers").contains(","+e.getAuthor().getId())) {
+								if (rs.getLong("Founder") != e.getAuthor().getIdLong()) {
+									e.getChannel().sendMessage(":no_entry: You must be an **Officer** to withdraw from the Clan Bank!").queue();
+									return;
+								}
+							}
 							long amount = -1L;
 							try {
 								amount = Long.parseLong(args[2]);
@@ -277,9 +367,9 @@ public class Clans extends ListenerAdapter {
 							
 						}
 					}
-				} else if (args[1].equalsIgnoreCase("help") || args[1].equalsIgnoreCase("commands")) {
+				} else if (args.length > 1 && args[1].equalsIgnoreCase("help") || args.length > 1 && args[1].equalsIgnoreCase("commands")) {
 					e.getChannel().sendMessage(help.build()).queue();
-				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("open")) {
+				} else if (args.length > 1 && args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("open")) {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
 					while (rs.next()) {
 						if (rs.getString("Status").equalsIgnoreCase("OPEN")) {
@@ -291,7 +381,7 @@ public class Clans extends ListenerAdapter {
 						return;
 					}
 					e.getChannel().sendMessage(":no_entry: You don't own a clan!").queue();
-				} else if (args[1].equalsIgnoreCase("create")) {
+				} else if (args.length > 1 && args[1].equalsIgnoreCase("create")) {
 					ResultSet user = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getId());
 					while (user.next()) {
 						if (user.getLong("DBux") < 100000) {
@@ -328,9 +418,32 @@ public class Clans extends ListenerAdapter {
 					}
 										
  				} else if (args[0].equalsIgnoreCase("!clan")) {
- 					e.getChannel().sendMessage(viewClan(e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getJDA().getSelfUser())).queue();
- 				} else if (args[0].equalsIgnoreCase("!clans") && args.length == 1) {
- 					
+ 					try {
+ 						e.getChannel().sendMessage(viewClan(e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getJDA().getSelfUser())).queue();
+ 					} catch (NullPointerException | IllegalArgumentException e1) {
+ 						e.getChannel().sendMessage(":no_entry: That Clan couldn't be found! Type `!clans` for a list of Clans!").queue();
+ 					}
+ 				} else if (args[0].equalsIgnoreCase("!clans") && args.length > 1) {
+ 					e.getChannel().sendMessage(":no_entry: The `!clans` command is just for viewing the Clan List! Did you mean `!clan`?").queue();
+  				} else if (args[0].equalsIgnoreCase("!clans") && args.length == 1) {
+ 					EmbedBuilder eb = new EmbedBuilder().setAuthor("Clan List", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png")
+						.setColor(Color.blue);
+ 					ResultSet rs = con.prepareStatement("SELECT * FROM Clans ORDER BY Bank DESC, LENGTH(MEMBERS) DESC").executeQuery();
+ 					int counter = 0;
+ 					int total = 0;
+ 					while (rs.next()) {
+ 						if (counter < 10) {
+ 							int pos = counter + 1;
+	 						eb.addField("#"+pos+" "+rs.getString("Name"), "**Members:** `"+new DecimalFormat("#,###").format(Math.subtractExact(rs.getString("Members").split(",").length , 1))+"`"
+	 								+ "\n**Bank:** `$"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+"`", false);
+	 						counter++;
+ 						}
+ 						total++;
+ 					}
+ 					eb.setFooter(counter+"/"+total, null);
+ 					Message msg = e.getChannel().sendMessage(eb.build()).complete();
+ 					msg.addReaction("⬅").queue();
+ 					msg.addReaction("➡").queue();
 				} else {
  					e.getChannel().sendMessage(help.build()).queue();
  				}
@@ -338,6 +451,147 @@ public class Clans extends ListenerAdapter {
 			} catch (SQLException e1) {e1.printStackTrace();}
 		}
 		
+	}
+	
+	@Override
+	public void onMessageReactionAdd(MessageReactionAddEvent e) {
+		if (e.getUser().isBot() || e.getUser().isFake()) {
+			return;
+		}
+		Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
+		try {
+			if (e.getReaction().getReactionEmote().getName().equals("⬅") && msg.getEmbeds().get(0).getAuthor().getName().equals("Clan List")) { //left
+				int max = Integer.parseInt(msg.getEmbeds().get(0).getFooter().getText().split("/")[0]) - 10;
+				if (max < 10) {
+					max = 10;
+				}
+				EmbedBuilder eb = new EmbedBuilder().setAuthor("Clan List", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png")
+						.setColor(Color.blue);
+				try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+ 					ResultSet rs = con.prepareStatement("SELECT * FROM Clans ORDER BY Bank DESC, LENGTH(MEMBERS) DESC").executeQuery();
+ 					
+ 					int counter = max - 10;
+ 					int total = 0;
+ 					while (rs.next()) {
+ 						if (counter < max && total < max) {
+ 							int pos = counter + 1;
+	 						eb.addField("#"+pos+" "+rs.getString("Name"), "**Members:** `"+new DecimalFormat("#,###").format(Math.subtractExact(rs.getString("Members").split(",").length , 1))+"`"
+	 								+ "\n**Bank:** `$"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+"`", false);
+	 						counter++;
+ 						}
+ 						total++;
+ 					}
+ 					/*if (max - 10 >= total) {
+ 						return;
+ 					}*/
+ 					eb.setFooter(max+"/"+total, null);
+ 					msg.editMessage(eb.build()).queue();
+				} catch (SQLException e1) {e1.printStackTrace();}
+			}
+		} catch (NullPointerException e1) {}
+		try {
+			if (e.getReaction().getReactionEmote().getName().equals("➡") && msg.getEmbeds().get(0).getAuthor().getName().equals("Clan List")) { //right
+				int max = Integer.parseInt(msg.getEmbeds().get(0).getFooter().getText().split("/")[0]) + 10;
+				if (max < 10) {
+					max = 10;
+				}
+				EmbedBuilder eb = new EmbedBuilder().setAuthor("Clan List", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png")
+						.setColor(Color.blue);
+				try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+ 					ResultSet rs = con.prepareStatement("SELECT * FROM Clans ORDER BY Bank DESC, LENGTH(MEMBERS) DESC").executeQuery();
+ 					
+ 					int counter = max - 10;
+ 					int min = counter;
+ 					int total = 0;
+ 					while (rs.next()) {
+ 						if (counter < max && total >= min) {
+ 							int pos = counter + 1;
+	 						eb.addField("#"+pos+" **"+rs.getString("Name")+"**", "**Members:** `"+new DecimalFormat("#,###").format(Math.subtractExact(rs.getString("Members").split(",").length , 1))+"`"
+	 								+ "\n**Bank:** `$"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+"`", false);
+	 						counter++;
+ 						}
+ 						total++;
+ 					}
+ 					if (max - 10 >= total) {
+ 						return;
+ 					}
+ 					eb.setFooter(max+"/"+total, null);
+ 					msg.editMessage(eb.build()).queue();
+				} catch (SQLException e1) {e1.printStackTrace();}
+			}
+		} catch (NullPointerException e1) {}
+		
+		
+	}
+	
+	@Override
+	public void onMessageReactionRemove(MessageReactionRemoveEvent e) {
+		
+		if (e.getUser().isBot() || e.getUser().isFake()) {
+			return;
+		}
+		Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
+		try {
+			if (e.getReaction().getReactionEmote().getName().equals("⬅") && msg.getEmbeds().get(0).getAuthor().getName().equals("Clan List")) { //left
+				int max = Integer.parseInt(msg.getEmbeds().get(0).getFooter().getText().split("/")[0]) - 10;
+				if (max < 10) {
+					max = 10;
+				}
+				EmbedBuilder eb = new EmbedBuilder().setAuthor("Clan List", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png")
+						.setColor(Color.blue);
+				try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+ 					ResultSet rs = con.prepareStatement("SELECT * FROM Clans ORDER BY Bank DESC, LENGTH(MEMBERS) DESC").executeQuery();
+ 					
+ 					int counter = max - 10;
+ 					int total = 0;
+ 					while (rs.next()) {
+ 						if (counter < max && total < max) {
+ 							int pos = counter + 1;
+	 						eb.addField("#"+pos+" "+rs.getString("Name"), "**Members:** `"+new DecimalFormat("#,###").format(Math.subtractExact(rs.getString("Members").split(",").length , 1))+"`"
+	 								+ "\n**Bank:** `$"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+"`", false);
+	 						counter++;
+ 						}
+ 						total++;
+ 					}
+ 					/*if (max - 10 >= total) {
+ 						return;
+ 					}*/
+ 					eb.setFooter(max+"/"+total, null);
+ 					msg.editMessage(eb.build()).queue();
+				} catch (SQLException e1) {e1.printStackTrace();}
+			}
+		} catch (NullPointerException e1) {}
+		try {
+			if (e.getReaction().getReactionEmote().getName().equals("➡") && msg.getEmbeds().get(0).getAuthor().getName().equals("Clan List")) { //right
+				int max = Integer.parseInt(msg.getEmbeds().get(0).getFooter().getText().split("/")[0]) + 10;
+				if (max < 10) {
+					max = 10;
+				}
+				EmbedBuilder eb = new EmbedBuilder().setAuthor("Clan List", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png")
+						.setColor(Color.blue);
+				try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+ 					ResultSet rs = con.prepareStatement("SELECT * FROM Clans ORDER BY Bank DESC, LENGTH(MEMBERS) DESC").executeQuery();
+ 					
+ 					int counter = max - 10;
+ 					int min = counter;
+ 					int total = 0;
+ 					while (rs.next()) {
+ 						if (counter < max && total >= min) {
+ 							int pos = counter + 1;
+	 						eb.addField("#"+pos+" **"+rs.getString("Name")+"**", "**Members:** `"+new DecimalFormat("#,###").format(Math.subtractExact(rs.getString("Members").split(",").length , 1))+"`"
+	 								+ "\n**Bank:** `$"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+"`", false);
+	 						counter++;
+ 						}
+ 						total++;
+ 					}
+ 					if (max - 10 >= total) {
+ 						return;
+ 					}
+ 					eb.setFooter(max+"/"+total, null);
+ 					msg.editMessage(eb.build()).queue();
+				} catch (SQLException e1) {e1.printStackTrace();}
+			}
+		} catch (NullPointerException e1) {}
 	}
 
 }

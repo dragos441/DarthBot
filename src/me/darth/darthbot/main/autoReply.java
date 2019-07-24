@@ -2,6 +2,7 @@ package me.darth.darthbot.main;
 
 import java.util.concurrent.TimeUnit;
 
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.events.message.MessageUpdateEvent;
