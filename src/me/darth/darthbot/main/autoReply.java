@@ -36,7 +36,8 @@ public class autoReply extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (e.getAuthor().getId().equals("159770472567799808") && e.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!say")) {
+		if (e.getAuthor().getId().equals("159770472567799808") && e.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!say")
+				|| e.getAuthor().getId().equals("328581145190989825") && e.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!say")) {
 			e.getMessage().delete().queue();
 			e.getChannel().sendMessage(e.getMessage().getContentRaw().replace(e.getMessage().getContentRaw().split(" ")[0]+" ", "")).queue();
 		}

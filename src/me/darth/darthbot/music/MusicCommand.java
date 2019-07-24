@@ -201,7 +201,7 @@ public class MusicCommand extends ListenerAdapter {
 			eb.setDescription("The song queue has been cleared!");
 			e.getChannel().sendMessage(eb.build()).queue();
 		}
-		if (args[0].equalsIgnoreCase("!playing") || args[0].equalsIgnoreCase("!nowplaying")) {
+		if (args[0].equalsIgnoreCase("!playing") || args[0].equalsIgnoreCase("!nowplaying") || args[0].equalsIgnoreCase("!track")) {
 			eb.setDescription("Currently playing **"+manager.getPlayer(e.getGuild()).getAudioPlayer().getPlayingTrack().getInfo().title+"**");
 			e.getChannel().sendMessage(eb.build()).queue();
 		}

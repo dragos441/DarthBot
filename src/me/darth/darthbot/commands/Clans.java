@@ -1,12 +1,14 @@
 package me.darth.darthbot.commands;
 
 import java.awt.Color;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 
@@ -22,7 +24,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Clans extends ListenerAdapter {
 	
-	final static double season = 1.5;
+	final static int season = 2;
 	
 	public static MessageEmbed viewClan(String clanID, User bot) {
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
@@ -30,8 +32,16 @@ public class Clans extends ListenerAdapter {
 			while (rs.next()) {
 				try {
 					if (rs.getString("Name").equalsIgnoreCase(clanID) || rs.getInt("ID") == Integer.parseInt(clanID)) {
-						EmbedBuilder eb = new EmbedBuilder().setAuthor("["+rs.getInt("ID")+"] "+rs.getString("Name")+"   ~   $"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+" BANK", null, bot.getEffectiveAvatarUrl()).setColor(Color.red);
-						eb.setFooter("Clans ~ Season "+season+" | !clan help", null);
+						EmbedBuilder eb = new EmbedBuilder();
+						eb.setFooter("[S"+season+"] Clan Created", null);
+						Color c = null;
+						if (rs.getString("Colour") != null) {
+							eb.setColor(rs.getInt("Colour"));
+						}
+						eb.setAuthor("["+rs.getInt("ID")+"] "+rs.getString("Name")+" [$"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+"]");
+						if (rs.getString("Picture") != null) {
+							eb.setThumbnail(rs.getString("Picture"));
+						}
 						User founder = me.darth.darthbot.main.Main.sm.getUserById(rs.getLong("Founder"));
 						String members = "";
 						String[] memberssplit = rs.getString("Members").split(",");
@@ -39,7 +49,7 @@ public class Clans extends ListenerAdapter {
 							try {
 								User m = me.darth.darthbot.main.Main.sm.getUserById(memberssplit[x]);
 								members = members+"\n"+m.getAsMention();
-							} catch (IllegalArgumentException e1) {}
+							} catch (IllegalArgumentException | NullPointerException e1) {}
 						}
 						String officers = "";
 						if (rs.getString("Officers") != null && !rs.getString("Officers").isEmpty()) {
@@ -51,7 +61,7 @@ public class Clans extends ListenerAdapter {
 								} catch (IllegalArgumentException e1) {}
 							}
 						}
-						eb.addField("Founder", founder.getAsMention(), true);
+						//eb.addField("Founder", founder.getAsMention(), true);
 						eb.addField("Members "+Math.subtractExact(memberssplit.length, 1)+"/25", members, true);
 						if (officers.equals("")) {
 							eb.addField("Officers", "*No Officers*", true);
@@ -59,9 +69,12 @@ public class Clans extends ListenerAdapter {
 							eb.addField("Officers", officers, true);
 						}
 						eb.addField("Join Status", rs.getString("Status"), true);
+						String desc = "**Founder:** "+founder.getAsMention();
 						if (rs.getString("Description") != null) {
-							eb.setDescription(rs.getString("Description"));
+							desc=desc+"\nDescription: "+rs.getString("Description");
+							eb.setDescription(desc);
 						}
+						eb.setTimestamp(Instant.ofEpochMilli(rs.getLong("Created")));
 						return eb.build();
 					}
 				} catch (SQLException e1) {
@@ -84,9 +97,10 @@ public class Clans extends ListenerAdapter {
 				EmbedBuilder help = new EmbedBuilder().setAuthor("Clans Commands", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png")
 						.setColor(Color.blue);
 				help.setDescription("**General Commands**\n"
+						+ "`!clan` View the Clan that you're in\n"
 						+ "`!clan create <Name>` Create a clan\n"
 						+ "`!clan join <Name/ID>` Joins a clan\n"
-						+ "`!clan leaves` Leaves a clan\n"
+						+ "`!clan leave` Leaves a clan\n"
 						+ "`!clan deposit <Amount>` Deposit an amount to your Clan Bank\n"
 						+ "`!clan withdraw <Amount>` Withdraw an amount to your Clan Bank `[OFFICER]`\n"
 						+ "`!clans` View all clans\n"
@@ -96,7 +110,10 @@ public class Clans extends ListenerAdapter {
 						+ "`!clan invite <User>` Invites a user to the Clan\n"
 						+ "`!clan promote <User>` Promotes a member to Officer\n"
 						+ "`!clan demote <User>` Demotes a member from Officer\n"
-						+ "`!clan kick <User>` Kicks a user from the Clan");
+						+ "`!clan kick <User>` Kicks a user from the Clan\n"
+						+ ":new:`!clan description <Description>` Set a description for the Clan `2+ MEMBERS`\n"
+						+ ":new:`!clan colour <Colour>` Set a colour for your Clan `5+ MEMBERS`\n"
+						+ ":new:`!clan avatar <URL>` Set an avatar for your Clan `10+ MEMBERS`");
 				if (args[0].equalsIgnoreCase("!clan") && args.length == 1) {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
 					while (rs.next()) {
@@ -109,6 +126,112 @@ public class Clans extends ListenerAdapter {
 					}
 					e.getChannel().sendMessage(":no_entry: You're not currently in a clan. To join one, use `!clans join <Clan>`!").queue();
 					return;
+				} else if (args[0].equalsIgnoreCase("!clans") && args.length > 1) {
+	 				e.getChannel().sendMessage(":no_entry: The `!clans` command is just for viewing the Clan List! Did you mean `!clan`?").queue();
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].toLowerCase().contains("perk")) {
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
+					while (rs.next()) {
+						if (rs.getString("Members").contains(","+e.getAuthor().getId())) {
+							
+							EmbedBuilder eb = new EmbedBuilder().setAuthor("Clan Perks", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png");
+							eb.setDescription("Bank Size: `$max` :white_small_square::black_small_square::black_small_square::black_small_square::black_small_square:`UPGRADE: $UPGRADE`\n"
+									+ "Clan Size: `$max` :white_small_square::white_small_square::black_small_square::black_small_square::black_small_square: ` UPGRADE: $UPGRADE`").setColor(Color.blue);
+							int members = rs.getString("Members").split(",").length - 1;
+							String desc = "🔒";
+							String colour = "🔒";
+							String picture = "🔒";
+							if (members >= 2) {
+								desc = "🔓";
+							} if (members >= 5) {
+								colour = "🔓";
+							} if (members >= 10) {
+								picture = "🔓";
+							}
+							eb.addField("Cosmetics", "**Clan Description** `2 Members` "+desc
+									+ "\n**Clan Colour** `5 Members` "+colour
+									+ "\n**Clan Avatar** `10 Members` "+picture, true);
+							eb.setFooter("Clans Season "+season+" | !upgrade <BANK / SIZE>", null);
+							e.getChannel().sendMessage(eb.build()).queue();
+						}
+					}
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("desc") || args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("description")) {
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
+					while (rs.next()) {
+						int members = Math.subtractExact(rs.getString("Members").split(",").length, 1);
+						if (members < 2) {
+							e.getChannel().sendMessage("You must have `2` Clan members to use this command!").queue();
+							return;
+						}
+						if (args.length < 3) {
+							e.getChannel().sendMessage(":no_entry: Invalid Syntax `!clan description <Clan Description>`").queue();
+							return;
+						} else if (e.getMessage().getContentRaw().length() > 200) {
+							e.getChannel().sendMessage(":no_entry: Your description is too long").queue();
+							return;
+						} else {
+							PreparedStatement ps = con.prepareStatement("UPDATE Clans SET Description =? WHERE ID = "+rs.getInt("ID"));
+							ps.setString(1, e.getMessage().getContentRaw().replace(args[0]+" "+args[1], ""));
+							ps.execute();
+							e.getChannel().sendMessage(":white_check_mark: Successfully updated Clan's description!").queue();
+							return;
+						}
+					}
+					e.getChannel().sendMessage(":no_entry: You don't own a Clan!").queue();
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("colour") || args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("color")) {
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
+					while (rs.next()) {
+						int members = Math.subtractExact(rs.getString("Members").split(",").length, 1);
+						if (members < 5) {
+							e.getChannel().sendMessage("You must have `5` Clan members to use this command!").queue();
+							return;
+						}
+						if (args.length < 3) {
+							e.getChannel().sendMessage(":no_entry: Invalid Syntax `!clan colour <Clan Description>`").queue();
+						} else {
+							Color c = null;
+							try {
+								Field f = Color.class.getField(args[2]);
+								c = (Color)f.get(null);
+							} catch (Exception e1) {}
+							if (c == null) {
+								e.getChannel().sendMessage(":no_entry: That is not a valid Colour!\n`[RED, GREEN, BLUE, MAGENTA, CYAN, YELLOW, BLACK, WHITE, GRAY, DARK_GRAY, LIGHT_GRAY, ORANGE, PINK]`").queue();
+								return;
+							}
+							PreparedStatement ps = con.prepareStatement("UPDATE Clans SET Colour = ? WHERE ID = "+rs.getInt("ID"));
+							ps.setString(1, c.getRGB()+"");
+							ps.execute();
+							e.getChannel().sendMessage(":white_check_mark: Successfully updated Clan's colour!").queue();
+						}
+						return;
+					}
+					e.getChannel().sendMessage(":no_entry: You don't own a Clan!").queue();			
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("avatar") || args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("picture") || args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("image")) {
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
+					while (rs.next()) {
+						int members = Math.subtractExact(rs.getString("Members").split(",").length, 1);
+						if (members < 10) {
+							e.getChannel().sendMessage("You must have `10` Clan members to use this command!").queue();
+							return;
+						}
+						if (args.length < 3) {
+							e.getChannel().sendMessage(":no_entry: Invalid Syntax `!clan avatar <Clan Description>`").queue();
+						} else {
+
+							try {
+								EmbedBuilder test = new EmbedBuilder().setImage(args[2]);
+							} catch (IllegalArgumentException e1) {
+								e.getChannel().sendMessage(":no_entry: That is not a valid image URL!").queue();
+								return;
+							}
+							
+							PreparedStatement ps = con.prepareStatement("UPDATE Clans SET Picture = ? WHERE ID = "+rs.getInt("ID"));
+							ps.setString(1, args[2]);
+							ps.execute();
+							e.getChannel().sendMessage(":white_check_mark: Successfully updated Clan's avatar!").queue();
+						}
+						return;
+					}
+					e.getChannel().sendMessage(":no_entry: You don't own a Clan!").queue();			
 				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("promote")) {
 					
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
@@ -423,8 +546,7 @@ public class Clans extends ListenerAdapter {
  					} catch (NullPointerException | IllegalArgumentException e1) {
  						e.getChannel().sendMessage(":no_entry: That Clan couldn't be found! Type `!clans` for a list of Clans!").queue();
  					}
- 				} else if (args[0].equalsIgnoreCase("!clans") && args.length > 1) {
- 					e.getChannel().sendMessage(":no_entry: The `!clans` command is just for viewing the Clan List! Did you mean `!clan`?").queue();
+ 				
   				} else if (args[0].equalsIgnoreCase("!clans") && args.length == 1) {
  					EmbedBuilder eb = new EmbedBuilder().setAuthor("Clan List", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png")
 						.setColor(Color.blue);

@@ -150,11 +150,16 @@ public class Rob extends ListenerAdapter {
 				}
 				//e.getChannel().sendMessage("`DEBUG` "+robchance+" - "+randint+" odds").queue();
 				int policechance = new Random().nextInt(10) + 1;
-				if (policechance >= 0) {
+				if (policechance == 1) {
 					ResultSet caught = con.createStatement().executeQuery("SELECT * FROM profiles where UserID = "+e.getAuthor().getId());
 					while (caught.next()) {
 						long bux = caught.getLong("DBux");
-						long min = bux / 100;
+						long min = 0L;
+						if (bux < 100) {
+							 min = 1;
+						} else {
+							 min = bux / 100;
+						}
 						long max = min * 5;
 						long rand = ThreadLocalRandom.current().nextLong(max);
 						robbery.addField("🚓 You were caught!", "The Police caught you robbing "+target.getEffectiveName()+", and you bribe the officers **$"+new DecimalFormat("#,###").format(rand)+"** to stay out of jail!", false);
