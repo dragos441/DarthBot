@@ -87,7 +87,7 @@ public class autoReply extends ListenerAdapter {
 	    	if (e.getMessage().getInvites().size() == 0) {
 	    		e.getChannel().sendMessage("Responding to DMs is a bit beyond me yet. If you're looking for Support, join the DarthBot Server! https://discord.gg/hVgXYyv").queue();
 	    	} else {
-	    		e.getChannel().sendMessage("I'm currently in a private beta! If you'd like to have me on your server, join the DarthBot Discord (https://discord.gg/hVgXYyv) and fill out the form in <#569465554079842306>!").queue();
+	    		e.getChannel().sendMessage("I'm currently in a private beta! If you'd like to have me on your server, join the DarthBot Discord (https://discord.gg/hVgXYyv) and fill out the form in the <#602255519348162570> channel!").queue();
 	    	}
 	    });
 	}

@@ -12,7 +12,7 @@ public class Commands extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!commands") || args[0].equalsIgnoreCase("!help") || args[0].equalsIgnoreCase("!command") || args[0].equalsIgnoreCase("!cmd") || args[0].equalsIgnoreCase("!cmds")) {
-			String def = "`!setup` - View commands to configure DarthBot\n`!clans help` View Clans commands\n`!commands` - View command categories\n`!commands Economy` - View economy commands\n"
+			String def = "`!setup` - View commands to configure DarthBot\n`!clan help` View Clans commands\n`!commands` - View command categories\n`!commands Economy` - View economy commands\n"
 					+ "`!commands Moderation` - View moderation commands\n`!commands Music` - View music commands\n`!commands Misc` - View miscellaneous commands";
 			EmbedBuilder eb = new EmbedBuilder().setAuthor("Commands", null, e.getGuild().getIconUrl()).setColor(Color.blue);
 			if (!e.getGuild().getId().equals("568849490425937940")) {
@@ -55,8 +55,8 @@ public class Commands extends ListenerAdapter {
 				eb.setDescription("`!ping` Checks the bot's latency between discord and itself\n"
 						+ "`!trello` Displays the Development Trello\n"
 						+ "`!search <Text>` Searches the development trello for an existing suggestion/bug\n"
-						+ "`!suggest <Title - Description>` Suggests an idea for improving the bot\n"
-						+ "`!reportbug <Title - Description` Reports a bug regarding the bot\n"
+						+ "`!suggest <Title | Description>` Suggests an idea for improving the bot\n"
+						+ "`!reportbug <Title | Description` Reports a bug regarding the bot\n"
 						+ "`info` Displays information about the server\n"
 						+ "`!whois <User>` Displays information about a user\n"
 						+ "`!getid <Category/Emote/Member/Role/Channel` Gets the ID code for an object\n"

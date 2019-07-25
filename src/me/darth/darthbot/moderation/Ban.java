@@ -151,7 +151,7 @@ public class Ban extends ListenerAdapter {
 					
 					
 			      }
-			      String reason = null;
+			      String reason = "";
 			      if (temp) {
 			    	  reason = e.getMessage().getContentRaw().replace(args[0], "").replace(args[1], "").replace(args[2], "");
 			      } else {

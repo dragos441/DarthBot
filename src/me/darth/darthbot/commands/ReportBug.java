@@ -118,7 +118,7 @@ public class ReportBug extends ListenerAdapter {
 			if (e.getMessage().getContentRaw().contains("|")) {
 				title = e.getMessage().getContentRaw().split("\\|")[0];
 			} else if (title.length() > 50) {
-				e.getChannel().sendMessage(":no_entry: Your suggestion title is too long! Make sure to split the title and description using the `|` symbol!\n*Eg: `!suggest This is the title | This is the description`*").queue();
+				e.getChannel().sendMessage(":no_entry: Your suggestion title is too long! Make sure to split the title and description using the `|` symbol!\n*Eg: `!reportbug This is the title | This is the description`*").queue();
 				return;
 			}
 			EmbedBuilder dupes = new EmbedBuilder().setAuthor("Possible Duplicates Found", null, e.getGuild().getIconUrl()).setColor(Color.red);

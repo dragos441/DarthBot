@@ -80,7 +80,7 @@ public class Give extends ListenerAdapter{
 					if (lastGiven > cal.getTimeInMillis()) {
 						Calendar claimed = Calendar.getInstance();
 			        	claimed.setTimeInMillis(lastGiven);
-			        	long mins = ChronoUnit.MINUTES.between(cal.toInstant(), claimed.toInstant()) - 1;
+			        	long mins = ChronoUnit.MINUTES.between(cal.toInstant(), claimed.toInstant());
 			        	int hours = 0;
 			        	while (mins >= 60) {
 			        		hours++;

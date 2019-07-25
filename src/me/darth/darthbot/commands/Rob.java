@@ -65,7 +65,7 @@ public class Rob extends ListenerAdapter {
 						robstring = rs.getString("Inventory");
 						Calendar claimed = Calendar.getInstance();
 			        	claimed.setTimeInMillis(rs.getLong("Robbed"));
-			        	long mins = ChronoUnit.MINUTES.between(cal.toInstant(), claimed.toInstant()) - 1;
+			        	long mins = ChronoUnit.MINUTES.between(cal.toInstant(), claimed.toInstant());
 			        	int hours = 0;
 			        	while (mins >= 60) {
 			        		hours++;

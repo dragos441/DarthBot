@@ -26,6 +26,70 @@ public class Clans extends ListenerAdapter {
 	
 	final static int season = 2;
 	
+	public static int size(int level, String type) {
+		if (type.equalsIgnoreCase("BANK")) {
+			if (level == 0) {
+				return 250000;
+			} else if (level == 1) {
+				return 500000;
+			} else if (level == 2) {
+				return 1000000;
+			} else if (level == 3) {
+				return 2000000;
+			} else if (level == 4) {
+				return 5000000;
+			} else if (level == 5) {
+				return 10000000;
+			}
+		} else if (type.equalsIgnoreCase("SIZE")) {
+			if (level == 0) {
+				return 20;
+			} else if (level == 1) {
+				return 40;
+			} else if (level == 2) {
+				return 60;
+			} else if (level == 3) {
+				return 80;
+			} else if (level == 4) {
+				return 100;
+			} else if (level == 5) {
+				return 120;
+			}
+		}
+		
+		return -1;
+	}
+	
+	public static int upgrade(int level, String type) {
+		if (type.equalsIgnoreCase("BANK")) {
+			if (level == 0) {
+				return 50000;
+			} else if (level == 1) {
+				return 100000;
+			} else if (level == 2) {
+				return 200000;
+			} else if (level == 3) {
+				return 500000;
+			} else if (level == 4) {
+				return 1000000;
+			}
+		} else if (type.equalsIgnoreCase("SIZE")) {
+			if (level == 0) {
+				return 10000;
+			} else if (level == 1) {
+				return 20000;
+			} else if (level == 2) {
+				return 50000;
+			} else if (level == 3) {
+				return 100000;
+			} else if (level == 4) {
+				return 250000;
+			}
+		}
+		
+		return -1;
+	}
+	
 	public static MessageEmbed viewClan(String clanID, User bot) {
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
@@ -58,11 +122,11 @@ public class Clans extends ListenerAdapter {
 								try {
 									User m = me.darth.darthbot.main.Main.sm.getUserById(officerssplit[x]);
 									officers = officers+"\n"+m.getAsMention();
-								} catch (IllegalArgumentException e1) {}
+								} catch (IllegalArgumentException | NullPointerException e1) {}
 							}
 						}
 						//eb.addField("Founder", founder.getAsMention(), true);
-						eb.addField("Members "+Math.subtractExact(memberssplit.length, 1)+"/25", members, true);
+						eb.addField("Members "+Math.subtractExact(memberssplit.length, 1)+"/"+size(rs.getInt("SizeLevel"), "SIZE"), members, true);
 						if (officers.equals("")) {
 							eb.addField("Officers", "*No Officers*", true);
 						} else {
@@ -72,8 +136,8 @@ public class Clans extends ListenerAdapter {
 						String desc = "**Founder:** "+founder.getAsMention();
 						if (rs.getString("Description") != null) {
 							desc=desc+"\nDescription: "+rs.getString("Description");
-							eb.setDescription(desc);
 						}
+						eb.setDescription(desc);
 						eb.setTimestamp(Instant.ofEpochMilli(rs.getLong("Created")));
 						return eb.build();
 					}
@@ -98,7 +162,7 @@ public class Clans extends ListenerAdapter {
 						.setColor(Color.blue);
 				help.setDescription("**General Commands**\n"
 						+ "`!clan` View the Clan that you're in\n"
-						+ "`!clan create <Name>` Create a clan\n"
+						+ "`!clan create <Name>` Create a clan `$100k`\n"
 						+ "`!clan join <Name/ID>` Joins a clan\n"
 						+ "`!clan leave` Leaves a clan\n"
 						+ "`!clan deposit <Amount>` Deposit an amount to your Clan Bank\n"
@@ -111,6 +175,10 @@ public class Clans extends ListenerAdapter {
 						+ "`!clan promote <User>` Promotes a member to Officer\n"
 						+ "`!clan demote <User>` Demotes a member from Officer\n"
 						+ "`!clan kick <User>` Kicks a user from the Clan\n"
+						+ "`!clan perks` View a list of your Clans perks\n"
+						+ ":new:`!clan rename <Name>` Change your Clans name\n"
+						+ ":new:`!clan disband` Delete the Clan you own\n"
+						+ ":new:`!clan upgrade <BANK/SIZE>` Upgrades an aspect of your Clan\n"
 						+ ":new:`!clan description <Description>` Set a description for the Clan `2+ MEMBERS`\n"
 						+ ":new:`!clan colour <Colour>` Set a colour for your Clan `5+ MEMBERS`\n"
 						+ ":new:`!clan avatar <URL>` Set an avatar for your Clan `10+ MEMBERS`");
@@ -132,26 +200,136 @@ public class Clans extends ListenerAdapter {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
 					while (rs.next()) {
 						if (rs.getString("Members").contains(","+e.getAuthor().getId())) {
+							String bankstring = "";
+							String sizestring = "";
+							int banksize = rs.getInt("BankLevel");
+							int clansize = rs.getInt("SizeLevel");
+							String bankupgrade = null;
+							if (upgrade(rs.getInt("BankLevel"), "BANK") == -1) {
+								bankupgrade = "MAX";
+							} else {
+								bankupgrade = "$"+new DecimalFormat("#,###").format(upgrade(rs.getInt("BankLevel"), "BANK"));
+							}
+							String sizeupgrade = null;
+							if (upgrade(rs.getInt("SizeLevel"), "SIZE") == -1) {
+								sizeupgrade = "MAX";
+							} else {
+								sizeupgrade = "$"+new DecimalFormat("#,###").format(upgrade(rs.getInt("SizeLevel"), "SIZE"));
+							}
+							for (int x = 0 ; x < 5 ; x++) { 
+								if (banksize > 0) {
+									bankstring=bankstring+":white_small_square:";
+									banksize--;
+								} else {
+									bankstring=bankstring+":black_small_square:";
+								}
+							}
+							for (int x = 0 ; x < 5 ; x++) { 
+								if (clansize > 0) {
+									sizestring=sizestring+":white_small_square:";
+									clansize--;
+								} else {
+									sizestring=sizestring+":black_small_square:";
+								}
+							}
 							
 							EmbedBuilder eb = new EmbedBuilder().setAuthor("Clan Perks", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png");
-							eb.setDescription("Bank Size: `$max` :white_small_square::black_small_square::black_small_square::black_small_square::black_small_square:`UPGRADE: $UPGRADE`\n"
-									+ "Clan Size: `$max` :white_small_square::white_small_square::black_small_square::black_small_square::black_small_square: ` UPGRADE: $UPGRADE`").setColor(Color.blue);
+							eb.setDescription("Bank Capacity: `$"+new DecimalFormat("#,###").format(size(rs.getInt("BankLevel"), "BANK"))+"` "+bankstring+" `UPGRADE: "+bankupgrade+"`\n"
+									+ "Clan Size: `"+new DecimalFormat("#,###").format(size(rs.getInt("SizeLevel"), "SIZE"))+"` "+sizestring+" ` UPGRADE: "+sizeupgrade+"`").setColor(Color.blue);
 							int members = rs.getString("Members").split(",").length - 1;
 							String desc = "🔒";
 							String colour = "🔒";
 							String picture = "🔒";
 							if (members >= 2) {
-								desc = "🔓";
+								desc = "🔓`!clan desc`";
 							} if (members >= 5) {
-								colour = "🔓";
+								colour = "🔓`!clan colour`";
 							} if (members >= 10) {
-								picture = "🔓";
+								picture = "🔓`!clan avatar`";
 							}
 							eb.addField("Cosmetics", "**Clan Description** `2 Members` "+desc
 									+ "\n**Clan Colour** `5 Members` "+colour
 									+ "\n**Clan Avatar** `10 Members` "+picture, true);
-							eb.setFooter("Clans Season "+season+" | !upgrade <BANK / SIZE>", null);
+							eb.setFooter("Clans Season "+season+" | !clan upgrade <BANK / SIZE>", null);
 							e.getChannel().sendMessage(eb.build()).queue();
+						}
+					}
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("rename")) {
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
+					while (rs.next()) {
+						if (args.length < 3) {
+							e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!clan rename <Name>`").queue();
+							return;
+						}
+						String name = e.getMessage().getContentRaw().replace(args[0]+" "+args[1]+" ", "");
+						ResultSet clans = con.prepareStatement("SELECT * FROM Clans").executeQuery();
+						while (clans.next()) {
+							if (clans.getString("Name").replace(" ", "").toLowerCase().equalsIgnoreCase(name.toLowerCase().replace(" ", ""))) {
+								e.getChannel().sendMessage(":no_entry: A Clan already exists with that name!").queue();
+								return;
+							}
+						}
+						PreparedStatement ps = con.prepareStatement("UPDATE Clans SET Name = ? WHERE ID = "+rs.getInt("ID"));
+						ps.setString(1, name);
+						ps.execute();
+						e.getChannel().sendMessage(":white_check_mark: Successfully renamed Clan!").queue();
+					}
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("disband")) {
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
+					while (rs.next()) {
+						if (args.length < 2) {
+							e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!clan disband``").queue();
+							return;
+						}
+						e.getChannel().sendMessage(":exclamation: Disbanding a clan is **irreversible**, and once done, **cannot be recovered**. React to your message with a :white_check_mark: to confirm the action.\n"+e.getMember().getAsMention()).queue();
+						e.getMessage().addReaction("✅").queue();
+					}
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("upgrade")) {
+					ResultSet user = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getId());
+					long bal = -1L;
+					while (user.next()) {
+						bal = user.getLong("DBux");
+					}
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
+					while (rs.next()) {
+						if (rs.getString("Members").contains(","+e.getAuthor().getId())) { 
+							if (args.length < 3) {
+								e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!clan upgrade <BANK / SIZE>").queue();
+							}
+							if (args[2].equalsIgnoreCase("BANK")) {
+								int banklevel = rs.getInt("BankLevel");
+								if (banklevel >= 5) {
+									e.getChannel().sendMessage(":no_entry: This perk is at the maximum level!").queue();
+									return;
+								}
+								int price = upgrade(banklevel, "BANK");
+								if (price > bal) {
+									e.getChannel().sendMessage(":no_entry: You do not have enough in your personal balance to afford this upgrade!").queue();
+								} else {
+									con.prepareStatement("UPDATE profiles SET DBux = DBux - "+price+" WHERE UserID = "+e.getAuthor().getId()).execute();
+									con.prepareStatement("UPDATE Clans SET BankLevel = BankLevel + 1 WHERE ID = "+rs.getInt("ID")).execute();
+									banklevel++;
+									e.getChannel().sendMessage(":white_check_mark: Successfully upgraded Clan bank to **Level "+banklevel+"**!").queue();
+								}
+							} else if (args[2].equalsIgnoreCase("SIZE")) {
+								int sizelevel = rs.getInt("SizeLevel");
+								if (sizelevel >= 5) {
+									e.getChannel().sendMessage(":no_entry: This perk is at the maximum level!").queue();
+									return;
+								}
+								int price = upgrade(sizelevel, "SIZE");
+								if (price > bal) {
+									e.getChannel().sendMessage(":no_entry: You do not have enough in your personal balance to afford this upgrade!").queue();
+								} else {
+									con.prepareStatement("UPDATE profiles SET DBux = DBux - "+price+" WHERE UserID = "+e.getAuthor().getId()).execute();
+									con.prepareStatement("UPDATE Clans SET SizeLevel = SizeLevel + 1 WHERE ID = "+rs.getInt("ID")).execute();
+									sizelevel++;
+									e.getChannel().sendMessage(":white_check_mark: Successfully upgraded Clan size to **Level "+sizelevel+"**!").queue();
+								}
+							} else {
+								e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!clan upgrade <BANK / SIZE>`").queue();
+							}
+							
 						}
 					}
 				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("desc") || args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("description")) {
@@ -190,7 +368,7 @@ public class Clans extends ListenerAdapter {
 						} else {
 							Color c = null;
 							try {
-								Field f = Color.class.getField(args[2]);
+								Field f = Color.class.getField(args[2].toUpperCase());
 								c = (Color)f.get(null);
 							} catch (Exception e1) {}
 							if (c == null) {
@@ -387,7 +565,7 @@ public class Clans extends ListenerAdapter {
 									return;
 								} else {
 									String members = rs.getString("Members");
-									if (Math.subtractExact(members.split(",").length, 1) >= 25) {
+									if (Math.subtractExact(members.split(",").length, 1) >= size(rs.getInt("SizeLevel"), "SIZE")) {
 										e.getChannel().sendMessage(":no_entry: This Clan is full!").queue();
 										return;
 									}
@@ -466,6 +644,10 @@ public class Clans extends ListenerAdapter {
 					while (rs.next()) {
 						if (rs.getString("Members").contains(","+e.getAuthor().getId())) {
 							long amount = -1L;
+							if (args.length < 3) {
+								e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!clan deposit <Amount>`").queue();
+								return;
+							}
 							try {
 								amount = Long.parseLong(args[2]);
 								if (amount < 1) {
@@ -481,7 +663,9 @@ public class Clans extends ListenerAdapter {
 								if (money.getLong("DBux") < amount) {
 									e.getChannel().sendMessage(":no_entry: You don't have that amount to deposit!").queue();
 									return;
-								} else {
+								} else if (rs.getLong("Bank") + amount > size(rs.getInt("BankLevel"), "BANK")) {
+									e.getChannel().sendMessage(":no_entry: Your Clan bank isn't big enough to hold that much money!\n*Upgrade it using `!clan upgrade BANK`*").queue();
+ 								} else {
 									con.prepareStatement("UPDATE profiles SET DBux = DBux - "+amount+" WHERE UserID = "+e.getAuthor().getId()).execute();
 									con.prepareStatement("UPDATE Clans SET Bank = Bank + "+amount+" WHERE ID = "+rs.getInt("ID")).execute();
 									e.getChannel().sendMessage(":white_check_mark: Successfully added $**"+amount+"** to the Clans bank!").queue();
@@ -582,6 +766,21 @@ public class Clans extends ListenerAdapter {
 		}
 		Message msg = e.getChannel().getMessageById(e.getMessageId()).complete();
 		try {
+			if (e.getReaction().getReactionEmote().getName().equals("✅") && msg.getContentRaw().split(" ")[0].equalsIgnoreCase("!clan") && msg.getContentRaw().split(" ")[1].equalsIgnoreCase("disband")) {
+				if (msg.getAuthor().getIdLong() == e.getUser().getIdLong()) {
+					try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+						ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getUser().getId());
+						while (rs.next()) {
+							con.prepareStatement("DELETE FROM Clans WHERE Founder = "+e.getUser().getId()+" AND ID = "+rs.getInt("ID")).execute();
+							e.getChannel().sendMessage(":white_check_mark: Successfully disbanded Clan!").queue();
+						}
+					} catch (SQLException e1) {e1.printStackTrace();}
+				} else {
+					e.getTextChannel().removeReactionById(e.getMessageId(), e.getReaction().getReactionEmote().getName(), e.getMember().getUser()).queue();
+				}
+			}
+		} catch (Exception e1) {}
+		try {
 			if (e.getReaction().getReactionEmote().getName().equals("⬅") && msg.getEmbeds().get(0).getAuthor().getName().equals("Clan List")) { //left
 				int max = Integer.parseInt(msg.getEmbeds().get(0).getFooter().getText().split("/")[0]) - 10;
 				if (max < 10) {
@@ -595,7 +794,7 @@ public class Clans extends ListenerAdapter {
  					int counter = max - 10;
  					int total = 0;
  					while (rs.next()) {
- 						if (counter < max && total < max) {
+ 						if (counter < max && total < max && total >= counter) {
  							int pos = counter + 1;
 	 						eb.addField("#"+pos+" "+rs.getString("Name"), "**Members:** `"+new DecimalFormat("#,###").format(Math.subtractExact(rs.getString("Members").split(",").length , 1))+"`"
 	 								+ "\n**Bank:** `$"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+"`", false);
@@ -628,7 +827,7 @@ public class Clans extends ListenerAdapter {
  					while (rs.next()) {
  						if (counter < max && total >= min) {
  							int pos = counter + 1;
-	 						eb.addField("#"+pos+" **"+rs.getString("Name")+"**", "**Members:** `"+new DecimalFormat("#,###").format(Math.subtractExact(rs.getString("Members").split(",").length , 1))+"`"
+	 						eb.addField("#"+pos+" "+rs.getString("Name"), "**Members:** `"+new DecimalFormat("#,###").format(Math.subtractExact(rs.getString("Members").split(",").length , 1))+"`"
 	 								+ "\n**Bank:** `$"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+"`", false);
 	 						counter++;
  						}
@@ -667,7 +866,7 @@ public class Clans extends ListenerAdapter {
  					int counter = max - 10;
  					int total = 0;
  					while (rs.next()) {
- 						if (counter < max && total < max) {
+ 						if (counter < max && total < max && total >= counter) {
  							int pos = counter + 1;
 	 						eb.addField("#"+pos+" "+rs.getString("Name"), "**Members:** `"+new DecimalFormat("#,###").format(Math.subtractExact(rs.getString("Members").split(",").length , 1))+"`"
 	 								+ "\n**Bank:** `$"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+"`", false);
@@ -700,7 +899,7 @@ public class Clans extends ListenerAdapter {
  					while (rs.next()) {
  						if (counter < max && total >= min) {
  							int pos = counter + 1;
-	 						eb.addField("#"+pos+" **"+rs.getString("Name")+"**", "**Members:** `"+new DecimalFormat("#,###").format(Math.subtractExact(rs.getString("Members").split(",").length , 1))+"`"
+	 						eb.addField("#"+pos+" "+rs.getString("Name"), "**Members:** `"+new DecimalFormat("#,###").format(Math.subtractExact(rs.getString("Members").split(",").length , 1))+"`"
 	 								+ "\n**Bank:** `$"+new DecimalFormat("#,###").format(rs.getLong("Bank"))+"`", false);
 	 						counter++;
  						}
