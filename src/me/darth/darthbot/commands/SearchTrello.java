@@ -45,6 +45,9 @@ public class SearchTrello extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		
 		if (args[0].equalsIgnoreCase("!search")) {

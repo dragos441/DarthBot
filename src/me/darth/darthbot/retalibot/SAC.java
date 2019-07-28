@@ -15,6 +15,9 @@ public class SAC extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		if (e.getChannel().equals(e.getGuild().getTextChannelById("543562394702446593"))) {
 			if (e.getMember().getUser().equals(e.getJDA().getSelfUser())) {
 				return;

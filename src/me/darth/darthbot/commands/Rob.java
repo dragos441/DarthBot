@@ -26,6 +26,9 @@ public class Rob extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!rob") || args[0].equalsIgnoreCase("!steal")) {
 			if (!me.darth.darthbot.main.Main.economyEnabled) {

@@ -35,7 +35,7 @@ public class Clans extends ListenerAdapter {
 			} else if (level == 2) {
 				return 1000000;
 			} else if (level == 3) {
-				return 2000000;
+				return 2500000;
 			} else if (level == 4) {
 				return 5000000;
 			} else if (level == 5) {
@@ -43,17 +43,17 @@ public class Clans extends ListenerAdapter {
 			}
 		} else if (type.equalsIgnoreCase("SIZE")) {
 			if (level == 0) {
-				return 20;
+				return 15;
 			} else if (level == 1) {
-				return 40;
+				return 30;
 			} else if (level == 2) {
-				return 60;
+				return 45;
 			} else if (level == 3) {
-				return 80;
+				return 60;
 			} else if (level == 4) {
-				return 100;
+				return 75;
 			} else if (level == 5) {
-				return 120;
+				return 90;
 			}
 		}
 		
@@ -63,27 +63,27 @@ public class Clans extends ListenerAdapter {
 	public static int upgrade(int level, String type) {
 		if (type.equalsIgnoreCase("BANK")) {
 			if (level == 0) {
+				return 100000;
+			} else if (level == 1) {
+				return 250000;
+			} else if (level == 2) {
+				return 500000;
+			} else if (level == 3) {
+				return 1000000;
+			} else if (level == 4) {
+				return 2500000;
+			}
+		} else if (type.equalsIgnoreCase("SIZE")) {
+			if (level == 0) {
 				return 50000;
 			} else if (level == 1) {
 				return 100000;
 			} else if (level == 2) {
-				return 200000;
+				return 250000;
 			} else if (level == 3) {
 				return 500000;
 			} else if (level == 4) {
 				return 1000000;
-			}
-		} else if (type.equalsIgnoreCase("SIZE")) {
-			if (level == 0) {
-				return 10000;
-			} else if (level == 1) {
-				return 20000;
-			} else if (level == 2) {
-				return 50000;
-			} else if (level == 3) {
-				return 100000;
-			} else if (level == 4) {
-				return 250000;
 			}
 		}
 		
@@ -154,7 +154,9 @@ public class Clans extends ListenerAdapter {
 	@SuppressWarnings("unused")
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
+        if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!clan") || args[0].equalsIgnoreCase("!clans") && args.length == 1 || args.length > 1 && args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("list")) {
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {

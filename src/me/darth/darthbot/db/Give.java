@@ -20,9 +20,11 @@ public class Give extends ListenerAdapter{
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!give") || args[0].equalsIgnoreCase("!donate") || args[0].equalsIgnoreCase("!transfer") || args[0].equalsIgnoreCase("!pay")) {
-			
 			if (args.length < 3) {
 				e.getChannel().sendMessage("Invalid Syntax: `"+args[0]+" <User> <Amount>`").queue();
 				return;

@@ -48,6 +48,9 @@ public class Mute extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		EmbedBuilder eb = new EmbedBuilder().setAuthor("Mute Guide", null, e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setDescription("**Command Usage**\n"
 				+ "`!mute @User (Optional Duration) (Reason)`\n*() = Optional Argument*").addField("Permanent Mute", "`!mute @User (Reason)`", false).addField("Temporary Mute", "`!mute @User 1m test`\n**1m** = 1 minute\n"

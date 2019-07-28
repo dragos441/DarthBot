@@ -9,7 +9,9 @@ public class EditMsg extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
+        if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!editmsg") && e.getAuthor().getId().equals("159770472567799808")) {
 			e.getChannel().getMessageById(args[1]).complete().editMessage(e.getMessage().getContentRaw().replace(args[0]+" "+args[1]+" ", "")).queue();

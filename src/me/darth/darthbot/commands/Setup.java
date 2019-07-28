@@ -20,6 +20,9 @@ public class Setup extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!enable") || args[0].equalsIgnoreCase("!disable") || args[0].equalsIgnoreCase("!setup") || args[0].equalsIgnoreCase("!configure")) {
 			if (!e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {

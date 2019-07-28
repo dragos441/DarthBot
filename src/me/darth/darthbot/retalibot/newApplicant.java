@@ -15,7 +15,9 @@ public class newApplicant extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (e.getGuild().getId().equals("393499439739961366") && args[0].equalsIgnoreCase("!newapp") && e.getMember().getRoles().contains(e.getGuild().getRoleById("557702978455339009"))) {
 			if (args.length < 1 || e.getMessage().getMentionedMembers().size() == 0 || e.getMessage().getMentionedMembers().size() > 1) {

@@ -37,7 +37,9 @@ public class Slots extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!emojis") && e.getAuthor().getId().equals("159770472567799808")) {
 			e.getChannel().sendMessage(e.getGuild().getEmotes().toString()).queue();

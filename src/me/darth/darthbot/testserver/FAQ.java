@@ -19,7 +19,9 @@ public class FAQ extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-	
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		if (e.getGuild().getId().equals("568849490425937940") && e.getChannel().getId().equals("574246600570830853") && !e.getAuthor().isBot()) {
 			EmbedBuilder eb = new EmbedBuilder().setAuthor("Asked by "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator(), null, e.getAuthor().getEffectiveAvatarUrl())
 				.addField("Question", e.getMessage().getContentDisplay(), false).setColor(Color.orange).setFooter(e.getMember().getUser().getId(), null);

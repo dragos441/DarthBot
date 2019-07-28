@@ -50,6 +50,7 @@ public class AutoMod extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+		
 		if (e.getAuthor().isFake() || e.getAuthor().isBot()) {
 			return;
 		}

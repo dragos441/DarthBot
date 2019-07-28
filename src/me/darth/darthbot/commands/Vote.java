@@ -254,6 +254,9 @@ public class Vote extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+		if (e.getAuthor().isBot() && !e.getAuthor().getId().equals("159770472567799808") || e.getAuthor().isFake()) {
+			return;
+		}
 		if (!e.getGuild().getId().equals("568849490425937940") && !e.getGuild().getId().equals("545700502747349022")) {
 			return;
 		}

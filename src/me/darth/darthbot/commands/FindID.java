@@ -16,7 +16,9 @@ public class FindID extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
+        if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!findid") || args[0].equalsIgnoreCase("!getid") || args[0].equalsIgnoreCase("!id")) {
 			String target = e.getMessage().getContentStripped().replace(args[0]+" ", "");

@@ -21,6 +21,9 @@ public class ViewProfile extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!profile") || args[0].equalsIgnoreCase("!account") || args[0].equalsIgnoreCase("!p")
 			|| args[0].equalsIgnoreCase("!balance") || args[0].equalsIgnoreCase("!bal") || args[0].equalsIgnoreCase("!rank")

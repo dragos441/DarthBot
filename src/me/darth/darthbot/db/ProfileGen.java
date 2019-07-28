@@ -52,7 +52,9 @@ public class ProfileGen extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		/*if (e.getMessage().getContentRaw().contains("gen")) {
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/retali8", "root", "57d9c35a8160b5644e032d8a10d37324")) {
 

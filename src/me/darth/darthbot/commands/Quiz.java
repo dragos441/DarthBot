@@ -39,6 +39,9 @@ public class Quiz extends ListenerAdapter {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+        if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) { 
+			return;
+		}
 		if (ansmap.get(e.getGuild().getIdLong()) != null && !e.getAuthor().isBot()) {
 			if (ansmap.get(e.getGuild().getIdLong()).equalsIgnoreCase(e.getMessage().getContentRaw())) {
 				Message msg = e.getChannel().getMessageById(msgmap.get(e.getGuild().getIdLong())).complete();

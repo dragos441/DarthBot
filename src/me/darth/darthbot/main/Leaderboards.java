@@ -24,7 +24,9 @@ public class Leaderboards extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!leaderboard") || args[0].equalsIgnoreCase("!lb") || args[0].equalsIgnoreCase("!chatleaderboard") || args[0].equalsIgnoreCase("!cl")
 				|| args[0].equalsIgnoreCase("!moneyleaderboard") || args[0].equalsIgnoreCase("!ml")) {

@@ -13,6 +13,9 @@ public class GetRoles extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+		if (event.getAuthor().isBot() || event.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = event.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!rolepost") && event.getMember().getRoles().contains(event.getGuild().getRoleById("393796810918985728"))) {
 			Message msg = event.getMessage();

@@ -15,12 +15,14 @@ public class DBCommands extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!changelog") && me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser())
 				.getRoles().contains(e.getGuild().getRoleById("569463842552152094"))) {
 			e.getGuild().getRoleById("571066563055321098").getManager().setMentionable(true).queue();
-			me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("569466661644795910").sendMessage(e.getMessage().getContentDisplay().replace(args[0]+" ", "")+"\n<@&571066563055321098> *(<#569465554079842306> to get Update Notifications!)*").queue();
+			me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("569466661644795910").sendMessage(e.getMessage().getContentDisplay().replace(args[0]+" ", "")+"\n<@&602255519348162570> *(<#569465554079842306> to get Update Notifications!)*").queue();
 			e.getGuild().getRoleById("571066563055321098").getManager().setMentionable(false).queueAfter(3, TimeUnit.SECONDS);
 			e.getMessage().delete().queue();
 		}

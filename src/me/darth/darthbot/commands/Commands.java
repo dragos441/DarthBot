@@ -10,6 +10,9 @@ public class Commands extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+		if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!commands") || args[0].equalsIgnoreCase("!help") || args[0].equalsIgnoreCase("!command") || args[0].equalsIgnoreCase("!cmd") || args[0].equalsIgnoreCase("!cmds")) {
 			String def = "`!setup` - View commands to configure DarthBot\n`!clan help` View Clans commands\n`!commands` - View command categories\n`!commands Economy` - View economy commands\n"

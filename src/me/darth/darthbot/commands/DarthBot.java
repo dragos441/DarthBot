@@ -10,6 +10,9 @@ public class DarthBot extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+        if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) { 
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!darthbot")) {
 			EmbedBuilder eb = new EmbedBuilder().setAuthor("DarthBot", "https://discord.gg/hVgXYyv", me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getIconUrl())

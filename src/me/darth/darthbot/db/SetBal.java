@@ -19,7 +19,9 @@ public class SetBal extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!addall")) {
 			if (!me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getRoleById("569463842552152094"))

@@ -8,7 +8,9 @@ public class Ping extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
+        if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) { 
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().toLowerCase().split(" ");
 		if (args[0].equalsIgnoreCase("!ping")) {
 			long start = System.currentTimeMillis();

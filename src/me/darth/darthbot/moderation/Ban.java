@@ -25,6 +25,9 @@ public class Ban extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		if (e.getGuild().getId().equals("393499439739961366")) {
 			return;
 		}

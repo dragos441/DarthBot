@@ -15,6 +15,9 @@ public class Project_Natter extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (!e.getChannel().getId().equals("602116618780147712") || e.getAuthor().isBot() || e.getAuthor().isFake()) {
 			return;

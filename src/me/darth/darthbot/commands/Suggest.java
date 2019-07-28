@@ -12,7 +12,9 @@ public class Suggest extends ListenerAdapter {
 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		
+         if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!trello")) {
 			e.getChannel().sendMessage("Here is the Development Trello Board :smile:: https://trello.com/b/EndaJ5Op/DarthBot").queue();

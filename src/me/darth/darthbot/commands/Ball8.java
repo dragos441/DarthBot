@@ -12,7 +12,9 @@ public class Ball8 extends ListenerAdapter {
     //CLASS BY THE ONE AND ONLY GENGAR :)
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-       
+        if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+			return;
+		}
         String[] args = e.getMessage().getContentRaw().split(" ");
         if (args[0].equalsIgnoreCase("!8ball")) {
             if (args.length > 1) {
