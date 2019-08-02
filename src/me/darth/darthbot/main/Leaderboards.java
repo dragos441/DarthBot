@@ -63,7 +63,7 @@ public class Leaderboards extends ListenerAdapter {
 			eb.setThumbnail(g.getIconUrl());
 		} catch (NullPointerException e1) {}
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
-		      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildProfiles WHERE GuildID = "+g.getId()+" ORDER BY `Level` DESC, `xp` DESC");
+		      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildProfiles WHERE GuildID = "+g.getId()+" ORDER BY Level DESC, xp DESC");
 		      int counter = 1;
 		      while (counter <= 15 && rs.next()) {
 		    	  if (me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMemberById(rs.getLong("UserID")) != null) {

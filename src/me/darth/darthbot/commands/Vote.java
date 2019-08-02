@@ -254,10 +254,7 @@ public class Vote extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		if (e.getAuthor().isBot() && !e.getAuthor().getId().equals("159770472567799808") || e.getAuthor().isFake()) {
-			return;
-		}
-		if (!e.getGuild().getId().equals("568849490425937940") && !e.getGuild().getId().equals("545700502747349022")) {
+        if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
 			return;
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
@@ -555,9 +552,18 @@ public class Vote extends ListenerAdapter {
 					return;
 				}
 				if (e.getReactionEmote().getId().equals("574532922321797120")) {
-					votes=votes+1;
+					if (e.getMember().getRoles().contains(e.getGuild().getRoleById("582164371455606784"))) {
+						votes=votes+3;
+					} else {
+						votes=votes+1;
+					}
 				} else {
-					votes=votes-1;
+					if (e.getMember().getRoles().contains(e.getGuild().getRoleById("582164371455606784"))) {
+						votes=votes-3;
+					} else {
+						votes=votes-1;
+					}
+					
 				}
 				if (canVote(cardID, e.getMember().getUser().getIdLong())) {
 					boolean done = addVoted(cardID, e.getMember().getUser().getIdLong());

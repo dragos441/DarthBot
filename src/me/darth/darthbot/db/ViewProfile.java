@@ -70,7 +70,6 @@ public class ViewProfile extends ListenerAdapter {
 				      if (UserID == target.getUser().getIdLong()) {
 				    	  found = true;
 				    	  Member m = e.getGuild().getMemberById(UserID);
-				    	  eb.setColor(Color.green);
 				    	  eb.setAuthor(target.getEffectiveName()+"'s Profile", null, target.getUser().getEffectiveAvatarUrl());
 				    	  eb.setThumbnail(target.getUser().getEffectiveAvatarUrl());
 				    	  eb.addField("User", target.getAsMention(), true);
@@ -86,7 +85,7 @@ public class ViewProfile extends ListenerAdapter {
 								}
 				    	  }
 				    	  Collections.reverse(roles);
-				    	  if (!e.getMember().getRoles().isEmpty()) {
+				    	  if (!m.getRoles().isEmpty()) {
 				    		  eb.setColor(m.getRoles().get(0).getColorRaw());
 				    	  }
 				    	  int reqxp = (level + 1) * 100;
