@@ -42,7 +42,7 @@ public class Suggest extends ListenerAdapter {
 			String title = e.getMessage().getContentRaw();
 			if (e.getMessage().getContentRaw().contains("|")) {
 				title = e.getMessage().getContentRaw().split("\\|")[0];
-			} else if (title.length() > 50) {
+			} else if (title.length() > 100) {
 				e.getChannel().sendMessage(":no_entry: Your suggestion title is too long! Make sure to split the title and description using the `|` symbol!\n*Eg: `!suggest This is the title | This is the description`*").queue();
 				return;
 			}

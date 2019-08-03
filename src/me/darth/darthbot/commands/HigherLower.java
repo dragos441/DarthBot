@@ -101,6 +101,12 @@ public class HigherLower extends ListenerAdapter {
     				e.getChannel().sendMessage(eb.build()).queue();
     				eb.setFooter(e.getAuthor().getId(), null);
     				eb.setDescription("*Starting Bet: $*"+args[1]+"\n**Cashout Prize: $**"+args[1]+"");
+					if (me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").isMember(e.getAuthor()) && 
+							me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getAuthor()).getRoles().contains(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getRoleById("582164371455606784"))) {
+						eb.setDescription("*Starting Bet: $*"+args[1]+"\n**Cashout Prize: $**"+args[1]);					
+						} else {
+						eb.setDescription("*Starting Bet: $*"+args[1]+"\n**Cashout Prize: $**"+args[1]+"");
+					}
     				int rand = new Random().nextInt(100);
     				rand++;
     				eb.addField("Higher or Lower: ", ""+rand, false);
@@ -144,13 +150,14 @@ public class HigherLower extends ListenerAdapter {
 					num = Integer.parseInt(e.getChannel().getMessageById(e.getMessageId()).complete().getEmbeds().get(0).getFields().get(num).getValue());
 				} catch (IndexOutOfBoundsException e1) {con.close(); return;} catch (NumberFormatException e2) { con.close();return;}
 				int rand = new Random().nextInt(101);
-				/*if (bux > 10000) {
-					if (rand < 4 && new Random().nextInt(10) <= 3) {
-						rand++;
-					} else if (rand > 6 && new Random().nextInt(10) >= 7) {
-						rand--;
+				if (me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").isMember(e.getUser()) && 
+						me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getRoleById("582164371455606784"))) {
+					if (rand > 40 && rand <= 50) {
+						rand=rand-10;
+					} else if (rand >= 50 && rand < 60) {
+						rand=rand+10;
 					}
-				}*/
+				}
 				EmbedBuilder eb = new EmbedBuilder(oldeb);
 				eb.addField("Higher or Lower:", ""+rand, false);
 				if (!e.getMember().getUser().isBot()) {
@@ -189,7 +196,12 @@ public class HigherLower extends ListenerAdapter {
 					int start = Integer.parseInt(oldeb.getDescription().split("\n")[0].replace("*Starting Bet: $*", ""));
 					int cashout = Integer.parseInt(oldeb.getDescription().split("\n")[1].replace("**Cashout Prize: $**", ""));
 					cashout = cashout + Math.abs(start / 10);
-					eb.setDescription("*Starting Bet: $*"+start+"\n**Cashout Prize: $**"+cashout+"");
+					if (me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").isMember(e.getUser()) && 
+							me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getRoleById("582164371455606784"))) {
+						eb.setDescription("*Starting Bet: $*"+start+"\n**Cashout Prize: $**"+cashout);					
+						} else {
+						eb.setDescription("*Starting Bet: $*"+start+"\n**Cashout Prize: $**"+cashout+"");
+					}
 					
 				} else {
 					eb.addField("You Lose!", "You guessed wrong! Game Over!", false);
@@ -271,7 +283,12 @@ public class HigherLower extends ListenerAdapter {
 					int start = Integer.parseInt(oldeb.getDescription().split("\n")[0].replace("*Starting Bet: $*", ""));
 					int cashout = Integer.parseInt(oldeb.getDescription().split("\n")[1].replace("**Cashout Prize: $**", ""));
 					cashout = cashout + Math.abs(start / 10);
-					eb.setDescription("*Starting Bet: $*"+start+"\n**Cashout Prize: $**"+cashout+"");
+					if (me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").isMember(e.getUser()) && 
+							me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getUser()).getRoles().contains(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getRoleById("582164371455606784"))) {
+						eb.setDescription("*Starting Bet: $*"+start+"\n**Cashout Prize: $**"+cashout);					
+					} else {
+						eb.setDescription("*Starting Bet: $*"+start+"\n**Cashout Prize: $**"+cashout+"");
+					}
 					
 				} else {
 					eb.addField("You Lose!", "You guessed wrong! Game Over!\nNew Balance: $"+bux, false);

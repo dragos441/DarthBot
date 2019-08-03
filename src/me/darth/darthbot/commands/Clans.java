@@ -10,9 +10,11 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.Calendar;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
@@ -194,10 +196,39 @@ public class Clans extends ListenerAdapter {
 							return;
 						}
 					}
-					e.getChannel().sendMessage(":no_entry: You're not currently in a clan. To join one, use `!clans join <Clan>`!").queue();
+					e.getChannel().sendMessage(":no_entry: You're not currently in a clan. To join one, use `!clan join <Clan>`!").queue();
 					return;
 				} else if (args[0].equalsIgnoreCase("!clans") && args.length > 1) {
 	 				e.getChannel().sendMessage(":no_entry: The `!clans` command is just for viewing the Clan List! Did you mean `!clan`?").queue();
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("mine")) {
+					Emote stone = me.darth.darthbot.main.Main.sm.getEmoteById("607340388230889482");
+					Emote coal = me.darth.darthbot.main.Main.sm.getEmoteById("607340611929899018");
+					Emote iron = me.darth.darthbot.main.Main.sm.getEmoteById("607340627885031434");
+					Emote gold = me.darth.darthbot.main.Main.sm.getEmoteById("607340641529233409");
+					Emote diamond = me.darth.darthbot.main.Main.sm.getEmoteById("607340668871770133");
+					int max = 10000;
+					EmbedBuilder eb = new EmbedBuilder();
+					String str = "";
+					for (int x = 0 ; x < 50 ; x++) {
+						int rand = new Random().nextInt(max);
+						if (x % 10 == 0) {
+							str=str+"\n";
+						}
+						if (rand > 0 && rand < 1000) {
+							str=str+stone.getAsMention();
+						} else if (rand >= 1000 && rand < 2000) {
+							str=str+coal.getAsMention();
+						} else if (rand >= 2000 && rand < 5000) {
+							str = str+iron.getAsMention();
+						} else if (rand >= 5000 && rand < 10000) {
+							str = str+gold.getAsMention();
+						} else if (rand >= 10000) {
+							str = str+diamond.getAsMention();
+						}
+					}
+					eb.setDescription(str);
+					e.getChannel().sendMessage(eb.build()).queue();
+					
 				} else if (args[0].equalsIgnoreCase("!clan") && args[1].toLowerCase().contains("perk")) {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
 					while (rs.next()) {
@@ -238,6 +269,9 @@ public class Clans extends ListenerAdapter {
 							EmbedBuilder eb = new EmbedBuilder().setAuthor("Clan Perks", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png");
 							eb.setDescription("Bank Capacity: `$"+new DecimalFormat("#,###").format(size(rs.getInt("BankLevel"), "BANK"))+"` "+bankstring+" `UPGRADE: "+bankupgrade+"`\n"
 									+ "Clan Size: `"+new DecimalFormat("#,###").format(size(rs.getInt("SizeLevel"), "SIZE"))+"` "+sizestring+" ` UPGRADE: "+sizeupgrade+"`").setColor(Color.blue);
+							if (rs.getString("Picture") != null) {
+								eb.setAuthor("Clan Perks", null, rs.getString("Picture"));
+							}
 							int members = rs.getString("Members").split(",").length - 1;
 							String desc = "🔒";
 							String colour = "🔒";
@@ -394,7 +428,7 @@ public class Clans extends ListenerAdapter {
 							return;
 						}
 						if (args.length < 3) {
-							e.getChannel().sendMessage(":no_entry: Invalid Syntax `!clan avatar <Clan Description>`").queue();
+							e.getChannel().sendMessage(":no_entry: Invalid Syntax `!clan avatar <Image URL>`").queue();
 						} else {
 
 							try {
@@ -540,6 +574,10 @@ public class Clans extends ListenerAdapter {
 								String members = rs.getString("Members");
 								members = members.replace(","+m.getUser().getId(), "");
 								con.prepareStatement("UPDATE Clans SET Members = '"+members+"' WHERE ID = "+rs.getInt("ID")).execute();
+								
+								String officers = rs.getString("Officers");
+								officers = officers.replace(","+m.getUser().getIdLong(), "");
+								con.prepareStatement("UPDATE Clans SET Officers = '"+officers+"' WHERE ID = "+rs.getInt("ID")).execute();
 								e.getChannel().sendMessage(":white_check_mark: Successfully kicked user!").queue();
 								return;
 							}
@@ -551,6 +589,10 @@ public class Clans extends ListenerAdapter {
 					while (rs2.next()) {
 						if (rs2.getString("Members").contains(","+e.getAuthor().getId())) {
 							e.getChannel().sendMessage(":no_entry: You are already in a Clan!").queue();
+							return;
+						}
+						if (rs2.getLong("Founder") == e.getAuthor().getIdLong()) {
+							e.getChannel().sendMessage(":no_entry: You cannot join a Clan while owning one!").queue();
 							return;
 						}
 					}
@@ -587,8 +629,11 @@ public class Clans extends ListenerAdapter {
 						if (rs.getString("Members").contains(","+e.getAuthor().getId())) {
 							String members = rs.getString("Members");
 							members = members.replace(","+e.getAuthor().getIdLong(), "");
-							System.out.print(members);
 							con.prepareStatement("UPDATE Clans SET Members = '"+members+"' WHERE ID = "+rs.getInt("ID")).execute();
+							
+							String officers = rs.getString("Officers");
+							officers = officers.replace(","+e.getAuthor().getIdLong(), "");
+							con.prepareStatement("UPDATE Clans SET Officers = '"+officers+"' WHERE ID = "+rs.getInt("ID")).execute();
 							e.getChannel().sendMessage(":white_check_mark: You successfully left the Clan!").queue();
 							return;
 						}

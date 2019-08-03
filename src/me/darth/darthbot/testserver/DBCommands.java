@@ -19,10 +19,32 @@ public class DBCommands extends ListenerAdapter {
 			return;
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
+	
+		if (args[0].equalsIgnoreCase("!beta")) {
+			if (!e.getGuild().getOwner().equals(e.getMember())) {
+				e.getChannel().sendMessage(":no_entry: You are not the owner of this server! - You must execute this command on your own server!").queue();
+				return;
+			}
+			if (!me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").isMember(e.getAuthor())) {
+				e.getChannel().sendMessage(":no_entry: You are not a member of the DarthBot Discord!").queue();
+				return;
+			}
+			if (e.getGuild().getMembers().size() < 10) {
+				e.getChannel().sendMessage(":no_entry: To prevent abuse, your server must have 10 members to claim the role!").queue();
+				return;
+			}
+			if (me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getAuthor()).getRoles().contains(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getRoleById("581531284074135552"))) {
+				e.getChannel().sendMessage(":no_entry: You already have the role!").queue();
+				return;
+			}
+			me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getController().addSingleRoleToMember(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getAuthor()), 
+					me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getRoleById("581531284074135552")).queue();
+			e.getChannel().sendMessage(":white_check_mark: You have succesfully claimed your Beta Tester role! Thanks for testing DarthBot!").queue();
+		}
 		if (args[0].equalsIgnoreCase("!changelog") && me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getMember().getUser())
 				.getRoles().contains(e.getGuild().getRoleById("569463842552152094"))) {
 			e.getGuild().getRoleById("571066563055321098").getManager().setMentionable(true).queue();
-			me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("569466661644795910").sendMessage(e.getMessage().getContentDisplay().replace(args[0]+" ", "")+"\n<@&602255519348162570> *(<#569465554079842306> to get Update Notifications!)*").queue();
+			me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("569466661644795910").sendMessage(e.getMessage().getContentDisplay().replace(args[0]+" ", "")+"\n<@&571066563055321098> *(<#602255519348162570> to get Update Notifications!)*").queue();
 			e.getGuild().getRoleById("571066563055321098").getManager().setMentionable(false).queueAfter(3, TimeUnit.SECONDS);
 			e.getMessage().delete().queue();
 		}

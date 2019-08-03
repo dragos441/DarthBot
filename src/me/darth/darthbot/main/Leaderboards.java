@@ -65,45 +65,43 @@ public class Leaderboards extends ListenerAdapter {
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 		      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM GuildProfiles WHERE GuildID = "+g.getId()+" ORDER BY Level DESC, xp DESC");
 		      int counter = 1;
-		      while (counter <= 15 && rs.next()) {
-		    	  if (me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMemberById(rs.getLong("UserID")) != null) {
-			    	  String m = null;
-			    	  int level = rs.getInt("Level");
-			    	  boolean fU = true;
-			    	  try {
-			    		  m=g.getMemberById(rs.getLong("UserID")).getAsMention();
-			    	  } catch (NullPointerException e1) {
-			    		  fU=false;
-			    	  }
-			    	  
-			    	  String visual = "";
-			    	  int levelup = (level + 1) * 100;
-			    	  int xp = rs.getInt("xp");
-			    	  int xpcount = 0;
-			    	  for (int x = 1 ; x <= 5 ; x++) {
-			    		  xpcount = xpcount + ((levelup / 10) * 2);
-			    		  if (xp >= xpcount) {
-			    			  visual=visual+":white_small_square:";
-			    		  } else {
-			    			  visual=visual+":black_small_square:";
-			    		  }
-			    	  }
-			    	  
-			    	  if (fU) {
-				    	  m=g.getMemberById(rs.getLong("UserID")).getAsMention();
-				    	  if (counter == 1) {
-				    		  eb.addField("🥇 1st Place 🥇", "👑**"+m+"** at Level `"+level+"`"+visual, false);
-				    	  } else if (counter == 2) {
-				    		  eb.addField("🥈 2nd Place 🥈", "**"+m+"** at Level `"+level+"`"+visual, false);
-				    	  } else if (counter == 3) {
-				    		  eb.addField("🥉 3rd Place 🥉", "**"+m+"** at Level `"+level+"`"+visual, false);
-				    	  } else {
-				    		  eb.addField(counter+"th Place", "**"+m+"** at Level `"+level+"`"+visual, false);
-				    	  }
-				    	  counter++;
-			    	  }
+		      while (counter <= 10 && rs.next()) {
+		    	  String m = null;
+		    	  int level = rs.getInt("Level");
+		    	  boolean fU = true;
+		    	  try {
+		    		  m=g.getMemberById(rs.getLong("UserID")).getAsMention();
+		    	  } catch (NullPointerException e1) {
+		    		  fU=false;
 		    	  }
-		      }
+		    	  
+		    	  String visual = "";
+		    	  int levelup = (level + 1) * 100;
+		    	  int xp = rs.getInt("xp");
+		    	  int xpcount = 0;
+		    	  for (int x = 1 ; x <= 5 ; x++) {
+		    		  xpcount = xpcount + ((levelup / 10) * 2);
+		    		  if (xp >= xpcount) {
+		    			  visual=visual+":white_small_square:";
+		    		  } else {
+		    			  visual=visual+":black_small_square:";
+		    		  }
+		    	  }
+		    	  
+		    	  if (fU) {
+			    	  m=g.getMemberById(rs.getLong("UserID")).getAsMention();
+			    	  if (counter == 1) {
+			    		  eb.addField("🥇 1st Place 🥇", "👑**"+m+"** at Level `"+level+"`"+visual, false);
+			    	  } else if (counter == 2) {
+			    		  eb.addField("🥈 2nd Place 🥈", "**"+m+"** at Level `"+level+"`"+visual, false);
+			    	  } else if (counter == 3) {
+			    		  eb.addField("🥉 3rd Place 🥉", "**"+m+"** at Level `"+level+"`"+visual, false);
+			    	  } else {
+			    		  eb.addField(counter+"th Place", "**"+m+"** at Level `"+level+"`"+visual, false);
+			    	  }
+			    	  counter++;
+		    	  }
+	    	  }
 		      rs.close();
 		      con.close();
 		} catch (SQLException e1) {
@@ -198,8 +196,6 @@ public class Leaderboards extends ListenerAdapter {
 		    	  counter++;
 		      }
 		      lastUpdated = eb.build();
-		      me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getTextChannelById("584150264509104139")
-				.getMessageById("584150350899052558").complete().editMessage(eb.build()).queue();
 		      rs.close();
 		      con.close();
 		} catch (SQLException e1) {

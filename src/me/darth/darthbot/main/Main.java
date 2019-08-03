@@ -28,8 +28,8 @@ public class Main {
 	//public static JDA jda = null;
 	public static ShardManager sm = null;
 	public static int updatedmin = -1;
-	private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
-	//private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
+	//private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
+	private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
 	
 	public static final boolean economyEnabled = true;
 	
@@ -91,6 +91,7 @@ public class Main {
 		builder.addEventListeners(new AutoMod());
 		builder.addEventListeners(new CustomStores());
 		builder.addEventListeners(new Clans());
+		builder.addEventListeners(new Debug());
 		//builder.addEventListeners(new Project_Natter());
 		sm = builder.build();
 		me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
@@ -177,10 +178,10 @@ public class Main {
 					eb.setFooter(m.getEffectiveName()+" is the Event Coordinator on the DarthBot Discord!", "https://i.imgur.com/wN5JF1r.png");
 				}
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("589550817649098773"))) {
-					eb.setFooter(m.getEffectiveName()+" is the Feedback Manager of DarthBot!", "https://i.imgur.com/P0Fkt4t.png");
+					eb.setFooter(m.getEffectiveName()+" is the Feedback and Clans Manager of DarthBot!", "https://i.imgur.com/P0Fkt4t.png");
 				}
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("589550729593880590"))) {
-					eb.setFooter(m.getEffectiveName()+" is the Community Support Team Manager!", "https://i.imgur.com/P0Fkt4t.png");
+					eb.setFooter(m.getEffectiveName()+" is the Community Support Team Manager on the DarthBot Discord!", "https://i.imgur.com/P0Fkt4t.png");
 				}
 				if (sm.getGuildById("568849490425937940").getMember(m.getUser()).getRoles().contains(sm.getGuildById("568849490425937940").getRoleById("589550625537392643"))) {
 					eb.setFooter(m.getEffectiveName()+" is the Economy Manager of DarthBot!", "https://i.imgur.com/P0Fkt4t.png");

@@ -12,27 +12,27 @@ import java.util.Random;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Slots extends ListenerAdapter {
 
-	public String getSlot() {
-		int rand = new Random().nextInt(5) + 1;
-		if (rand == 1) {
+	public String getSlot(User m) {
+		int rand = new Random().nextInt(10) + 1;
+		if (rand == 1 || rand == 2) {
 			return ":cherries:";
-		} else if (rand == 2) {
+		} else if (rand == 3 || rand == 4) {
 			return ":apple:";
-		}  else if (rand == 3) {
+		}  else if (rand == 5 || rand == 6) {
 			return ":lemon:";
-		}  else if (rand == 4) {
+		}  else if (rand == 7 || rand == 8) {
 			return ":pineapple:";
-		}  else if (rand == 5) {
+		}  else if (rand == 9 || rand == 10) {
 			return ":watermelon:";
-		} 
-		
-		
-		return null;
+		} else {
+			return null;
+		}
 	}
 	
 	@Override
@@ -62,7 +62,6 @@ public class Slots extends ListenerAdapter {
 				e.getChannel().sendMessage(":no_entry: You must bet more than **$0**!").queue();
 				return;
 			}
-			
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			    ResultSet rs = con.createStatement().executeQuery("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getIdLong());
 			    while (rs.next()) {
@@ -74,7 +73,7 @@ public class Slots extends ListenerAdapter {
 							.setDescription("Betting: `$"+new DecimalFormat("#,###").format(tobet)+"`");
 					String slotgif = me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("599953101050609664").getAsMention();
 					
-					String[] slot = (getSlot()+","+slotgif+","+slotgif).split(",");
+					String[] slot = (getSlot(e.getAuthor())+","+slotgif+","+slotgif).split(",");
 					eb.addField("🎰 Slots 🎰",slot[0]+" "+slot[1]+" "+slot[2], false);
 					Message msg = e.getChannel().sendMessage(eb.build()).complete();
 					for (int x = 1 ; x < 3 ; x++) {
@@ -85,7 +84,7 @@ public class Slots extends ListenerAdapter {
 							e1.printStackTrace();
 						}
 						eb.getFields().clear();
-						slot[x] = getSlot();
+						slot[x] = getSlot(e.getAuthor());
 						eb.addField("🎰 Slots 🎰",slot[0]+" "+slot[1]+" "+slot[2], false);
 						if (x != 2) {
 							msg.editMessage(eb.build()).queue();
@@ -100,7 +99,7 @@ public class Slots extends ListenerAdapter {
 						newbal = rs.getLong("DBux") + winnings;
 						con.prepareStatement("UPDATE profiles SET DBux = "+newbal+" WHERE UserID = "+e.getAuthor().getId()).execute();
 						eb.addField("TRIPLE WIN", "**YOU WIN** `$"+new DecimalFormat("#,###").format(winnings)+"`", false).setColor(Color.green).setDescription("Starting Bet: `$"+
-								new DecimalFormat("#,###").format(tobet)+"`\nNew Balance: `$"+new DecimalFormat("#,###").format(totalwin)+"`");
+								new DecimalFormat("#,###").format(tobet)+"`\nNew Balance: `$"+new DecimalFormat("#,###").format(newbal)+"`");
 					} else if (slot[0].equals(slot[1]) || slot[0].equals(slot[2]) || slot[1].equals(slot[2])) {
 						int winnings = tobet;
 						int totalwin = winnings + tobet;

@@ -36,7 +36,7 @@ public class Setup extends ListenerAdapter {
 							+ "`!enable ActionLog <Channel>` Setup the action log channel to log all notable events on the server\n"
 							+ "`!enable Moderation <Role>` Setup the role that can use Punishment Commands (Ban, Mute, Kick etc)\n"
 							+ "`!enable PublicRooms <Category>` Setup the Category that will have automatic public rooms\n"
-							+ "`!enable Experience` Enabled the Level/Experience Feature `Enabled by default`\n"
+							+ "`!enable Experience` Enables the Level/Experience Feature `Enabled by default`\n"
 							+ "`!enable ChatLeaderboard` Generates a Leaderboard that automatically updates every 5 minutes of the most active members\n"
 							+ "`!levelrewards` Add level rewards for when users reach specific chat levels!\n"
 							+ "`!automod` Setup automatic moderation actions", false);

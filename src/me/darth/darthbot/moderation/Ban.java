@@ -215,7 +215,7 @@ public class Ban extends ListenerAdapter {
 		  			}
 	  				PreparedStatement ps = con.prepareStatement("INSERT INTO ModHistory (Timestamp, GuildID, PunishedID, PunisherID, Type, Reason, Expires, Active)  values "
 				      		+ "("+System.currentTimeMillis()+", "+e.getGuild().getIdLong()+", "+target.getUser().getIdLong()+", "+e.getAuthor().getIdLong()
-				      		+ ", '"+type+"', , "+expires+", 1)");
+				      		+ ", '"+type+"', ?, "+expires+", 1)");
 	  				ps.setString(1, reason);
 	  				ps.execute();
 		          	e.getChannel().sendMessage(eb.build()).queue();

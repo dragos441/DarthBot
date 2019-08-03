@@ -36,7 +36,7 @@ public class Commands extends ListenerAdapter {
 				eb.setDescription("`!warn <User> (Reason)` Issues a user with a warning\n"
 						+ "`!mute <User> (Time) (Reason)` Mutes a user from speaking with an optional duration\n"
 						+ "`!kick <User> (Reason)` Kicks the user from the server\n"
-						+ "`!ban <User< (Time) (Reason)` Bans the user from the server with an optional duration\n"
+						+ "`!ban <User> (Time) (Reason)` Bans the user from the server with an optional duration\n"
 						+ "`!purge <1-99>` Purge an amount of messages from chat\n"
 						+ "`!lock` Locks the current channel from people without a permission override from speaking\n"
 						+ "`!unlock` Unlocks the current channel\n"
@@ -44,7 +44,7 @@ public class Commands extends ListenerAdapter {
 				eb.setFooter("<> means an argument is required - () means an argument is optional", null) ;
 				e.getChannel().sendMessage(eb.build()).queue();
 			} else if (args[1].equalsIgnoreCase("music")) {
-				eb.setDescription("`!play <Song Name / YouTube URL` Plays a song from YouTube\n"
+				eb.setDescription("`!play <Song Name / YouTube URL>` Plays a song from YouTube\n"
 						+ "`!pause` Pauses the current song\n"
 						+ "`!stop` Stops the current song from playing\n"
 						+ "`!queue` Displays the current song queue\n"
@@ -59,7 +59,7 @@ public class Commands extends ListenerAdapter {
 						+ "`!trello` Displays the Development Trello\n"
 						+ "`!search <Text>` Searches the development trello for an existing suggestion/bug\n"
 						+ "`!suggest <Title | Description>` Suggests an idea for improving the bot\n"
-						+ "`!reportbug <Title | Description` Reports a bug regarding the bot\n"
+						+ "`!reportbug <Title | Description>` Reports a bug regarding the bot\n"
 						+ "`info` Displays information about the server\n"
 						+ "`!whois <User>` Displays information about a user\n"
 						+ "`!getid <Category/Emote/Member/Role/Channel` Gets the ID code for an object\n"

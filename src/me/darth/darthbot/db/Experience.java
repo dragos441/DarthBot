@@ -37,6 +37,15 @@ public class Experience extends ListenerAdapter {
 				if (UserID == e.getMember().getUser().getIdLong() && GuildID == e.getGuild().getIdLong() && e.getMessage().toString().toCharArray()[0] != '!') {
 					long newxp = new Random().nextInt((12 - 8) + 1) + 12;
 					long reqxp = (level + 1) * 100;
+					if (new Date().getMinutes() != lastearned) {
+						lastearned = new Date().getMinutes();
+						xp = xp + newxp;
+						con.prepareStatement("UPDATE GuildProfiles SET xp = "+xp+", xpGained = "+lastearned+", Level = "+level+" WHERE UserID = "+e.getMember().getUser().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong()).execute();
+						ResultSet rewards = con.createStatement().executeQuery("SELECT * FROM RoleRewards WHERE GuildID = "+e.getGuild().getId()+" AND Level = "+level);
+						while (rewards.next()) {
+							e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(rewards.getLong("RoleID"))).queue();
+						}
+				    }
 					if (xp >= reqxp) {
 					    int prevlevel = level;
 					    level++;
@@ -44,16 +53,6 @@ public class Experience extends ListenerAdapter {
 				    	con.prepareStatement("UPDATE GuildProfiles SET Level = "+level+", xp = 0 WHERE UserID = "+e.getMember().getUser().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong()).execute();
 						e.getChannel().sendMessage("Congrats "+e.getMember().getAsMention()+", you advanced from **Level "+prevlevel+"** :arrow_right: **Level "+level+"**!").complete().delete().queueAfter(2, TimeUnit.MINUTES);
 					}
-					if (new Date().getMinutes() != lastearned) {
-				    	  lastearned = new Date().getMinutes();
-				    	  xp = xp + newxp;
-				    	  con.prepareStatement("UPDATE GuildProfiles SET xp = "+xp+", xpGained = "+lastearned+", Level = "+level+" WHERE UserID = "+e.getMember().getUser().getIdLong()+" AND GuildID = "+e.getGuild().getIdLong()).execute();
-				    	  ResultSet rewards = con.createStatement().executeQuery("SELECT * FROM RoleRewards WHERE GuildID = "+e.getGuild().getId()+" AND Level = "+level);
-				    	  while (rewards.next()) {
-				    		  e.getGuild().getController().addSingleRoleToMember(e.getMember(), e.getGuild().getRoleById(rewards.getLong("RoleID"))).queue();
-				    		  
-				    	  }
-				     }
 				}
 		     }
 		      
