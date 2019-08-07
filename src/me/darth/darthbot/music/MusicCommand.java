@@ -34,7 +34,7 @@ public class MusicCommand extends ListenerAdapter {
 	public static String ytsearch(String search, TextChannel channel) {
 		URL url;
 		try {
-			url = new URL("https://www.googleapis.com/youtube/v3/search?part=snippet&q="+URLEncoder.encode(search)+"&key=AIzaSyBG13lW2pi41WjHORZNdFxMELhgEBBE0Fk");
+			url = new URL("https://www.googleapis.com/youtube/v3/search?part=snippet&q="+URLEncoder.encode(search)+"&key=AIzaSyDAbQY_-imhgeZalTwxSB7HE1hafbYRFRQ");
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));

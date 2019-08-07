@@ -9,9 +9,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Emote;
@@ -23,10 +28,17 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.core.requests.Route.Emotes;
 
 public class Clans extends ListenerAdapter {
 	
-	final static int season = 2;
+	final static int season = 3;
+	
+	public static int stoneunlock = 0;
+	public static int coalunlock = 500;
+	public static int ironunlock = 2000;
+	public static int goldunlock = 5000;
+	public static int diamondunlock = 10000;
 	
 	public static int size(int level, String type) {
 		if (type.equalsIgnoreCase("BANK")) {
@@ -92,6 +104,84 @@ public class Clans extends ListenerAdapter {
 		return -1;
 	}
 	
+	public MessageEmbed clanMine(Member m, int clanID) {
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+			ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE ID = "+clanID);
+			while (rs.next()) {
+				Emote stone = me.darth.darthbot.main.Main.sm.getEmoteById("607340388230889482");
+				Emote coal = me.darth.darthbot.main.Main.sm.getEmoteById("607340611929899018");
+				Emote iron = me.darth.darthbot.main.Main.sm.getEmoteById("607340627885031434");
+				Emote gold = me.darth.darthbot.main.Main.sm.getEmoteById("607340641529233409");
+				Emote diamond = me.darth.darthbot.main.Main.sm.getEmoteById("607340668871770133");
+				Emote autominer = me.darth.darthbot.main.Main.sm.getEmoteById("607558852728324097");
+				int max = rs.getInt("Mine");
+				EmbedBuilder eb = new EmbedBuilder().setAuthor(rs.getString("Name")+"'s Mine", null, "http://www.blocksandgold.com//media/catalog/product/cache/3/image/200x/6cffa5908a86143a54dc6ad9b8a7c38e/i/r/ironpickaxe_icon32.png").setColor(Color.black)
+					.addField("Mine Depth", "`"+new DecimalFormat("#,###").format(max)+"` blocks!", true)
+					.addField("To Mine", "Type `!clan work` to mine some resources!", true);
+				if (max == 0) {
+					max++;
+				}
+				if (rs.getString("Picture") != null) {
+					eb.setAuthor(rs.getString("Name")+"'s Mine", null, rs.getString("Picture"));
+				}
+				String stoneemoji = ":no_entry:";
+				String coalemoji = ":no_entry:";
+				String ironemoji = ":no_entry:";
+				String goldemoji = ":no_entry:";
+				String diamondemoji = ":no_entry:";
+				if (max >= stoneunlock) {
+					stoneemoji = ":white_check_mark:";
+					eb.setColor(Color.DARK_GRAY);
+				}
+				if (max >= coalunlock) {
+					coalemoji = ":white_check_mark:";
+					eb.setColor(Color.black);
+				
+				}
+				if (max >= ironunlock) {
+					ironemoji = ":white_check_mark:";
+					eb.setColor(Color.gray);
+				}
+				if (max >= goldunlock) {
+					goldemoji = ":white_check_mark:";
+					eb.setColor(Color.yellow);
+				}
+				if (max >= diamondunlock) {
+					diamondemoji = ":white_check_mark:";
+					eb.setColor(85242255);
+				}
+				eb.addField("Materials", stone.getAsMention()+"Stone *at depth `"+new DecimalFormat("#,###").format(stoneunlock)+"`* "+stoneemoji+"\n"
+						+ coal.getAsMention()+"Coal *at depth `"+new DecimalFormat("#,###").format(coalunlock)+"`* "+coalemoji+"\n"
+								+ iron.getAsMention()+"Iron *at depth `"+new DecimalFormat("#,###").format(ironunlock)+"`* "+ironemoji+"\n"
+										+ gold.getAsMention()+"Gold *at depth `"+new DecimalFormat("#,###").format(goldunlock)+"`* "+goldemoji+"\n"
+												+ diamond.getAsMention()+"Diamond *at depth `"+new DecimalFormat("#,###").format(diamondunlock)+"`* "+diamondemoji, true);
+				//eb.addField("Auto Miner", autominer.getAsMention()+"`0` blocks per hour\nUpgrade: `$0`", true);
+				eb.addField("Auto Miner", autominer.getAsMention()+" ***Coming Soon!***", true); //coming soon
+				String str = "";
+				for (int x = 0 ; x < 60 ; x++) {
+					int rand = new Random().nextInt(max);
+					if (x % 15 == 0) {
+						str=str+"\n";
+					}
+					if (rand >= stoneunlock && rand < coalunlock) {
+						str=str+stone.getAsMention();
+					} else if (rand >= coalunlock && rand < ironunlock) {
+						str=str+coal.getAsMention();
+					} else if (rand >= ironunlock && rand < goldunlock) {
+						str = str+iron.getAsMention();
+					} else if (rand >= goldunlock && rand < diamondunlock) {
+						str = str+gold.getAsMention();
+					} else if (rand >= diamondunlock) {
+						str = str+diamond.getAsMention();
+					}
+				}
+				eb.setDescription(str);
+				return eb.build();
+			}
+		} catch (SQLException e1) {}
+		return null;
+	}
+	
 	public static MessageEmbed viewClan(String clanID, User bot) {
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 			ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
@@ -134,7 +224,7 @@ public class Clans extends ListenerAdapter {
 						} else {
 							eb.addField("Officers", officers, true);
 						}
-						eb.addField("Join Status", rs.getString("Status"), true);
+						eb.addField("Clan Stats", "Join Status: **"+rs.getString("Status")+"**\nMine Depth: `"+new DecimalFormat("#,###").format(rs.getInt("Mine"))+"`", true);
 						String desc = "**Founder:** "+founder.getAsMention();
 						if (rs.getString("Description") != null) {
 							desc=desc+"\nDescription: "+rs.getString("Description");
@@ -166,12 +256,14 @@ public class Clans extends ListenerAdapter {
 						.setColor(Color.blue);
 				help.setDescription("**General Commands**\n"
 						+ "`!clan` View the Clan that you're in\n"
+						+ "`!clans` View all clans\n"
 						+ "`!clan create <Name>` Create a clan `$100k`\n"
 						+ "`!clan join <Name/ID>` Joins a clan\n"
 						+ "`!clan leave` Leaves a clan\n"
 						+ "`!clan deposit <Amount>` Deposit an amount to your Clan Bank\n"
 						+ "`!clan withdraw <Amount>` Withdraw an amount to your Clan Bank `[OFFICER]`\n"
-						+ "`!clans` View all clans\n"
+						+ ":new:`!clan mine (Clan)` View your own or other Clans mines\n"
+						+ ":new:`!clan work` Work in your Clans mine\n"
 						+ "\n**Management**\n"
 						+ "`!clan open` Opens the clan to the public\n"
 						+ "`!clan close` Closes the clan (invite only)\n"
@@ -180,12 +272,12 @@ public class Clans extends ListenerAdapter {
 						+ "`!clan demote <User>` Demotes a member from Officer\n"
 						+ "`!clan kick <User>` Kicks a user from the Clan\n"
 						+ "`!clan perks` View a list of your Clans perks\n"
-						+ ":new:`!clan rename <Name>` Change your Clans name\n"
-						+ ":new:`!clan disband` Delete the Clan you own\n"
-						+ ":new:`!clan upgrade <BANK/SIZE>` Upgrades an aspect of your Clan\n"
-						+ ":new:`!clan description <Description>` Set a description for the Clan `2+ MEMBERS`\n"
-						+ ":new:`!clan colour <Colour>` Set a colour for your Clan `5+ MEMBERS`\n"
-						+ ":new:`!clan avatar <URL>` Set an avatar for your Clan `10+ MEMBERS`");
+						+ "`!clan rename <Name>` Change your Clans name\n"
+						+ "`!clan disband` Delete the Clan you own\n"
+						+ "`!clan upgrade <BANK/SIZE>` Upgrades an aspect of your Clan\n"
+						+ "`!clan description <Description>` Set a description for the Clan `2+ MEMBERS`\n"
+						+ "`!clan colour <Colour>` Set a colour for your Clan `5+ MEMBERS`\n"
+						+ "`!clan avatar <URL>` Set an avatar for your Clan `10+ MEMBERS`");
 				if (args[0].equalsIgnoreCase("!clan") && args.length == 1) {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
 					while (rs.next()) {
@@ -200,35 +292,114 @@ public class Clans extends ListenerAdapter {
 					return;
 				} else if (args[0].equalsIgnoreCase("!clans") && args.length > 1) {
 	 				e.getChannel().sendMessage(":no_entry: The `!clans` command is just for viewing the Clan List! Did you mean `!clan`?").queue();
-				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("mine")) {
-					Emote stone = me.darth.darthbot.main.Main.sm.getEmoteById("607340388230889482");
-					Emote coal = me.darth.darthbot.main.Main.sm.getEmoteById("607340611929899018");
-					Emote iron = me.darth.darthbot.main.Main.sm.getEmoteById("607340627885031434");
-					Emote gold = me.darth.darthbot.main.Main.sm.getEmoteById("607340641529233409");
-					Emote diamond = me.darth.darthbot.main.Main.sm.getEmoteById("607340668871770133");
-					int max = 10000;
-					EmbedBuilder eb = new EmbedBuilder();
-					String str = "";
-					for (int x = 0 ; x < 50 ; x++) {
-						int rand = new Random().nextInt(max);
-						if (x % 10 == 0) {
-							str=str+"\n";
-						}
-						if (rand > 0 && rand < 1000) {
-							str=str+stone.getAsMention();
-						} else if (rand >= 1000 && rand < 2000) {
-							str=str+coal.getAsMention();
-						} else if (rand >= 2000 && rand < 5000) {
-							str = str+iron.getAsMention();
-						} else if (rand >= 5000 && rand < 10000) {
-							str = str+gold.getAsMention();
-						} else if (rand >= 10000) {
-							str = str+diamond.getAsMention();
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("work")) {
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
+					while (rs.next()) {
+						if (rs.getString("Members").contains(","+e.getAuthor().getIdLong())) {
+							ResultSet profile = con.prepareStatement("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getId()).executeQuery();
+							while (profile.next()) {
+								if (profile.getLong("Mine") != 0L) {
+									Calendar cal = Calendar.getInstance();
+									cal.setTimeInMillis(profile.getLong("Mine"));
+									cal.add(Calendar.MINUTE, 1);
+									if (cal.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
+										long secs = ChronoUnit.SECONDS.between(Calendar.getInstance().toInstant(), cal.toInstant());
+										e.getChannel().sendMessage("You're tired after that hard work and must rest! You're able to mine again in **"+secs+"** seconds!").queue();
+										return;
+									}
+								}	
+							}
+							Emote stone = me.darth.darthbot.main.Main.sm.getEmoteById("607340388230889482");
+							Emote coal = me.darth.darthbot.main.Main.sm.getEmoteById("607340611929899018");
+							Emote iron = me.darth.darthbot.main.Main.sm.getEmoteById("607340627885031434");
+							Emote gold = me.darth.darthbot.main.Main.sm.getEmoteById("607340641529233409");
+							Emote diamond = me.darth.darthbot.main.Main.sm.getEmoteById("607340668871770133");
+							Emote autominer = me.darth.darthbot.main.Main.sm.getEmoteById("607558852728324097");
+							Emote pickaxe = me.darth.darthbot.main.Main.sm.getEmoteById("607670699250942001");
+							EmbedBuilder eb = new EmbedBuilder().setAuthor("Working in the Mine", null, "http://www.blocksandgold.com//media/catalog/product/cache/3/image/200x/6cffa5908a86143a54dc6ad9b8a7c38e/i/r/ironpickaxe_icon32.png");
+							eb.setColor(Color.yellow).setFooter("Type | !clan mine | to view an overview of your Clan mine", null);
+							eb.setDescription(pickaxe.getAsMention()+"You enter the mine and begin digging...");
+							if (rs.getString("Picture") != null) {
+								eb.setAuthor(rs.getString("Name")+"'s Mine", null, rs.getString("Picture"));
+							}
+							Message msg = e.getChannel().sendMessage(eb.build()).complete();
+							int max = rs.getInt("Mine");
+							String str = "";
+							int stonec = 0;
+							int coalc = 0;
+							int ironc = 0;
+							int goldc = 0;
+							int diamondc = 0;
+							int earnings = 0;
+							for (int x = 0 ; x < 10 ; x++) {
+								if (max == 0) {
+									max++;
+								}
+								int rand = new Random().nextInt(max);
+								if (rand >= stoneunlock && rand < coalunlock) {
+									stonec++;
+									earnings=earnings+1;
+								} else if (rand >= coalunlock && rand < ironunlock) {
+									coalc++;
+									earnings=earnings+2;
+								} else if (rand >= ironunlock && rand < goldunlock) {
+									ironc++;
+									earnings=earnings+5;
+								} else if (rand >= goldunlock && rand < diamondunlock) {
+									goldc++;
+									earnings=earnings+10;
+								} else if (rand >= diamondunlock) {
+									diamondc++;
+									earnings=earnings+20;
+								}
+							}
+							long clanbal = rs.getLong("Bank") + earnings;
+							eb.addField("You Return With:", stone.getAsMention()+"Stone: **x"+stonec+"**\n"
+									+ coal.getAsMention()+"Coal: **x"+coalc+"**\n"
+											+ iron.getAsMention()+"Iron: **x"+ironc+"**\n"
+													+ gold.getAsMention()+"Gold: **x"+goldc+"**\n"
+														+ diamond.getAsMention()+"Diamond: **x"+diamondc+"**\n"
+																+ "**Total Earnings: `$"+earnings+"`**\n**New Clan Balance: `$"
+															+new DecimalFormat("#,###").format(clanbal)+"`**", true);
+							if (clanbal > size(rs.getInt("BankLevel"), "BANK")) {
+								eb.addField("❗Bank Full❗", "Money couldn't be deposited into your clan bank as it's full! Consider upgrading it through `!clan perks`", true);
+							} else {
+								con.prepareStatement("UPDATE Clans SET Bank = "+clanbal+" WHERE ID = "+rs.getInt("ID")).execute();
+							}
+							con.prepareStatement("UPDATE profiles SET Mine = "+Calendar.getInstance().getTimeInMillis()+" WHERE UserID = "+e.getAuthor().getId()).execute();
+							con.prepareStatement("UPDATE Clans SET Mine = Mine + 1 WHERE ID = "+rs.getInt("ID")).execute();
+							ScheduledExecutorService executorService
+						      = Executors.newSingleThreadScheduledExecutor();
+							ScheduledFuture<?> scheduledFuture = executorService.schedule(() -> {
+								msg.editMessage(eb.build()).queue();
+						    }, 5, TimeUnit.SECONDS);
+							return;
 						}
 					}
-					eb.setDescription(str);
-					e.getChannel().sendMessage(eb.build()).queue();
-					
+					e.getChannel().sendMessage(":no_entry: You are not in a Clan!").queue();
+				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("mine")) {
+					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
+					if (args.length < 3) {
+						while (rs.next()) {
+							if (rs.getString("Members").contains(","+e.getAuthor().getId())) {
+								e.getChannel().sendMessage(clanMine(e.getMember(), rs.getInt("ID"))).queue();
+								return;
+							}
+						}
+					} else {
+						while (rs.next()) {
+							String clanID = e.getMessage().getContentRaw().replace(args[0]+" "+args[1]+" ", "");
+							try {
+								if (rs.getString("Name").equalsIgnoreCase(clanID) || rs.getInt("ID") == Integer.parseInt(clanID)) {
+									e.getChannel().sendMessage(clanMine(e.getMember(), rs.getInt("ID"))).queue();
+									return;
+								}
+							} catch (NumberFormatException e1) {}
+						}
+						e.getChannel().sendMessage(":no_entry: That Clan couldn't be found! Please ensure the name/ID is exact!").queue();
+						return;
+					}
+					e.getChannel().sendMessage(":no_entry: You are not in a Clan!").queue();
 				} else if (args[0].equalsIgnoreCase("!clan") && args[1].toLowerCase().contains("perk")) {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
 					while (rs.next()) {
@@ -367,7 +538,9 @@ public class Clans extends ListenerAdapter {
 							}
 							
 						}
+						return;
 					}
+					e.getChannel().sendMessage(":no_entry: You are not in a Clan!").queue();
 				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("desc") || args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("description")) {
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans WHERE Founder = "+e.getAuthor().getId());
 					while (rs.next()) {
@@ -585,6 +758,7 @@ public class Clans extends ListenerAdapter {
 					}
 					e.getChannel().sendMessage(":no_entry: You do not own a clan!").queue();
 				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("join")) {
+					long aicf = 0L;
 					ResultSet rs2 = con.createStatement().executeQuery("SELECT * FROM Clans");
 					while (rs2.next()) {
 						if (rs2.getString("Members").contains(","+e.getAuthor().getId())) {
@@ -593,7 +767,7 @@ public class Clans extends ListenerAdapter {
 						}
 						if (rs2.getLong("Founder") == e.getAuthor().getIdLong()) {
 							e.getChannel().sendMessage(":no_entry: You cannot join a Clan while owning one!").queue();
-							return;
+							aicf=rs2.getLong("Founder");
 						}
 					}
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
@@ -604,7 +778,10 @@ public class Clans extends ListenerAdapter {
 								invites = "";
 							}
 							if (e.getMessage().getContentRaw().replace(args[0]+" "+args[1]+" ", "").equalsIgnoreCase(rs.getString("Name")) || Integer.parseInt(args[2]) == rs.getInt("ID")) {
-								if (rs.getString("Status").equals("CLOSED") && !invites.contains(","+e.getAuthor().getId()) && rs.getLong("Founder") != e.getAuthor().getIdLong()) {
+								if (aicf != 0L && aicf != e.getAuthor().getIdLong()) {
+									e.getChannel().sendMessage(":no_entry: You cannot join a Clan while owning one!").queue();
+									return;
+								} else if (rs.getString("Status").equals("CLOSED") && !invites.contains(","+e.getAuthor().getId()) && rs.getLong("Founder") != e.getAuthor().getIdLong()) {
 									e.getChannel().sendMessage(":no_entry: That clan is invite only!").queue();
 									return;
 								} else {

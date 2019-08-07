@@ -12,6 +12,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -151,6 +154,8 @@ public class Rob extends ListenerAdapter {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				ScheduledExecutorService executorService
+			      = Executors.newSingleThreadScheduledExecutor();
 				//e.getChannel().sendMessage("`DEBUG` "+robchance+" - "+randint+" odds").queue();
 				int policechance = new Random().nextInt(10) + 1;
 				if (policechance == 1) {
@@ -168,7 +173,10 @@ public class Rob extends ListenerAdapter {
 						robbery.addField("🚓 You were caught!", "The Police caught you robbing "+target.getEffectiveName()+", and you bribe the officers **$"+new DecimalFormat("#,###").format(rand)+"** to stay out of jail!", false);
 						robbery.setColor(Color.blue);
 						long newbux = bux - rand;
-						msg.editMessage(robbery.build()).queue();
+						ScheduledFuture<?> scheduledFuture = executorService.schedule(() -> {
+							//
+							msg.editMessage(robbery.build()).queue();
+						}, 1, TimeUnit.SECONDS);
 						con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+e.getAuthor().getId()).execute();
 						con.close();
 						return;
@@ -185,7 +193,9 @@ public class Rob extends ListenerAdapter {
 						long newbux = victim.getLong("DBux") - rand;
 						robbery.addField(target.getEffectiveName()+" surrenders", "And hands over **$"+new DecimalFormat("#,###").format(rand)+"**. You drop your weapon and run!", false);
 						robbery.setColor(Color.green);
-						msg.editMessage(robbery.build()).queue();
+						ScheduledFuture<?> scheduledFuture = executorService.schedule(() -> {
+							msg.editMessage(robbery.build()).queue();
+					    }, 1, TimeUnit.SECONDS);
 						con.prepareStatement("UPDATE profiles SET DBux = "+newbux+" WHERE UserID = "+target.getUser().getId()).execute();
 						EmbedBuilder log = new EmbedBuilder().setAuthor(e.getMember().getEffectiveName()+" robbed "+target.getEffectiveName(), null, e.getAuthor().getEffectiveAvatarUrl()).setTimestamp(Instant.from(ZonedDateTime.now()));
 	    				log.setDescription(e.getMember().getAsMention()+" robbed "+target.getEffectiveName()+" for a total of **$"+rand+"**").setColor(Color.green)
@@ -204,7 +214,10 @@ public class Rob extends ListenerAdapter {
 				} else {
 					robbery.addField(target.getEffectiveName()+" escapes", "You drop your weapon, and walk away a failure!", false);
 					robbery.setColor(Color.red);
-					msg.editMessage(robbery.build()).queue();
+					ScheduledFuture<?> scheduledFuture = executorService.schedule(() -> {
+						msg.editMessage(robbery.build()).queue();
+				    }, 1, TimeUnit.SECONDS);
+					
 					
 				}
 				robstring = robstring.replaceFirst(","+foundWeapon, "");
@@ -214,7 +227,11 @@ public class Rob extends ListenerAdapter {
 					if (rand == 1) {
 						victimstring = victimstring.replaceFirst(","+foundDefense, "");
 						robbery.setTitle(target.getEffectiveName()+" dropped their **"+dname+"**!", null);
-						msg.editMessage(robbery.build()).queue();
+						con.prepareStatement("UPDATE profiles SET inventory = '"+victimstring+"' WHERE UserID = "+target.getUser().getId()).execute();
+						ScheduledFuture<?> scheduledFuture = executorService.schedule(() -> {
+							msg.editMessage(robbery.build()).queue();
+					    }, 1, TimeUnit.SECONDS);
+						
 					}
 				}
 				con.prepareStatement("UPDATE profiles SET Robbed = "+Calendar.getInstance().getTimeInMillis()+" WHERE UserID = "+e.getAuthor().getId()).execute();

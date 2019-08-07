@@ -15,7 +15,8 @@ public class Commands extends ListenerAdapter {
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		if (args[0].equalsIgnoreCase("!commands") || args[0].equalsIgnoreCase("!help") || args[0].equalsIgnoreCase("!command") || args[0].equalsIgnoreCase("!cmd") || args[0].equalsIgnoreCase("!cmds")) {
-			String def = "`!setup` - View commands to configure DarthBot\n`!clan help` View Clans commands\n`!commands` - View command categories\n`!commands Economy` - View economy commands\n"
+			String def = "`!setup` - View commands to configure DarthBot\n`!clan help` View Clans commands\n`!customstores` View all custom store commands\n"
+					+ "`!commands` - View command categories\n`!commands Economy` - View economy commands\n"
 					+ "`!commands Moderation` - View moderation commands\n`!commands Music` - View music commands\n`!commands Misc` - View miscellaneous commands";
 			EmbedBuilder eb = new EmbedBuilder().setAuthor("Commands", null, e.getGuild().getIconUrl()).setColor(Color.blue);
 			if (!e.getGuild().getId().equals("568849490425937940")) {

@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -104,17 +107,14 @@ public class Lock extends ListenerAdapter {
 				        	return;
 				        }
 			        } catch (NullPointerException e1) {}
-			        e.getChannel().getPermissionOverride(e.getGuild().getPublicRole()).getManager().grant(Permission.MESSAGE_WRITE).queue();
-			        try {
-						Thread.sleep(100);
-					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-			        String reason = "No Reason Provided";
         			EmbedBuilder eb = new EmbedBuilder().setAuthor("Channel Unlocked", null, e.getGuild().getIconUrl()).setDescription("This channel has been unlocked")
         					.addField("Unlocked By", e.getMember().getAsMention(), false).setColor(Color.green);
-        			e.getChannel().sendMessage(eb.build()).queue();
+			        e.getChannel().getPermissionOverride(e.getGuild().getPublicRole()).getManager().grant(Permission.MESSAGE_WRITE).queue();
+					ScheduledExecutorService executorService
+				      = Executors.newSingleThreadScheduledExecutor();
+					ScheduledFuture<?> scheduledFuture = executorService.schedule(() -> {
+	        			e.getChannel().sendMessage(eb.build()).queue();
+				    }, 1, TimeUnit.SECONDS);
 			      }
 		          e.getMessage().delete().queue();
 			      rs.close();

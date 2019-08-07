@@ -9,9 +9,14 @@ import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -36,7 +41,7 @@ public class Slots extends ListenerAdapter {
 	}
 	
 	@Override
-	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+	public synchronized void onGuildMessageReceived(GuildMessageReceivedEvent e) {
          if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
 			return;
 		}
@@ -76,20 +81,22 @@ public class Slots extends ListenerAdapter {
 					String[] slot = (getSlot(e.getAuthor())+","+slotgif+","+slotgif).split(",");
 					eb.addField("🎰 Slots 🎰",slot[0]+" "+slot[1]+" "+slot[2], false);
 					Message msg = e.getChannel().sendMessage(eb.build()).complete();
+					MessageEmbed u2a = null;
 					for (int x = 1 ; x < 3 ; x++) {
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
+
 						eb.getFields().clear();
 						slot[x] = getSlot(e.getAuthor());
 						eb.addField("🎰 Slots 🎰",slot[0]+" "+slot[1]+" "+slot[2], false);
 						if (x != 2) {
-							msg.editMessage(eb.build()).queue();
+							u2a=eb.build();
 						}
 					}
+					final MessageEmbed u2 = u2a;
+					ScheduledExecutorService executorService
+				      = Executors.newSingleThreadScheduledExecutor();
+					ScheduledFuture<?> scheduledFuture = executorService.schedule(() -> {
+						msg.editMessage(u2).queue();
+				    }, 1, TimeUnit.SECONDS);
 					long newbal = -1;
 					boolean log = false;
 					if (slot[0].equals(slot[1]) && slot[1].equals(slot[2]) && slot[0].equals(slot[2])) {
@@ -114,13 +121,17 @@ public class Slots extends ListenerAdapter {
 						eb.setColor(Color.red).setDescription("Lost: `$"+new DecimalFormat("#,###").format(tobet)+"`\nNew Balance: `$"
 								+new DecimalFormat("#,###").format(newbal)+"`");
 					}
-					msg.editMessage(eb.build()).queue();
-					if (log) {
-						eb.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl());
-						eb.addField("User Details", e.getMember().getAsMention()+" ("+e.getMember().getUser().toString()+")", false).setTimestamp(Instant.from(ZonedDateTime.now()));
-						
-						me.darth.darthbot.main.Main.sm.getTextChannelById("590156048002711552").sendMessage(eb.build()).queue();
-					}
+					final MessageEmbed u3 = eb.build();
+					final boolean logf = log;
+					ScheduledFuture<?> scheduledFuture2 = executorService.schedule(() -> {
+						msg.editMessage(u3).queue();
+						if (logf) {
+							eb.setFooter(e.getGuild().toString(), e.getGuild().getIconUrl());
+							eb.addField("User Details", e.getMember().getAsMention()+" ("+e.getMember().getUser().toString()+")", false).setTimestamp(Instant.from(ZonedDateTime.now()));
+							
+							me.darth.darthbot.main.Main.sm.getTextChannelById("590156048002711552").sendMessage(eb.build()).queue();
+						}
+				    }, 2, TimeUnit.SECONDS);
 			    }
 			} catch (SQLException e1) {e1.printStackTrace();}
 		}

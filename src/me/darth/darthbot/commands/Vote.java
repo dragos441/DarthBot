@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.client.methods.HttpPut;
@@ -384,21 +387,18 @@ public class Vote extends ListenerAdapter {
 					}
 				
 					Message msg = e.getChannel().sendMessage(eb.build()).complete();
-					msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532922321797120")).queue();
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532942437810177")).queue();
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					msg.addReaction("❗").queue();
+					ScheduledExecutorService executorService
+				      = Executors.newSingleThreadScheduledExecutor();
+					ScheduledFuture<?> scheduledFuture = executorService.schedule(() -> {
+						msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532922321797120")).queue();
+				    }, 100, TimeUnit.MILLISECONDS);
+					ScheduledFuture<?> scheduledFuture2 = executorService.schedule(() -> {
+						msg.addReaction(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getEmoteById("574532942437810177")).queue();
+				    }, 200, TimeUnit.MILLISECONDS);
+					ScheduledFuture<?> scheduledFuture3 = executorService.schedule(() -> {
+						msg.addReaction("❗").queue();
+				    }, 300, TimeUnit.MILLISECONDS);
+					
 				} catch (NumberFormatException e1) {
 					
 					Member sm = e.getGuild().getMemberById(obj.getString("desc").toString().split("\n")[6].replace("> Reporter ID: `", "").replace("`", ""));
@@ -424,18 +424,6 @@ public class Vote extends ListenerAdapter {
 						eb.setAuthor("Submitted by "+sm.getUser().getName()+"#"+sm.getUser().getDiscriminator(), link, sm.getUser().getEffectiveAvatarUrl());
 					}
 					Message msg = e.getChannel().sendMessage(eb.build()).complete();
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e3) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e3) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
 					msg.addReaction("❗").queue();
 					
 				}

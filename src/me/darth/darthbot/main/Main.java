@@ -3,6 +3,12 @@ package me.darth.darthbot.main;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import org.discordbots.api.client.DiscordBotListAPI;
 
 import me.darth.darthbot.commands.*;
 import me.darth.darthbot.db.*;
@@ -24,7 +30,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 
 public class Main {
-	
+
 	//public static JDA jda = null;
 	public static ShardManager sm = null;
 	public static int updatedmin = -1;
@@ -33,6 +39,7 @@ public class Main {
 	
 	public static final boolean economyEnabled = true;
 	
+	public static DiscordBotListAPI api = null;
 	
 	public static void main(String[] args) throws Exception {
 		DefaultShardManagerBuilder builder = new DefaultShardManagerBuilder(key);
@@ -99,10 +106,14 @@ public class Main {
 			sm.setPresence(OnlineStatus.DO_NOT_DISTURB, Game.playing("[BETA] !commands"));
 		} else {
 			sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
+			api = new DiscordBotListAPI.Builder()
+					.token("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU2OTQ2MTQ2OTE1NDkwMjAxNiIsImJvdCI6dHJ1ZSwiaWF0IjoxNTY0OTMzOTE1fQ.BKr0ZuMXAGtNezNfTaDfuiugWsWVLfPKdSNStYF9uIw")
+					.botId("569461469154902016")
+					.build();
 		}
-		Thread.sleep(5000);
 		while (true) {
 			try {
+				Thread.sleep(5000);
 				if (key.contains("NTY")) {
 					int min = Calendar.getInstance().get(Calendar.MINUTE);
 					if (min != updatedmin) {
@@ -112,7 +123,7 @@ public class Main {
 						if (min % 5 == 0 || updatedmin == -1) {
 							me.darth.darthbot.main.Leaderboards.GlobalLeaderboard();
 							me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
-							me.darth.darthbot.main.Leaderboards.Retali8Leaderboard();
+							api.setStats(sm.getGuilds().size());
 						}
 						if (min == 0 || updatedmin == -1) {
 							//me.darth.darthbot.commands.Vote.listSort();
@@ -122,7 +133,6 @@ public class Main {
 						}
 						updatedmin = min;
 					}
-					Thread.sleep(5000);
 				} else {
 					break;
 				}
@@ -197,6 +207,12 @@ public class Main {
 		return eb;
 	}
 	
-	
+	/*
+	ScheduledExecutorService executorService
+						      = Executors.newSingleThreadScheduledExecutor();
+							ScheduledFuture<?> scheduledFuture = executorService.schedule(() -> {
+								//
+						    }, 1, TimeUnit.SECONDS);
+	 */
 	
 }

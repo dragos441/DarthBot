@@ -19,7 +19,11 @@ public class Shard extends ListenerAdapter {
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		ShardManager sm = me.darth.darthbot.main.Main.sm;
 		if (args[0].equalsIgnoreCase("!shard")) {
-			e.getChannel().sendMessage("Running on Shard "+sm.getShardsRunning()+" / "+sm.getShardsTotal()+"\nAverage Global Ping: `"+sm.getAveragePing()+"`").queue();
+			for (int x = 0 ; x < sm.getShardsTotal() ; x++) {
+				if (sm.getShardById(x).getGuildById(e.getGuild().getId()) != null) {
+					e.getChannel().sendMessage("Running on Shard "+x+" / "+sm.getShardsTotal()+"\nAverage Global Ping: `"+sm.getAveragePing()+"`").queue();
+				}
+			}
 		}
 		
 		if (args[0].equalsIgnoreCase("!reboot") || args[0].equalsIgnoreCase("!restart")) {

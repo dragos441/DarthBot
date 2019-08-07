@@ -36,6 +36,7 @@ public class MusicManager {
 	public void loadTrack(final TextChannel channel, final String source, String iconURl, Guild g){
 		EmbedBuilder eb = new EmbedBuilder().setAuthor("Music", null, iconURl).setColor(Color.red);
 		eb.setDescription("Joining Channel & Configuring").setFooter("This may take a moment if you're loading a Playlist", null);
+		System.out.print(source);
 		eb.setFooter(null, null);
 		MusicPlayer player = getPlayer(channel.getGuild());
 		channel.getGuild().getAudioManager().setSendingHandler(player.getAudioHandler());
@@ -56,7 +57,7 @@ public class MusicManager {
 					eb.setDescription(":no_entry: Error! Track is longer than an hour!");
 				} else {
 					player.playTrack(track, g);
-					eb.setDescription("Added track **"+track.getInfo().title+"** to the queue! `"+(m < 10 ? "0" : ""+m)+":"+(s < 10 ? "0" : ""+s)+"`");
+					eb.setDescription("Added track **"+track.getInfo().title+"** to the queue! `"+m+":"+s+"`");
 				}
 				msg.editMessage(eb.build()).queue();
 			}
@@ -95,6 +96,7 @@ public class MusicManager {
 			@Override
 			public void loadFailed(FriendlyException exception) {
 				eb.setDescription("Unable to play the track: (" + exception.getMessage()+")");
+				exception.printStackTrace();
 				msg.editMessage(eb.build()).queue();
 				return;
 			}
