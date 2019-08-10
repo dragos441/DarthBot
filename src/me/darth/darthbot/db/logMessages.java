@@ -20,8 +20,7 @@ public class logMessages extends ListenerAdapter {
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
 		try {
-			if (e.getMessage().getContentRaw() != null && e.getMessage().getContentRaw() != "" && !e.getAuthor().isBot() 
-					&& e.getMessage().getContentRaw().toCharArray()[0] != '!') { 
+			if (e.getMessage().getContentRaw() != null && e.getMessage().getContentRaw() != "" && !e.getAuthor().isBot()) { 
 				try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 					String query1 = " INSERT INTO messageLog (GuildID, Timestamp, MessageID, AuthorID, ChannelID, Content)"
 					        + " values (?, ?, ?, ?, ?, ?)";

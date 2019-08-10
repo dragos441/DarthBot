@@ -13,6 +13,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class RandomEarn extends ListenerAdapter {
@@ -88,7 +89,9 @@ public class RandomEarn extends ListenerAdapter {
 			}
 			
 			if (!e.getGuild().getId().equals("575023671014588416")) {
-				e.getChannel().sendMessage(eb.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
+				try {
+					e.getChannel().sendMessage(eb.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
+				} catch (InsufficientPermissionException e1) {}
 			}
 		}
 		

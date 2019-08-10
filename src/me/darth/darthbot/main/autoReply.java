@@ -1,6 +1,19 @@
 package me.darth.darthbot.main;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
@@ -32,15 +45,15 @@ public class autoReply extends ListenerAdapter {
 			}
 		}
 	}
-	
+	//C:/Users/user/Downloads/file.jpg
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
          if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
 			return;
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
-		if (e.getChannel().getId().equals("604018500272390193")) {
-			e.getMessage().addReaction("✅").queue();
+		if (args[0].equalsIgnoreCase("!invite")) {
+			e.getChannel().sendMessage("Interested in having me on your server? I'd love to be there! - Use this link to add me - \nhttps://discordapp.com/api/oauth2/authorize?client_id=569461469154902016&permissions=8&scope=bot").queue();
 		}
 		if (e.getAuthor().getId().equals("159770472567799808") && e.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!say")
 				|| e.getAuthor().getId().equals("328581145190989825") && e.getMessage().getContentRaw().split(" ")[0].equalsIgnoreCase("!say")) {

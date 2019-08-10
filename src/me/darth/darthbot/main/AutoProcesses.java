@@ -40,6 +40,14 @@ public class AutoProcesses {
 		}	
 	}
 	
+	public static void reduceCaptchaChance() {
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+			con.prepareStatement("UPDATE profiles SET CaptchaChance = CaptchaChance - 0.1 WHERE CaptchaChance > 0").execute();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}	
+	}
+	
 	public static void removePunishments() {
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 		      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM ModHistory WHERE Active = 1 AND Expires <= "+Calendar.getInstance().getTimeInMillis());

@@ -14,6 +14,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.core.exceptions.HierarchyException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class LevelRoles extends ListenerAdapter {
@@ -119,7 +120,11 @@ public class LevelRoles extends ListenerAdapter {
 						rs = con.createStatement().executeQuery("SELECT * FROM GuildProfiles WHERE GuildID = "+e.getGuild().getIdLong()+" AND UserID = "+members.get(x).getUser().getIdLong());
 						while (rs.next()) {
 							if (rs.getInt("Level") >= level) {
-								e.getGuild().getController().addSingleRoleToMember(members.get(x), role).queue();
+								try {
+									e.getGuild().getController().addSingleRoleToMember(members.get(x), role).queue();
+								} catch (HierarchyException e1) {
+									e.getChannel().sendMessage(":no_entry: The DarthBot role must be above level roles in the Role List!").queue();
+								}
 							}
 						}
 					}

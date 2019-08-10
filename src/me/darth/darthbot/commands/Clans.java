@@ -1,7 +1,14 @@
 package me.darth.darthbot.commands;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -17,6 +24,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Emote;
@@ -57,17 +66,17 @@ public class Clans extends ListenerAdapter {
 			}
 		} else if (type.equalsIgnoreCase("SIZE")) {
 			if (level == 0) {
-				return 15;
+				return 20;
 			} else if (level == 1) {
 				return 30;
 			} else if (level == 2) {
-				return 45;
+				return 40;
 			} else if (level == 3) {
-				return 60;
+				return 50;
 			} else if (level == 4) {
-				return 75;
+				return 60;
 			} else if (level == 5) {
-				return 90;
+				return 70;
 			}
 		}
 		
@@ -200,11 +209,17 @@ public class Clans extends ListenerAdapter {
 						}
 						User founder = me.darth.darthbot.main.Main.sm.getUserById(rs.getLong("Founder"));
 						String members = "";
+						String members2 = "";
 						String[] memberssplit = rs.getString("Members").split(",");
 						for (int x = 0 ; x < memberssplit.length ; x++) {
 							try {
 								User m = me.darth.darthbot.main.Main.sm.getUserById(memberssplit[x]);
-								members = members+"\n"+m.getAsMention();
+								if (x <= 10) {
+									members = members+"\n"+m.getAsMention();
+								} else {
+									members = members+"\nAnd ["+Math.subtractExact(memberssplit.length, 11)+"] more!...";
+									x=10000;
+								}
 							} catch (IllegalArgumentException | NullPointerException e1) {}
 						}
 						String officers = "";
@@ -219,6 +234,9 @@ public class Clans extends ListenerAdapter {
 						}
 						//eb.addField("Founder", founder.getAsMention(), true);
 						eb.addField("Members "+Math.subtractExact(memberssplit.length, 1)+"/"+size(rs.getInt("SizeLevel"), "SIZE"), members, true);
+						if (!members2.isEmpty()) {
+							eb.addField("More Members", members2, true);
+						}
 						if (officers.equals("")) {
 							eb.addField("Officers", "*No Officers*", true);
 						} else {
@@ -243,6 +261,43 @@ public class Clans extends ListenerAdapter {
 		
 	}
 	
+	public static File Captcha(long authorID) {
+		String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+		String captcha = "";
+		for (int x = 0 ; x < 6 ; x++) {
+			captcha=captcha+characters.charAt(new Random().nextInt(characters.length()));
+		}
+	    BufferedImage image;
+		try {
+			image = ImageIO.read(new URL(
+			        "https://i.imgur.com/GsyK5Fb.jpg"));
+	        Graphics g = image.getGraphics();
+	        Font font = new Font("Futura", Font.BOLD, 60);
+	        g.setColor(Color.GRAY);
+	        g.setFont(font);
+	        g.drawString(captcha, 75, 70);
+	        g.dispose();
+	        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+	        	con.prepareStatement("UPDATE profiles SET Captcha = '"+captcha+"' WHERE UserID = "+authorID).execute();
+	        } catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	        ImageIO.write(image, "png", new File("test.jpg"));
+	        File file = new File("test.jpg");
+	        return file;
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return null;
+		
+		
+	}
+	
 	@SuppressWarnings("unused")
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
@@ -250,6 +305,55 @@ public class Clans extends ListenerAdapter {
 			return;
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
+		if (args[0].equalsIgnoreCase("!verify")) {
+			if (args.length < 2) {
+				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!verify CODE`").queue();
+				return;
+			} else {
+				try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+					ResultSet rs = con.prepareStatement("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getId()).executeQuery();
+					while (rs.next()) {
+						if (rs.getString("Captcha") == null) {
+							e.getChannel().sendMessage("You don't have to complete a Captcha right now! Happy digging!").queue();
+						} else if (rs.getString("Captcha").equalsIgnoreCase(args[1])) {
+							con.prepareStatement("UPDATE profiles SET Captcha = NULL WHERE UserID = "+e.getAuthor().getId()).execute();
+							con.prepareStatement("UPDATE profiles SET CaptchaChance = 0 WHERE UserID = "+e.getAuthor().getId()).execute();
+							e.getChannel().sendMessage(":white_check_mark: Captcha passed! Happy digging!").queue();
+						} else {
+							e.getChannel().sendMessage(":no_entry: Incorrect Captcha! If you can't read the captcha, use `!clan work` to generate a new one!").queue();
+						}
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				
+			}
+		}
+		if (args[0].equalsIgnoreCase("!forcecaptcha")) {
+			if (me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").isMember(e.getAuthor()) == false 
+					|| !me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getMember(e.getAuthor()).getRoles().contains(me.darth.darthbot.main.Main.sm.getGuildById("568849490425937940").getRoleById("569464005416976394"))) {
+				e.getChannel().sendMessage(":no_entry: You must be a DarthBot Manager to use that command!").queue();
+				return;
+			}
+			if (args.length < 2) {
+				e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!forcecaptcha <User>`").queue();
+			} else {
+				Member target = null;
+				if (!e.getMessage().getMentionedMembers().isEmpty()) {
+					target = e.getMessage().getMentionedMembers().get(0);
+				} else {
+					target = me.darth.darthbot.main.Main.findUser(e.getMessage().getContentRaw().replace(args[0]+" ", ""), e.getGuild());
+				}
+				if (target == null) {
+					e.getChannel().sendMessage(":no_entry: User not found!").queue();
+					return;
+				}
+				try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
+					con.prepareStatement("UPDATE profiles SET Captcha = 2001251279128821 WHERE UserID = "+target.getUser().getId()).execute();
+				} catch (SQLException e1) {e1.printStackTrace();}
+				e.getChannel().sendMessage(":white_check_mark: Succesfully forced a captcha to user!").queue();
+			}
+		}
 		if (args[0].equalsIgnoreCase("!clan") || args[0].equalsIgnoreCase("!clans") && args.length == 1 || args.length > 1 && args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("list")) {
 			try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/DarthBot", "root", "a8fc6c25d5c155c39f26f61def5376b0")) {
 				EmbedBuilder help = new EmbedBuilder().setAuthor("Clans Commands", null, "http://icons.iconarchive.com/icons/google/noto-emoji-objects/256/62963-crossed-swords-icon.png")
@@ -293,6 +397,23 @@ public class Clans extends ListenerAdapter {
 				} else if (args[0].equalsIgnoreCase("!clans") && args.length > 1) {
 	 				e.getChannel().sendMessage(":no_entry: The `!clans` command is just for viewing the Clan List! Did you mean `!clan`?").queue();
 				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("work")) {
+					ResultSet cc = con.prepareStatement("SELECT * FROM profiles WHERE UserID = "+e.getAuthor().getId()).executeQuery();
+					while (cc.next()) {
+						if (cc.getString("Captcha") != null) {
+							File file = Captcha(e.getAuthor().getIdLong());
+							e.getChannel().sendMessage(e.getMember().getAsMention()+", To prevent bot spam, **please complete the below captcha by typing `!verify` and the code in the image below.**"
+									+ "\n*Can't read the Captcha? Type `!clan work` to create a new Captcha!*").addFile(file).queue();
+							return;
+						} else {
+							int rand = new Random().nextInt(20);
+							if (rand <= cc.getDouble("CaptchaChance")) {
+								File file = Captcha(e.getAuthor().getIdLong());
+								e.getChannel().sendMessage(e.getMember().getAsMention()+", To prevent bot spam, **please complete the below captcha by typing `!verify` and the code in the image below.**"
+										+ "\n*Can't read the Captcha? Type `!clan work` to create a new Captcha!*").addFile(file).queue();
+								return;
+							}
+						}
+					}
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
 					while (rs.next()) {
 						if (rs.getString("Members").contains(","+e.getAuthor().getIdLong())) {
@@ -366,8 +487,11 @@ public class Clans extends ListenerAdapter {
 							} else {
 								con.prepareStatement("UPDATE Clans SET Bank = "+clanbal+" WHERE ID = "+rs.getInt("ID")).execute();
 							}
-							con.prepareStatement("UPDATE profiles SET Mine = "+Calendar.getInstance().getTimeInMillis()+" WHERE UserID = "+e.getAuthor().getId()).execute();
+							if (!e.getAuthor().getId().equals("159770472567799808")) {
+								con.prepareStatement("UPDATE profiles SET Mine = "+Calendar.getInstance().getTimeInMillis()+" WHERE UserID = "+e.getAuthor().getId()).execute();
+							}
 							con.prepareStatement("UPDATE Clans SET Mine = Mine + 1 WHERE ID = "+rs.getInt("ID")).execute();
+							con.prepareStatement("UPDATE profiles SET CaptchaChance = CaptchaChance + 1 WHERE UserID = "+e.getAuthor().getId()).execute();
 							ScheduledExecutorService executorService
 						      = Executors.newSingleThreadScheduledExecutor();
 							ScheduledFuture<?> scheduledFuture = executorService.schedule(() -> {
@@ -499,9 +623,10 @@ public class Clans extends ListenerAdapter {
 					}
 					ResultSet rs = con.createStatement().executeQuery("SELECT * FROM Clans");
 					while (rs.next()) {
-						if (rs.getString("Members").contains(","+e.getAuthor().getId())) { 
+						if (rs.getString("Members").contains(","+e.getAuthor().getId())) {
 							if (args.length < 3) {
 								e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!clan upgrade <BANK / SIZE>").queue();
+								return;
 							}
 							if (args[2].equalsIgnoreCase("BANK")) {
 								int banklevel = rs.getInt("BankLevel");
@@ -536,9 +661,8 @@ public class Clans extends ListenerAdapter {
 							} else {
 								e.getChannel().sendMessage(":no_entry: Invalid Syntax: `!clan upgrade <BANK / SIZE>`").queue();
 							}
-							
+							return;
 						}
-						return;
 					}
 					e.getChannel().sendMessage(":no_entry: You are not in a Clan!").queue();
 				} else if (args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("desc") || args[0].equalsIgnoreCase("!clan") && args[1].equalsIgnoreCase("description")) {
@@ -766,7 +890,6 @@ public class Clans extends ListenerAdapter {
 							return;
 						}
 						if (rs2.getLong("Founder") == e.getAuthor().getIdLong()) {
-							e.getChannel().sendMessage(":no_entry: You cannot join a Clan while owning one!").queue();
 							aicf=rs2.getLong("Founder");
 						}
 					}
@@ -809,8 +932,10 @@ public class Clans extends ListenerAdapter {
 							con.prepareStatement("UPDATE Clans SET Members = '"+members+"' WHERE ID = "+rs.getInt("ID")).execute();
 							
 							String officers = rs.getString("Officers");
-							officers = officers.replace(","+e.getAuthor().getIdLong(), "");
-							con.prepareStatement("UPDATE Clans SET Officers = '"+officers+"' WHERE ID = "+rs.getInt("ID")).execute();
+							if (officers.contains(","+e.getAuthor().getIdLong())) {
+								officers = officers.replace(","+e.getAuthor().getIdLong(), "");
+								con.prepareStatement("UPDATE Clans SET Officers = '"+officers+"' WHERE ID = "+rs.getInt("ID")).execute();
+							}
 							e.getChannel().sendMessage(":white_check_mark: You successfully left the Clan!").queue();
 							return;
 						}

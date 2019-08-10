@@ -34,8 +34,8 @@ public class Main {
 	//public static JDA jda = null;
 	public static ShardManager sm = null;
 	public static int updatedmin = -1;
-	//private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
-	private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
+	private static final String key = "NTY5NDYxNDY5MTU0OTAyMDE2.XLxG0w.U0xyCNtGEBRXMBOBAutkh_Jzgi8"; //Public Bot
+	//private static final String key = "NTc5NjQ3OTM5MTUyOTY5NzQ5.XOkv7g.Ln__EfJmO3jb-3VlpnWhI__MMlk"; //Dev Bot
 	
 	public static final boolean economyEnabled = true;
 	
@@ -100,8 +100,8 @@ public class Main {
 		builder.addEventListeners(new Clans());
 		builder.addEventListeners(new Debug());
 		//builder.addEventListeners(new Project_Natter());
+		me.darth.darthbot.main.AutoProcesses.reduceCaptchaChance();
 		sm = builder.build();
-		me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
 		if (key.contains("NTc")) {
 			sm.setPresence(OnlineStatus.DO_NOT_DISTURB, Game.playing("[BETA] !commands"));
 		} else {
@@ -113,24 +113,25 @@ public class Main {
 		}
 		while (true) {
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(6000);
 				if (key.contains("NTY")) {
 					int min = Calendar.getInstance().get(Calendar.MINUTE);
 					if (min != updatedmin) {
 						me.darth.darthbot.main.AutoProcesses.removePunishments();
-						sm.getVoiceChannelById("585917931586584586").getManager().setName("Supporting "+new DecimalFormat("#,###").format(sm.getGuilds().size())+" Servers").queue();
-						sm.getVoiceChannelById("585918083168731146").getManager().setName("Serving "+new DecimalFormat("#,###").format(sm.getUsers().size())+" Users").queue();
-						if (min % 5 == 0 || updatedmin == -1) {
+						me.darth.darthbot.main.AutoProcesses.reduceCaptchaChance();
+						if (min % 5 == 0) {
 							me.darth.darthbot.main.Leaderboards.GlobalLeaderboard();
 							me.darth.darthbot.main.AutoProcesses.chatLeaderboards();
 							api.setStats(sm.getGuilds().size());
 						}
-						if (min == 0 || updatedmin == -1) {
+						if (min == 0) {
 							//me.darth.darthbot.commands.Vote.listSort();
 							me.darth.darthbot.main.AutoProcesses.purgeMessages();
 							me.darth.darthbot.main.AutoProcesses.leaveChannels(sm.getGuilds());
 							sm.setPresence(OnlineStatus.ONLINE, Game.playing("[BETA] !commands"));
 						}
+						sm.getVoiceChannelById("585917931586584586").getManager().setName("Supporting "+new DecimalFormat("#,###").format(sm.getGuilds().size())+" Servers").queue();
+						sm.getVoiceChannelById("585918083168731146").getManager().setName("Serving "+new DecimalFormat("#,###").format(sm.getUsers().size())+" Users").queue();
 						updatedmin = min;
 					}
 				} else {

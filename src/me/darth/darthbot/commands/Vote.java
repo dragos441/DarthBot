@@ -257,7 +257,7 @@ public class Vote extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-        if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake()) {
+        if (e.getAuthor().isBot() && !e.getAuthor().equals(e.getJDA().getSelfUser())|| e.getAuthor().isFake() || !e.getGuild().getId().equals("568849490425937940")) {
 			return;
 		}
 		String[] args = e.getMessage().getContentRaw().split(" ");
@@ -448,6 +448,9 @@ public class Vote extends ListenerAdapter {
 	
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent e) {
+		if (!e.getGuild().getId().equals("568849490425937940")) {
+			return;
+		}
 		if (!e.getUser().isBot() && e.getChannel().getId().equals("591749394517458944") && e.getReaction().getReactionEmote().getName().equals("⛔")) {
 			e.getChannel().getMessageById(e.getMessageId()).complete().delete().queue();
 		}
